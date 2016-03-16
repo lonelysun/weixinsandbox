@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data noupdate="1">
+        <record id="cl100000" model="tl.wxcard.color">
+            <field name="rgb">#63b359</field>
+            <field name="name">Color010</field>
+        </record>
+        <record id="cl100001" model="tl.wxcard.color">
+            <field name="rgb">#2c9f67</field>
+            <field name="name">Color020</field>
+        </record>
+        <record id="cl100003" model="tl.wxcard.color">
+            <field name="rgb">#509fc9</field>
+            <field name="name">Color030</field>
+        </record>
+        <record id="cl100004" model="tl.wxcard.color">
+            <field name="rgb">#5885cf</field>
+            <field name="name">Color040</field>
+        </record>
+        <record id="cl100005" model="tl.wxcard.color">
+            <field name="rgb">#9062c0</field>
+            <field name="name">Color050</field>
+        </record>
+        <record id="cl100006" model="tl.wxcard.color">
+            <field name="rgb">#d09a45</field>
+            <field name="name">Color060</field>
+        </record>
+        <record id="cl100007" model="tl.wxcard.color">
+            <field name="rgb">#e4b138</field>
+            <field name="name">Color070</field>
+        </record>
+        <record id="cl100008" model="tl.wxcard.color">
+            <field name="rgb">#ee903c</field>
+            <field name="name">Color080</field>
+        </record>
+        <record id="cl100081" model="tl.wxcard.color">
+            <field name="rgb">#f08500</field>
+            <field name="name">Color081</field>
+        </record>
+        <record id="cl100082" model="tl.wxcard.color">
+            <field name="rgb">#a9d92d</field>
+            <field name="name">Color082</field>
+        </record>
+        <record id="cl100009" model="tl.wxcard.color">
+            <field name="rgb">#dd6549</field>
+            <field name="name">Color090</field>
+        </record>
+        <record id="cl100010" model="tl.wxcard.color">
+            <field name="rgb">#cc463d</field>
+            <field name="name">Color100</field>
+        </record>
+        <record id="cl100101" model="tl.wxcard.color">
+            <field name="rgb">#cf3e36</field>
+            <field name="name">Color101</field>
+        </record>
+        <record id="cl100102" model="tl.wxcard.color">
+            <field name="rgb">#5E6671</field>
+            <field name="name">Color102</field>
+        </record>
+    </data>
+</openerp>

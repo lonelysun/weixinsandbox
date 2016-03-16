@@ -1,0 +1,533 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <menuitem name="微信" id="menu_tl_weixin_root" sequence="1"/>
+        <menuitem name="设置" id="menu_tl_weixin_setting_root" parent="menu_tl_weixin_root" sequence="10"/>
+        <menuitem name="门店" id="menu_tl_weixin_poi_root" parent="menu_tl_weixin_root" sequence="2"/>
+        <menuitem name="关注者" id="menu_tl_weixin_users_root" parent="menu_tl_weixin_root" sequence="1"/>
+        <menuitem name="红包" id="menu_tl_weixin_redpack_root" parent="menu_tl_weixin_root" sequence="3"/>
+
+        <record id="view_tl_weixin_app_form" model="ir.ui.view">
+            <field name="name">微信配置表单</field>
+            <field name="model">tl.weixin.app</field>
+            <field name="arch" type="xml">
+                <form string="微信配置表单">
+                    <sheet>
+
+                        <div class="oe_button_box" name="button_box">
+                            <button name="test_weixin_app" string="测试连接" type="object" class="oe_inline oe_stat_button"
+                                    icon="fa-refresh"/>
+                            <button name="sync_weixin_page" string="同步页面" type="object" class="oe_inline oe_stat_button"
+                                    icon="fa-strikethrough"/>
+                            <button name="sync_followers" string="同步关注者" type="object" class="oe_inline oe_stat_button"
+                                    icon="fa-strikethrough"/>
+                            <button name="sync_weixin_devices" string="同步设备" type="object"
+                                    class="oe_inline oe_stat_button" icon="fa-strikethrough"/>
+                            <button name="sync_device_group" string="同步设备分组" type="object"
+                                    class="oe_inline oe_stat_button" icon="fa-strikethrough"/>
+                            <button name="sync_weixin_poi" string="同步门店" type="object" class="oe_inline oe_stat_button"
+                                    icon="fa-strikethrough"/>
+                            <button name="sync_weixin_card" string="同步卡券" type="object" class="oe_inline oe_stat_button"
+                                    icon="fa-strikethrough"/>
+                            <button name="sync_weixin_template" string="同步模板" type="object" class="oe_inline oe_stat_button"
+                                    icon="fa-strikethrough"/>
+                            <button name="sync_weixin_users_groups" string="同步分组" type="object" class="oe_inline oe_stat_button"
+                                    icon="fa-strikethrough"/>
+
+                        </div>
+                        <field name="image" widget='image' class="oe_avatar"/>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name" required="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <!--<field name="shop_id" options="{'no_create': True,'no_open':True}"/>  -->
+                                <field name="appid"/>
+                                <field name="appsecret"/>
+                                <field name="access_token" style="width:90%%"/>
+                                <field name="date_token"/>
+                                <field name="token_expires_at"/>
+                                <field name="jsapi_ticket"/>
+                                <field name="jsapi_ticket_date"/>
+                                <field name="jsapi_ticket_expires_at"/>
+                                <field name="mch_id"/>
+                                <field name="security_key"/>
+                                <field name="primary_industry" options="{'no_create': True,'no_open':True}"/>
+                                <field name="secondary_industry" options="{'no_create': True,'no_open':True}"/>
+                            </group>
+                            <group>
+                            </group>
+                        </group>
+
+
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_tl_weixin_app_tree" model="ir.ui.view">
+            <field name="name">微信配置</field>
+            <field name="model">tl.weixin.app</field>
+            <field name="priority">1</field>
+            <field name="arch" type="xml">
+                <tree string="List Tree">
+                    <field name="name"/>
+                    <field name="appid"/>
+                    <field name="appsecret"/>
+                    <field name="date_token"/>
+                    <field name="write_date" string="更新日期"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_tl_weixin_app" model="ir.actions.act_window">
+            <field name="name">微信配置</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">tl.weixin.app</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_tl_weixin_app_tree"/>
+            <field name="help">创建微信配置</field>
+        </record>
+
+        <record id="view_tl_weixin_users_form" model="ir.ui.view">
+            <field name="name">微信关注者表单</field>
+            <field name="model">tl.weixin.users</field>
+            <field name="arch" type="xml">
+                <form string="微信关注者表单" create="false">
+                    <header>
+                    </header>
+
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+
+                            <button name="user_getcardlist" string="获取卡券" type="object" class="oe_inline oe_stat_button"
+                                    icon="fa-refresh"/>
+                        </div>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name" required="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="openid"/>
+                                <field name="group_id" options="{'no_create': True,'no_open':True}"/>
+                                <field name="subscribe"/>
+                                <field name="subscribe_time"/>
+                                <field name="phone"/>
+                                <field name="sex"/>
+                                <field name="realname"/>
+                            </group>
+                            <group>
+                                <!--<field name="shop_id"/>-->
+                                <field name="country"/>
+                                <field name="province"/>
+                                <field name="city"/>
+                            </group>
+                        </group>
+
+                        <notebook>
+                            <page string="卡券" name="wxcard">
+                                <!--<field name="wxcard_ids"></field>-->
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_tl_weixin_users_tree" model="ir.ui.view">
+            <field name="name">微信关注者</field>
+            <field name="model">tl.weixin.users</field>
+            <field name="priority">1</field>
+            <field name="arch" type="xml">
+                <tree string="List Tree" create="false" delete="false">
+                    <field name="name"/>
+                    <field name="subscribe_time"/>
+                    <field name="province"/>
+                    <field name="city"/>
+                    <field name="subscribe"/>
+                    <field name="group_id"/>
+                    <!--<field name="shop_id"/>-->
+                    <field name="write_date" string="更新时间"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_tl_weixin_users" model="ir.actions.act_window">
+            <field name="name">微信关注者</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">tl.weixin.users</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_tl_weixin_users_tree"/>
+            <field name="help">创建微信关注者</field>
+        </record>
+
+        <record id="view_tl_weixin_poi_form" model="ir.ui.view">
+            <field name="name">微信门店表单</field>
+            <field name="model">tl.weixin.poi</field>
+            <field name="arch" type="xml">
+                <form string="微信门店表单">
+                    <header>
+
+                        <field name="state" widget="statusbar" statusbar_visible="draft,unapproved,succ,fail"/>
+                    </header>
+                    <sheet>'
+                        <div class="oe_button_box" name="button_box">
+                            <button name="draft_to_unapproved" states="draft" string="提交审核" type="object"
+                                    class="oe_stat_button" icon="fa-pencil-square-o"/>
+                            <button name="sync_poi_status" states="unapproved,succ" string="同步更新" type="object"
+                                    class="oe_inline oe_stat_button" icon="fa-strikethrough"/>
+                        </div>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name" required="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+
+                                <!--<field name="shop_id"/>-->
+                                <field name="app_id" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="branch_name" attrs="{'readonly':[('state','!=','draft')]}"
+                                       placeholder="不应包含地区信息，不应与门店名有重复"/>
+                                <field name="telephone" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="id" invisible="1"/>
+                                <field name="poi_id" attrs="{'invisible':[('poi_id','=',False)]}"/>
+                                <field name="update_status"/>
+                            </group>
+                            <group>
+                            </group>
+                        </group>
+
+                        <notebook colspan="4">
+                            <page string="基本信息">
+                                <group>
+                                    <group>
+                                        <label for="street" string="地址信息"/>
+                                        <div>
+                                            <div class="address_format">
+                                                <field attrs="{'readonly':[('state','!=','draft')],'required':[('id','=',False)]}"
+                                                       name="country_id" invisible="1" placeholder="国家"
+                                                       options='{"no_open": True}' style="width: 40%%"
+                                                       class="oe_no_button"/>
+                                                <field attrs="{'readonly':[('state','!=','draft')],'required':[('id','=',False)]}"
+                                                       name="state_id" domain="[('country_id','=',country_id)]"
+                                                       placeholder="省" style="width: 60%%"
+                                                       options="{'no_create': True,'no_open':True}"/>
+                                            </div>
+                                            <div class="address_format">
+                                                <field attrs="{'readonly':[('state','!=','draft')],'required':[('id','=',False)]}"
+                                                       name="city_id" placeholder="市" style="width: 35%%"
+                                                       domain="[('country_id','=',state_id)]"
+                                                       options="{'no_create': True,'no_open':True}"/>
+                                                <field attrs="{'readonly':[('state','!=','draft')],'required':[('id','=',False)]}"
+                                                       name="district_id" placeholder="县" style="width: 41%%"
+                                                       domain="[('country_id','=',city_id)]"
+                                                       options="{'no_create': True,'no_open':True}"/>
+                                            </div>
+                                            <field placeholder="门店所在的详细街道地址 "
+                                                   attrs="{'readonly':[('state','!=','draft')],'required':[('id','=',False)]}"
+                                                   name="address"/>
+                                        </div>
+                                        <label for="business_id" string="类目"/>
+                                        <div>
+                                            <div class="address_format">
+                                                <!--<field attrs="{'readonly':[('state','!=','draft')]}" name="business_id"-->
+                                                       <!--style="width: 50%%"-->
+                                                       <!--options="{'no_create': True,'on_open': True}"/>-->
+                                                <!--<field attrs="{'readonly':[('state','!=','draft')],'invisible':[('business_id','=',False)]}"-->
+                                                       <!--name="sub_business_id" style="width: 35%%"-->
+                                                       <!--domain="[('parent_id','=',business_id)]"-->
+                                                       <!--options="{'no_create': True,'no_open':True}"/>-->
+                                            </div>
+                                        </div>
+                                    </group>
+                                    <group>
+                                        <field name="longitude" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                        <field name="latitude" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                    </group>
+                                </group>
+
+                                <div style="padding:5px 0px;">
+                                    <p style="color:red;">*点击”提交审核“后门店信息将提交到微信，微信规定基本信息提交后不可修改,服务信息可以修改，请确认无误再提交审核！</p>
+                                </div>
+                            </page>
+                            <page string="服务信息">
+                                <group>
+                                    <group>
+                                        <field name="open_time" placeholder="如 8:00-20:00"/>
+                                        <field name="avg_price"/>
+
+                                    </group>
+                                    <group></group>
+                                </group>
+                                <group>
+                                    <field name="special"/>
+                                    <field name="recommend"/>
+                                </group>
+                                <div>
+                                    <h2>
+                                        <label for="introduction" string="商户简介" class="oe_edit_only"/>
+                                    </h2>
+                                    <field name="introduction"/>
+                                </div>
+
+                            </page>
+
+                            <page string="图片信息">
+                                <field name="image_ids" colspan="4">
+                                    <tree string="Record lines">
+                                        <field name="name"/>
+                                        <field name="image" widget='image' class="oe_avatar"/>
+                                    </tree>
+                                    <form string="image_poi">
+                                        <group>
+                                            <group>
+                                                <field name="name"/>
+                                                <field name="image" widget='image' class="oe_avatar"/>
+                                            </group>
+                                        </group>
+                                    </form>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_tl_weixin_poi_tree" model="ir.ui.view">
+            <field name="name">微信门店</field>
+            <field name="model">tl.weixin.poi</field>
+            <field name="priority">1</field>
+            <field name="arch" type="xml">
+                <tree string="List Tree">
+                    <!--<field name="shop_id"/>-->
+                    <field name="app_id"/>
+                    <field name="name"/>
+                    <field name="contact_address"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_tl_weixin_poi" model="ir.actions.act_window">
+            <field name="name">微信门店</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">tl.weixin.poi</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_tl_weixin_poi_tree"/>
+            <field name="help">创建微信门店</field>
+        </record>
+
+        <record id="view_tl_weixin_material_form" model="ir.ui.view">
+            <field name="name">微信素材表单</field>
+            <field name="model">tl.weixin.material</field>
+            <field name="arch" type="xml">
+                <form string="微信素材表单">
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                        </div>
+
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name" required="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="media_id" attrs="{'invisible':[('media_id','=',0)]}"/>
+                                <!--<field name="shop_id"/>-->
+                                <field name="app_id"/>
+                                <field name="type"/>
+                                <field name="annex" widget="image" filename="file_name"
+                                       attrs="{'invisible':[('type','=','news')]}" class="oe_avatar"/>
+                                <field name="file_name" invisible="1"/>
+                            </group>
+                            <group>
+                                <field name="update_time" attrs="{'invisible':[('update_time','=',False)]}"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="url" style="width:60%%" attrs="{'invisible':[('url','=',False)]}"/>
+                        </group>
+                        <notebook colspan="4" attrs="{'invisible':[('type','!=','news')]}">
+                            <page string="多图文素材">
+                                <field name="article_ids" colspan="4">
+                                    <tree string="Record lines">
+                                        <field name="name"/>
+                                        <field name="author"/>
+                                        <field name="digest"/>
+                                    </tree>
+                                    <form string="article from">
+                                        <div class="oe_button_box" name="button_box">
+                                        </div>
+                                        <div class="oe_title">
+                                            <label for="name" class="oe_edit_only"/>
+                                            <h1>
+                                                <field name="name" required="1"/>
+                                            </h1>
+                                        </div>
+                                        <group>
+                                            <group>
+                                                <field name="author"/>
+                                                <field name="show_cover_pic"/>
+                                                <field name="thumb_media_id"/>
+                                            </group>
+                                            <group>
+                                            </group>
+                                        </group>
+                                        <group>
+                                            <field name="content_source_url" placeholder="图文消息的原文地址，即点击“阅读原文”后的URL"/>
+                                            <field name="digest" placeholder="图文消息的摘要，仅有单图文消息才有摘要，多图文此处为空"/>
+                                        </group>
+                                        <div>
+                                            <h2>
+                                                <label for="content" string="内容" class="oe_edit_only"/>
+                                            </h2>
+                                            <field name="content"
+                                                   placeholder="图文消息的具体内容，支持HTML标签，必须少于2万字符，小于1M，且此处会去除JS"/>
+                                        </div>
+                                    </form>
+                                </field>
+                            </page>
+                        </notebook>
+
+                        <group>
+                            <field name="introduction" attrs="{'required':[('type','=','video')]}"/>
+                        </group>
+
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_tl_weixin_material_tree" model="ir.ui.view">
+            <field name="name">微信素材</field>
+            <field name="model">tl.weixin.material</field>
+            <field name="priority">1</field>
+            <field name="arch" type="xml">
+                <tree string="List Tree">
+                    <field name="app_id"/>
+                    <field name="name"/>
+                    <field name="type"/>
+                    <field name="update_time" string="更新日期"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_tl_weixin_material" model="ir.actions.act_window">
+            <field name="name">微信素材</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">tl.weixin.material</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_tl_weixin_material_tree"/>
+
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    1、新增的永久素材也可以在公众平台官网素材管理模块中看到
+                </p>
+                <p>
+                    2、永久素材的数量是有上限的，请谨慎新增。图文消息素材和图片素材的上限为5000，其他类型为1000
+                </p>
+                <p>
+                    3、素材的格式大小等要求与公众平台官网一致。具体是，图片大小不超过2M，支持bmp/png/jpeg/jpg/gif格式，语音大小不超过5M，长度不超过60秒（公众平台官网可以在文章中插入小于30分钟的语音，但这些语音不能用于群发等场景，只能放在文章内，这方面接口暂不支持），支持mp3/wma/wav/amr格式
+                </p>
+                <p>
+                    4、素材的类型，图片（image）、视频（video）、语音 （voice）、图文（news）
+                </p>
+            </field>
+        </record>
+
+        <record id="view_tl_weixin_image_form" model="ir.ui.view">
+            <field name="name">微信图片表单</field>
+            <field name="model">tl.weixin.image</field>
+            <field name="arch" type="xml">
+                <form string="微信图片表单">
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                        </div>
+                        <field name="image" widget='image' class="oe_avatar"/>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name" required="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="app_id"/>
+                            </group>
+                            <group>
+                            </group>
+                        </group>
+                        <group>
+                            <field style="width:60%%" name="url" attrs="{'invisible':[('url','=',False)]}"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_tl_weixin_image_tree" model="ir.ui.view">
+            <field name="name">微信图片</field>
+            <field name="model">tl.weixin.image</field>
+            <field name="priority">1</field>
+            <field name="arch" type="xml">
+                <tree string="List Tree">
+                    <field name="name"/>
+                    <field name="app_id"/>
+                    <field name="create_date" string="日期"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_tl_weixin_image" model="ir.actions.act_window">
+            <field name="name">微信图片</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">tl.weixin.image</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+
+
+            <field name="view_id" ref="view_tl_weixin_image_tree"/>
+
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    1、上传公司LOGO图片和公司门店展示图片到微信
+                </p>
+                <p>
+                    2、大小限制1MB，LOGO推荐像素为300*300，支持JPG格式
+                </p>
+                <p>
+                    3、门店展示图片 建议像素为640*340px，大小限制1MB，支持JPG格式
+                    必须为上一接口生成的url。图片内容不允许与门店不相关，不允许为二维码、员工合照（或模特肖像）、营业执照、无门店正门的街景、地图截图、公交地铁站牌、菜单截图等
+                </p>
+            </field>
+        </record>
+
+
+        <menuitem name="微信门店" id="menu_tl_weixin_poi" action="action_tl_weixin_poi" parent="menu_tl_weixin_poi_root"
+                  sequence="2"/>
+        <menuitem name="微信配置" id="menu_tl_weixin_app" action="action_tl_weixin_app" parent="menu_tl_weixin_setting_root"
+                  sequence="1"/>
+        <menuitem name="关注者" id="menu_tl_weixin_users" action="action_tl_weixin_users"
+                  parent="menu_tl_weixin_users_root" sequence="2"/>
+        <menuitem name="素材" id="menu_tl_weixin_material" action="action_tl_weixin_material"
+                  parent="menu_tl_weixin_setting_root" sequence="2"/>
+        <menuitem name="图片" id="menu_tl_weixin_image" action="action_tl_weixin_image"
+                  parent="menu_tl_weixin_setting_root" sequence="3"/>
+
+    </data>
+</openerp>

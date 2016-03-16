@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+
+        <record id="seq_weixin_bill_no" model="ir.sequence">
+            <field name="name">Weixin Bill No</field>
+            <field name="code">weixin.bill.no</field>
+            <field name="company_id" eval="False"/>
+            <field name="prefix"></field>
+        </record>
+
+    </data>
+</openerp>

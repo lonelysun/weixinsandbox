@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data noupdate="1">
+        <!--一级行业-->
+        <record id="tlwx10001" model="tl.weixin.industry">
+            <field name="name">IT科技</field>
+            <field name="code">0</field>
+            <field name="parent_id" />
+        </record>
+
+        <record id="tlwx10002" model="tl.weixin.industry">
+            <field name="name">金融业</field>
+            <field name="code">0</field>
+            <field name="parent_id" />
+        </record>
+
+        <record id="tlwx10003" model="tl.weixin.industry">
+            <field name="name">餐饮</field>
+            <field name="code">0</field>
+            <field name="parent_id" />
+        </record>
+
+        <record id="tlwx10004" model="tl.weixin.industry">
+            <field name="name">酒店旅游</field>
+            <field name="code">0</field>
+            <field name="parent_id" />
+        </record>
+
+        <record id="tlwx10005" model="tl.weixin.industry">
+            <field name="name">运输与仓储</field>
+            <field name="code">0</field>
+            <field name="parent_id" />
+        </record>
+
+        <record id="tlwx10006" model="tl.weixin.industry">
+            <field name="name">教育</field>
+            <field name="code">0</field>
+            <field name="parent_id" />
+        </record>
+
+        <record id="tlwx10007" model="tl.weixin.industry">
+            <field name="name">政府与公共事业</field>
+            <field name="code">0</field>
+            <field name="parent_id" />
+        </record>
+
+        <record id="tlwx10008" model="tl.weixin.industry">
+            <field name="name">医药护理</field>
+            <field name="code">0</field>
+            <field name="parent_id" />
+        </record>
+
+        <record id="tlwx10009" model="tl.weixin.industry">
+            <field name="name">交通工具</field>
+            <field name="code">0</field>
+            <field name="parent_id" />
+        </record>
+
+        <record id="tlwx10010" model="tl.weixin.industry">
+            <field name="name">房地产</field>
+            <field name="code">0</field>
+            <field name="parent_id" />
+        </record>
+
+        <record id="tlwx10011" model="tl.weixin.industry">
+            <field name="name">消费品</field>
+            <field name="code">0</field>
+            <field name="parent_id" />
+        </record>
+
+        <record id="tlwx10012" model="tl.weixin.industry">
+            <field name="name">商业服务</field>
+            <field name="code">0</field>
+            <field name="parent_id" />
+        </record>
+
+        <record id="tlwx10013" model="tl.weixin.industry">
+            <field name="name">文体娱乐</field>
+            <field name="code">0</field>
+            <field name="parent_id" />
+        </record>
+
+        <record id="tlwx10014" model="tl.weixin.industry">
+            <field name="name">印刷</field>
+            <field name="code">0</field>
+            <field name="parent_id" />
+        </record>
+
+        <record id="tlwx10015" model="tl.weixin.industry">
+            <field name="name">其它</field>
+            <field name="code">0</field>
+            <field name="parent_id" />
+        </record>
+
+
+        <!--IT科技二级行业-->
+        <record id="tlwx20001" model="tl.weixin.industry">
+            <field name="name">互联网/电子商务</field>
+            <field name="code">1</field>
+            <field name="parent_id" ref="tlwx10001"/>
+        </record>
+        <record id="tlwx20003" model="tl.weixin.industry">
+            <field name="name">IT软件与服务</field>
+            <field name="code">2</field>
+            <field name="parent_id" ref="tlwx10001"/>
+        </record>
+        <record id="tlwx20004" model="tl.weixin.industry">
+            <field name="name">IT硬件与设备</field>
+            <field name="code">3</field>
+            <field name="parent_id" ref="tlwx10001"/>
+        </record>
+        <record id="tlwx20004" model="tl.weixin.industry">
+            <field name="name">电子技术</field>
+            <field name="code">4</field>
+            <field name="parent_id" ref="tlwx10001"/>
+        </record>
+        <record id="tlwx20005" model="tl.weixin.industry">
+            <field name="name">通信与运营商</field>
+            <field name="code">5</field>
+            <field name="parent_id" ref="tlwx10001"/>
+        </record>
+        <record id="tlwx20006" model="tl.weixin.industry">
+            <field name="name">网络游戏</field>
+            <field name="code">6</field>
+            <field name="parent_id" ref="tlwx10001"/>
+        </record>
+
+        <!--金融业二级行业-->
+        <record id="tlwx20007" model="tl.weixin.industry">
+            <field name="name">银行</field>
+            <field name="code">7</field>
+            <field name="parent_id" ref="tlwx10002"/>
+        </record>
+        <record id="tlwx20008" model="tl.weixin.industry">
+            <field name="name">基金|理财|信托</field>
+            <field name="code">2</field>
+            <field name="parent_id" ref="tlwx10002"/>
+        </record>
+        <record id="tlwx20009" model="tl.weixin.industry">
+            <field name="name">保险</field>
+            <field name="code">3</field>
+            <field name="parent_id" ref="tlwx10002"/>
+        </record>
+
+        <!--餐饮业二级行业-->
+        <record id="tlwx20010" model="tl.weixin.industry">
+            <field name="name">餐饮</field>
+            <field name="code">10</field>
+            <field name="parent_id" ref="tlwx10003"/>
+        </record>
+
+        <!--酒店旅游二级行业-->
+        <record id="tlwx20011" model="tl.weixin.industry">
+            <field name="name">酒店</field>
+            <field name="code">11</field>
+            <field name="parent_id" ref="tlwx10004"/>
+        </record>
+        <record id="tlwx20012" model="tl.weixin.industry">
+            <field name="name">旅游</field>
+            <field name="code">12</field>
+            <field name="parent_id" ref="tlwx10004"/>
+        </record>
+
+        <!--运输与仓储二级行业-->
+        <record id="tlwx20013" model="tl.weixin.industry">
+            <field name="name">快递</field>
+            <field name="code">13</field>
+            <field name="parent_id" ref="tlwx10005"/>
+        </record>
+        <record id="tlwx20014" model="tl.weixin.industry">
+            <field name="name">物流</field>
+            <field name="code">14</field>
+            <field name="parent_id" ref="tlwx10005"/>
+        </record>
+        <record id="tlwx20015" model="tl.weixin.industry">
+            <field name="name">仓储</field>
+            <field name="code">15</field>
+            <field name="parent_id" ref="tlwx10005"/>
+        </record>
+
+        <!--教育二级行业-->
+        <record id="tlwx20016" model="tl.weixin.industry">
+            <field name="name">培训</field>
+            <field name="code">16</field>
+            <field name="parent_id" ref="tlwx10006"/>
+        </record>
+        <record id="tlwx20017" model="tl.weixin.industry">
+            <field name="name">院校</field>
+            <field name="code">17</field>
+            <field name="parent_id" ref="tlwx10006"/>
+        </record>
+
+        <!--政府与公共事业二级行业-->
+        <record id="tlwx20018" model="tl.weixin.industry">
+            <field name="name">学术科研</field>
+            <field name="code">18</field>
+            <field name="parent_id" ref="tlwx10007"/>
+        </record>
+        <record id="tlwx20019" model="tl.weixin.industry">
+            <field name="name">交警</field>
+            <field name="code">19</field>
+            <field name="parent_id" ref="tlwx10007"/>
+        </record>
+        <record id="tlwx20020" model="tl.weixin.industry">
+            <field name="name">博物馆</field>
+            <field name="code">20</field>
+            <field name="parent_id" ref="tlwx10007"/>
+        </record>
+        <record id="tlwx20021" model="tl.weixin.industry">
+            <field name="name">公共事业|非盈利机构</field>
+            <field name="code">21</field>
+            <field name="parent_id" ref="tlwx10007"/>
+        </record>
+
+        <!--医药护理二级行业-->
+        <record id="tlwx20022" model="tl.weixin.industry">
+            <field name="name">医药医疗</field>
+            <field name="code">22</field>
+            <field name="parent_id" ref="tlwx10008"/>
+        </record>
+        <record id="tlwx20023" model="tl.weixin.industry">
+            <field name="name">护理美容</field>
+            <field name="code">23</field>
+            <field name="parent_id" ref="tlwx10008"/>
+        </record>
+        <record id="tlwx20024" model="tl.weixin.industry">
+            <field name="name">保健与卫生</field>
+            <field name="code">24</field>
+            <field name="parent_id" ref="tlwx10008"/>
+        </record>
+
+        <!--交通工具二级行业-->
+        <record id="tlwx20025" model="tl.weixin.industry">
+            <field name="name">汽车相关</field>
+            <field name="code">25</field>
+            <field name="parent_id" ref="tlwx10009"/>
+        </record>
+        <record id="tlwx20026" model="tl.weixin.industry">
+            <field name="name">摩托车相关</field>
+            <field name="code">26</field>
+            <field name="parent_id" ref="tlwx10009"/>
+        </record>
+        <record id="tlwx20027" model="tl.weixin.industry">
+            <field name="name">火车相关</field>
+            <field name="code">27</field>
+            <field name="parent_id" ref="tlwx10009"/>
+        </record>
+        <record id="tlwx20028" model="tl.weixin.industry">
+            <field name="name">飞机相关</field>
+            <field name="code">28</field>
+            <field name="parent_id" ref="tlwx10009"/>
+        </record>
+
+        <!--房地产二级目录-->
+        <record id="tlwx20029" model="tl.weixin.industry">
+            <field name="name">建筑</field>
+            <field name="code">29</field>
+            <field name="parent_id" ref="tlwx10010"/>
+        </record>
+        <record id="tlwx20030" model="tl.weixin.industry">
+            <field name="name">物业</field>
+            <field name="code">30</field>
+            <field name="parent_id" ref="tlwx10010"/>
+        </record>
+
+        <!--消费品二级目录-->
+        <record id="tlwx20031" model="tl.weixin.industry">
+            <field name="name">消费品</field>
+            <field name="code">31</field>
+            <field name="parent_id" ref="tlwx10011"/>
+        </record>
+
+        <!--商业服务二级行业-->
+        <record id="tlwx20032" model="tl.weixin.industry">
+            <field name="name">法律</field>
+            <field name="code">32</field>
+            <field name="parent_id" ref="tlwx10012"/>
+        </record>
+        <record id="tlwx20033" model="tl.weixin.industry">
+            <field name="name">会展</field>
+            <field name="code">33</field>
+            <field name="parent_id" ref="tlwx10012"/>
+        </record>
+        <record id="tlwx20034" model="tl.weixin.industry">
+            <field name="name">中介服务</field>
+            <field name="code">34</field>
+            <field name="parent_id" ref="tlwx10012"/>
+        </record>
+        <record id="tlwx20035" model="tl.weixin.industry">
+            <field name="name">认证</field>
+            <field name="code">35</field>
+            <field name="parent_id" ref="tlwx10012"/>
+        </record>
+        <record id="tlwx20036" model="tl.weixin.industry">
+            <field name="name">审计</field>
+            <field name="code">36</field>
+            <field name="parent_id" ref="tlwx10012"/>
+        </record>
+
+        <!--文体娱乐二级行业-->
+        <record id="tlwx20037" model="tl.weixin.industry">
+            <field name="name">传媒</field>
+            <field name="code">37</field>
+            <field name="parent_id" ref="tlwx10013"/>
+        </record>
+        <record id="tlwx20038" model="tl.weixin.industry">
+            <field name="name">体育</field>
+            <field name="code">38</field>
+            <field name="parent_id" ref="tlwx10013"/>
+        </record>
+        <record id="tlwx20039" model="tl.weixin.industry">
+            <field name="name">娱乐休闲</field>
+            <field name="code">39</field>
+            <field name="parent_id" ref="tlwx10013"/>
+        </record>
+
+        <!--印刷二级行业-->
+        <record id="tlwx20040" model="tl.weixin.industry">
+            <field name="name">印刷</field>
+            <field name="code">40</field>
+            <field name="parent_id" ref="tlwx10014"/>
+        </record>
+
+        <!--其它二级行业-->
+        <record id="tlwx20041" model="tl.weixin.industry">
+            <field name="name">其它</field>
+            <field name="code">41</field>
+            <field name="parent_id" ref="tlwx10015"/>
+        </record>
+
+    </data>
+</openerp>
