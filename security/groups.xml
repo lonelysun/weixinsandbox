@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<openerp>
+    <data noupdate="0">
+
+        <record model="ir.module.category" id="module_category_tl_weixin">
+            <field name="name">微信</field>
+            <field name="sequence">51</field>
+        </record>
+		<record id="tl_weixin.group_tl_weixin_user" model="res.groups">
+            <field name="name">用户</field>
+            <field name="category_id" ref="tl_weixin.module_category_tl_weixin"/>
+        </record>
+        <record id="tl_weixin.group_tl_weixin_manager" model="res.groups">
+            <field name="name">管理员</field>
+            <field name="category_id" ref="tl_weixin.module_category_tl_weixin"/>
+            <field name="implied_ids" eval="[(4, ref('tl_weixin.group_tl_weixin_user'))]"/>
+        </record>
+
+    </data>
+</openerp>

@@ -442,7 +442,6 @@ class Home(http.Controller):
         用户关注 关注新建，取消关注更新 记录到数据库
          """
         # 增加全局来控制 微信响应
-        print(redirect.event)
         event_id = redirect.source+str(redirect.time)
         if event_id in MsgId:
             return ''
