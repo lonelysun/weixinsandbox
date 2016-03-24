@@ -1407,7 +1407,7 @@ class tl_weixin_msg_history(models.Model):
                                  ('VIEW', u'点击菜单跳转链接时的事件推送'),
                                  ],
                                 u'消息类型', help=u"消息类型", required=True, )
-    msg_id = fields.Integer(u'消息id', size=128, help=u"消息id，64位整型")
+    msg_id = fields.Char(u'消息id', size=128, help=u"消息id，64位整型")
     content = fields.Text(u'文本消息内容', help=u"文本消息内容")
     pic_url = fields.Text(u'图片链接', help=u"图片链接")
     media_id = fields.Text(u'消息媒体id', help=u"消息媒体id，可以调用多媒体文件下载接口拉取数据。")
@@ -1416,6 +1416,7 @@ class tl_weixin_msg_history(models.Model):
 
     location_x = fields.Char(u'地理位置维度', size=255, help=u"地理位置维度", )
     location_y = fields.Char(u'地理位置经度', size=255, help=u"地理位置经度", )
+    precision = fields.Char(u'地理位置精度',size=255,help=u'地理位置精度')
     scale = fields.Char(u'地图缩放大小', size=255, help=u"地图缩放大小", )
     label = fields.Char(u'地理位置信息', help=u"地理位置信息", )
     title = fields.Char(u'消息标题', help=u"消息标题", )
@@ -1429,4 +1430,5 @@ class tl_weixin_msg_history(models.Model):
 
     msg_event_id = fields.Char(u'事件id',size=255 ,help=u"事件id，由FromUserName+CreateTime组成")
     xml_content = fields.Text(u'XML数据包原始内容',help=u"微信服务器POST的XML数据包")
+
 

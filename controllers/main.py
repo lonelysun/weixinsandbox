@@ -20,6 +20,7 @@ from ..tools.client import Client
 from openerp import http
 import base64
 import urllib2
+from WXBizMsgCrypt import WXBizMsgCrypt
 # from WXBizMsgCrypt import WXBizMsgCrypt
 
 _logger = logging.getLogger(__name__)
@@ -45,6 +46,8 @@ class Home(http.Controller):
             request.session.db = db
             self.obj_users = request.registry['tl.weixin.users']
             self.obj_account = request.registry['tl.weixin.app']
+            #历史消息
+            self.obj_message_history = request.registry['tl.weixin.msg.history']
             if self.check_signature(signature, timestamp, nonce):
                 redirect = parse_user_msg(request.httprequest.data)
                 cr, uid, context, pool = request.cr, request.uid, request.context, request.registry
@@ -118,7 +121,18 @@ class Home(http.Controller):
         # 创建或者更新关注着信息
         self.obj_users.create_or_update_user_by_openid(cr, SUPERUSER_ID, context['account_id'], redirect.source,
                                                        context)
-
+        context['msg_id'] = redirect.id
+        val = {
+            'to_user_name': redirect.target,
+            'from_user_name': redirect.source,
+            'create_time': redirect.time,
+            'msg_type': redirect.type,
+            'xml_content': redirect.raw,
+            'content': redirect.content,
+            'msg_id': redirect.id,
+            'app_id': context['account_id']
+        }
+        self.obj_message_history.create(cr, SUPERUSER_ID, val,context)
         del MsgId[str(redirect.id)]
         return ''
 
@@ -131,9 +145,19 @@ class Home(http.Controller):
         context['property'] = u'链接'
         context['property_note'] = redirect.raw
         # 创建或者更新关注着信息
-        self.obj_users.create_or_update_user_by_openid(cr, SUPERUSER_ID, context['account_id'], redirect.source,
+        self.obj_users.create(cr, SUPERUSER_ID, context['account_id'], redirect.source,
                                                        context)
-
+        val = {
+            'to_user_name': redirect.target,
+            'from_user_name': redirect.source,
+            'create_time': redirect.time,
+            'msg_type': redirect.event,
+            'xml_content': redirect.raw,
+            'event_key':redirect.eventkey,
+            'msg_event_id':event_id,
+            'app_id': context['account_id']
+        }
+        self.obj_message_history.create(cr, SUPERUSER_ID, val,context)
         del MsgId[str(redirect.id)]
         return ''
 
@@ -150,6 +174,17 @@ class Home(http.Controller):
         context['property_note'] = redirect.raw
         # 创建或者更新关注着信息
         self.obj_users.create_or_update_user_by_openid(cr, SUPERUSER_ID, context['account_id'], redirect.source, context)
+        val = {
+            'to_user_name': redirect.target,
+            'from_user_name': redirect.source,
+            'create_time': redirect.time,
+            'msg_type': redirect.event,
+            'xml_content': redirect.raw,
+            'event_key':redirect.eventkey,
+            'msg_event_id':event_id,
+            'app_id': context['account_id']
+        }
+        self.obj_message_history.create(cr, SUPERUSER_ID, val,context)
         del MsgId[str(redirect.id)]
         return ''
 
@@ -168,7 +203,20 @@ class Home(http.Controller):
         # 创建或者更新关注着信息
         self.obj_users.create_or_update_user_by_openid(cr, SUPERUSER_ID, context['account_id'], redirect.source,
                                                        context)
-
+        val = {
+            'to_user_name': redirect.target,
+            'from_user_name': redirect.source,
+            'create_time': redirect.time,
+            'msg_type': redirect.event,
+            'xml_content': redirect.raw,
+            'event_key':redirect.event_key,
+            'msg_event_id':event_id,
+            'title':redirect.title,
+            'description':redirect.description,
+            'url':redirect.url,
+            'app_id': context['account_id']
+        }
+        self.obj_message_history.create(cr, SUPERUSER_ID, val,context)
         del MsgId[str(redirect.id)]
         return ''
 
@@ -182,25 +230,25 @@ class Home(http.Controller):
         MsgId[str(redirect.id)] = redirect.id
 
         ids = self.obj_users.search(cr, SUPERUSER_ID, [('openid', '=', redirect.source),
-                                                       ('weixin_account_users', '=', context['account_id'])])
+                                                       ('app_id', '=', context['account_id'])])
         if len(ids) == 0:
             ids = self.obj_users.get_user_info(cr, SUPERUSER_ID, [], redirect.source, context=context)
             ids = [ids]
             context = {'img': redirect.img, 'media_id': redirect.MediaId}
         # 取出用户在系统的ID
         o = self.obj_users.browse(cr, SUPERUSER_ID, ids, context)
-        client_o = Client(pool, cr, o.weixin_account_users.id, o.weixin_account_users.appid,
-                          o.weixin_account_users.appsecret, o.weixin_account_users.access_token,
-                          o.weixin_account_users.token_expires_at)
-        media_id = client_o.download_media(redirect.MediaId)
+        client_o = Client(pool, cr, o.app_id.id, o.app_id.appid,
+                          o.app_id.appsecret, o.app_id.access_token,
+                          o.app_id.token_expires_at)
+        media_id = client_o.download_media(redirect.mediaid)
         f = urllib2.urlopen(media_id.url)
         attach_vals = {
-            'name': '%s' % (redirect.MediaId),
-            'datas_fname': '%s.%s' % (redirect.MediaId, f.headers.subtype),
+            'name': '%s' % (redirect.mediaid),
+            'datas_fname': '%s.%s' % (redirect.mediaid, f.headers.subtype),
             'datas': base64.encodestring(f.read()),
             'file_type': format,
             'type_weixin': 'image',
-            'account_id': o.weixin_account_users.id,
+            'account_id': o.app_id.id,
             'description': redirect.source,
             'res_model': 'dhn.weixin.users',
         }
@@ -209,14 +257,25 @@ class Home(http.Controller):
         context['user_pos'] = 'image'
         context['property_note'] = redirect.raw
         # img = '<img src="%s" alt="%s" />' % (redirect.img, redirect.MediaId)  # width="100%" height="100%"
-        message_id = self.obj_users.message_post(cr, SUPERUSER_ID, ids,
-                                                 body=(u'<span class="label label-success">图片</span><br>'),
-                                                 context=context)
-        parm = {
-            'attachment_ids': [(4, attachment_id)],
+        # message_id = self.obj_users.message_post(cr, SUPERUSER_ID, ids,
+        #                                          body=(u'<span class="label label-success">图片</span><br>'),
+        #                                          context=context)
+        # parm = {
+        #     'attachment_ids': [(4, attachment_id)],
+        # }
+        # pool.get('mail.message').write(cr, SUPERUSER_ID, message_id, parm, context=context)
+        val = {
+            'to_user_name': redirect.target,
+            'from_user_name': redirect.source,
+            'create_time': redirect.time,
+            'msg_type': redirect.type,
+            'xml_content': redirect.raw,
+            'pic_url':redirect.img,
+            'media_id':redirect.mediaid,
+            'msg_id': redirect.id,
+            'app_id': context['account_id']
         }
-        pool.get('mail.message').write(cr, SUPERUSER_ID, message_id, parm, context=context)
-
+        self.obj_message_history.create(cr, SUPERUSER_ID, val,context)
         del MsgId[str(redirect.id)]
 
         return ''
@@ -243,7 +302,7 @@ class Home(http.Controller):
         MsgId[str(redirect.id)] = redirect.id
 
         ids = self.obj_users.search(cr, SUPERUSER_ID, [('openid', '=', redirect.source),
-                                                       ('weixin_account_users', '=', context['account_id'])])
+                                                       ('app_id', '=', context['account_id'])])
         if len(ids) == 0:
             ids = self.obj_users.get_user_info(cr, SUPERUSER_ID, [], redirect.source, context=context)
             ids = [ids]
@@ -295,16 +354,27 @@ class Home(http.Controller):
         #                    </audio> """
         # _logge.info(audio)
         _logger.info("--------will---in----message_post----")
-        message_id = self.obj_users.message_post(cr, SUPERUSER_ID, ids,
-                                                 body=(
-                                                     u'<span class="label label-info">语1音</span> <br>' + audio),
-                                                 context=context)
+        # message_id = self.obj_users.message_post(cr, SUPERUSER_ID, ids,
+        #                                          body=(
+        #                                              u'<span class="label label-info">语1音</span> <br>' + audio),
+        #                                          context=context)
         # _logge.info( "--333333-------------dddddd----")
-        parm = {
-            'attachment_ids': [(4, attachment_id)],
+        # parm = {
+        #     'attachment_ids': [(4, attachment_id)],
+        # }
+        # pool.get('mail.message').write(cr, SUPERUSER_ID, message_id, parm)
+        val = {
+            'to_user_name': redirect.target,
+            'from_user_name': redirect.source,
+            'create_time': redirect.time,
+            'msg_type': redirect.type,
+            'xml_content': redirect.raw,
+            'media_id':redirect.media_id,
+            'format':redirect.format,
+            'msg_id': redirect.id,
+            'app_id': context['account_id']
         }
-        pool.get('mail.message').write(cr, SUPERUSER_ID, message_id, parm)
-
+        self.obj_message_history.create(cr, SUPERUSER_ID, val,context)
         del MsgId[str(redirect.id)]
         t = int(time.time())
         # reply2 = reply.TextReply(redirect, content="aa加密了么？", time=t)
@@ -321,13 +391,27 @@ class Home(http.Controller):
         # _logger.info(encrypt_xml)
         # return encrypt_xml
         return ''
-
+    #视频记录未完成
     def user_post_message_video(self, cr, pool, uid, redirect, kw, context):
         """
         用户发来一条视频 记录到数据库
         """
         ids = self.obj_users.search(cr, SUPERUSER_ID, [('openid', '=', redirect.source),
-                                                       ('weixin_account_users', '=', context['account_id'])])
+                                                       ('app_id', '=', context['account_id'])])
+
+        val = {
+            'to_user_name': redirect.target,
+            'from_user_name': redirect.source,
+            'create_time': redirect.time,
+            'msg_type': redirect.type,
+            'xml_content': redirect.raw,
+            'media_id':redirect.media_id,
+            'thumb_media_id':redirect.thumb_media_id,
+            'msg_id': redirect.id,
+            'app_id': context['account_id']
+        }
+        self.obj_message_history.create(cr, SUPERUSER_ID, val,context)
+
         if len(ids) > 0:
             # instructors = obj.browse(cr, SUPERUSER_ID, ids[0])
             context = {'media_id': redirect.media_id, 'ThumbMediaId': redirect.thumb_media_id}
@@ -362,13 +446,28 @@ class Home(http.Controller):
                                            context=context) > 0:
                 return ''
         return ''
-
+    #记录数据库未完成
     def user_post_message_shortvideo(self, cr, pool, uid, redirect, kw, context):
         """
         用户发来一条小视频 记录到数据库
         """
         ids = self.obj_users.search(cr, SUPERUSER_ID, [('openid', '=', redirect.source),
-                                                       ('weixin_account_users', '=', context['account_id'])])
+                                                       ('app_id', '=', context['account_id'])])
+
+
+        val = {
+            'to_user_name': redirect.target,
+            'from_user_name': redirect.source,
+            'create_time': redirect.time,
+            'msg_type': redirect.type,
+            'xml_content': redirect.raw,
+            'media_id':redirect.media_id,
+            'thumb_media_id':redirect.thumb_media_id,
+            'msg_id': redirect.id,
+            'app_id': context['account_id']
+        }
+        self.obj_message_history.create(cr, SUPERUSER_ID, val,context)
+
         if len(ids) > 0:
             # instructors = obj.browse(cr, SUPERUSER_ID, ids[0])
             context = {'media_id': redirect.media_id, 'ThumbMediaId': redirect.thumb_media_id}
@@ -414,7 +513,7 @@ class Home(http.Controller):
             return ''
         MsgId[event_id] = event_id
         ids = self.obj_users.search(cr, SUPERUSER_ID, [('openid', '=', redirect.source),
-                                                       ('weixin_account_users', '=', context['account_id'])])
+                                                       ('app_id', '=', context['account_id'])])
         if len(ids) == 0:
             ids = self.obj_users.get_user_info(cr, SUPERUSER_ID, [], redirect.source, context=context)
             ids = [ids]
@@ -430,6 +529,19 @@ class Home(http.Controller):
             context['property_note'] = redirect.raw
             self.obj_users.message_post(cr, SUPERUSER_ID, ids, body=_(location), context=context)
 
+            val = {
+                'to_user_name': redirect.target,
+                'from_user_name': redirect.source,
+                'create_time': redirect.time,
+                'msg_type': redirect.event,
+                'xml_content': redirect.raw,
+                'msg_event_id':event_id,
+                'location_x':redirect.latitude,
+                'location_y':redirect.longitude,
+                'precision':redirect.precision,
+                'app_id': context['account_id']
+            }
+            self.obj_message_history.create(cr, SUPERUSER_ID, val,context)
 
         except Exception, e:
             _logger.info(e.message)
@@ -447,13 +559,25 @@ class Home(http.Controller):
             return ''
         MsgId[event_id] = event_id
         ids = self.obj_users.search(cr, SUPERUSER_ID, [('openid', '=', redirect.source),
-                                                       ('weixin_account_users', '=', context['account_id'])])
+                                                       ('app_id', '=', context['account_id'])])
 
         domain = [('appid', '=', kw['app_id'])]
         records = self.obj_account.search_read(cr, openerp.SUPERUSER_ID, domain,
                                                ['name', 'appid', 'appsecret', 'access_token', 'token_expires_at'],
                                                context=context)[0]
         context['account_id'] = records['id']
+
+        val = {
+            'to_user_name': redirect.target,
+            'from_user_name': redirect.source,
+            'create_time': redirect.time,
+            'msg_type': redirect.event,
+            'xml_content': redirect.raw,
+            'msg_event_id':event_id,
+            'app_id': context['account_id']
+        }
+        self.obj_message_history.create(cr, SUPERUSER_ID, val,context)
+
         if redirect.type == 'subscribe':
             if len(ids) > 0:
                 context['property'] = u'感谢您再次关注'
