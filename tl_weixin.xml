@@ -33,6 +33,12 @@
                                     icon="fa-strikethrough"/>
                             <button name="sync_weixin_users_groups" string="同步分组" type="object" class="oe_inline oe_stat_button"
                                     icon="fa-strikethrough"/>
+                            <button name="sync_weixin_kfaccount" string="同步客服" type="object" class="oe_inline oe_stat_button"
+                                    icon="fa-strikethrough"/>
+                            <button name="sync_weixin_menu" string="同步自定义菜单" type="object" class="oe_inline oe_stat_button"
+                                    icon="fa-strikethrough"/>
+                            <button name="sync_weixin_menu_delete" string="删除自定义菜单" type="object" class="oe_inline oe_stat_button"
+                                    icon="fa-strikethrough"/>
 
                         </div>
                         <field name="image" widget='image' class="oe_avatar"/>
@@ -45,6 +51,7 @@
                         <group>
                             <group>
                                 <!--<field name="shop_id" options="{'no_create': True,'no_open':True}"/>  -->
+                                <field name="account_name"/>
                                 <field name="appid"/>
                                 <field name="appsecret"/>
                                 <field name="access_token" style="width:90%%"/>
@@ -147,6 +154,7 @@
             <field name="priority">1</field>
             <field name="arch" type="xml">
                 <tree string="List Tree" create="false" delete="false">
+                    <field name="app_id"/>
                     <field name="name"/>
                     <field name="subscribe_time"/>
                     <field name="province"/>
@@ -395,7 +403,7 @@
                                             <h2>
                                                 <label for="content" string="内容" class="oe_edit_only"/>
                                             </h2>
-                                            <field name="content"
+                                            <field name="content" widget="html"
                                                    placeholder="图文消息的具体内容，支持HTML标签，必须少于2万字符，小于1M，且此处会去除JS"/>
                                         </div>
                                     </form>

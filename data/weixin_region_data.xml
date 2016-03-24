@@ -1,0 +1,3109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data noupdate="1">
+
+        <record id="wxcou0001" model="tl.weixin.country">
+            <field name="name">中国</field>
+            <field name="name_en">China</field>
+        </record>
+
+        <record id="wxpro0001" model="tl.weixin.province">
+            <field name="name">四川</field>
+            <field name="name_en">Sichuan</field>
+            <field name="country_id" ref="wxcou0001" />
+        </record>
+
+        <record id="wxcit0001" model="tl.weixin.city">
+            <field name="name">凉山</field>
+            <field name="name_en">Liangshan Yi Autonomous Prefecture</field>
+            <field name="province_id" ref="wxpro0001" />
+        </record>
+
+        <record id="wxcit0002" model="tl.weixin.city">
+            <field name="name">资阳</field>
+            <field name="name_en">Ziyang</field>
+            <field name="province_id" ref="wxpro0001" />
+        </record>
+
+        <record id="wxcit0003" model="tl.weixin.city">
+            <field name="name">成都</field>
+            <field name="name_en">Chengdu</field>
+            <field name="province_id" ref="wxpro0001" />
+        </record>
+
+        <record id="wxcit0004" model="tl.weixin.city">
+            <field name="name">自贡</field>
+            <field name="name_en">Zigong</field>
+            <field name="province_id" ref="wxpro0001" />
+        </record>
+
+        <record id="wxcit0005" model="tl.weixin.city">
+            <field name="name">泸州</field>
+            <field name="name_en">Luzhou</field>
+            <field name="province_id" ref="wxpro0001" />
+        </record>
+
+        <record id="wxcit0006" model="tl.weixin.city">
+            <field name="name">攀枝花</field>
+            <field name="name_en">Panzhihua</field>
+            <field name="province_id" ref="wxpro0001" />
+        </record>
+
+        <record id="wxcit0007" model="tl.weixin.city">
+            <field name="name">绵阳</field>
+            <field name="name_en">Mianyang</field>
+            <field name="province_id" ref="wxpro0001" />
+        </record>
+
+        <record id="wxcit0008" model="tl.weixin.city">
+            <field name="name">德阳</field>
+            <field name="name_en">Deyang</field>
+            <field name="province_id" ref="wxpro0001" />
+        </record>
+
+        <record id="wxcit0009" model="tl.weixin.city">
+            <field name="name">遂宁</field>
+            <field name="name_en">Suining</field>
+            <field name="province_id" ref="wxpro0001" />
+        </record>
+
+        <record id="wxcit0010" model="tl.weixin.city">
+            <field name="name">广元</field>
+            <field name="name_en">Guangyuan</field>
+            <field name="province_id" ref="wxpro0001" />
+        </record>
+
+        <record id="wxcit0011" model="tl.weixin.city">
+            <field name="name">乐山</field>
+            <field name="name_en">Leshan</field>
+            <field name="province_id" ref="wxpro0001" />
+        </record>
+
+        <record id="wxcit0012" model="tl.weixin.city">
+            <field name="name">内江</field>
+            <field name="name_en">Neijiang</field>
+            <field name="province_id" ref="wxpro0001" />
+        </record>
+
+        <record id="wxcit0013" model="tl.weixin.city">
+            <field name="name">南充</field>
+            <field name="name_en">Nancong</field>
+            <field name="province_id" ref="wxpro0001" />
+        </record>
+
+        <record id="wxcit0014" model="tl.weixin.city">
+            <field name="name">宜宾</field>
+            <field name="name_en">Yibin</field>
+            <field name="province_id" ref="wxpro0001" />
+        </record>
+
+        <record id="wxcit0015" model="tl.weixin.city">
+            <field name="name">眉山</field>
+            <field name="name_en">Meishan</field>
+            <field name="province_id" ref="wxpro0001" />
+        </record>
+
+        <record id="wxcit0016" model="tl.weixin.city">
+            <field name="name">达州</field>
+            <field name="name_en">Dazhou</field>
+            <field name="province_id" ref="wxpro0001" />
+        </record>
+
+        <record id="wxcit0017" model="tl.weixin.city">
+            <field name="name">广安</field>
+            <field name="name_en">Guang'an</field>
+            <field name="province_id" ref="wxpro0001" />
+        </record>
+
+        <record id="wxcit0018" model="tl.weixin.city">
+            <field name="name">巴中</field>
+            <field name="name_en">Bazhong</field>
+            <field name="province_id" ref="wxpro0001" />
+        </record>
+
+        <record id="wxcit0019" model="tl.weixin.city">
+            <field name="name">雅安</field>
+            <field name="name_en">Ya'an</field>
+            <field name="province_id" ref="wxpro0001" />
+        </record>
+
+        <record id="wxcit0020" model="tl.weixin.city">
+            <field name="name">甘孜</field>
+            <field name="name_en">Garze Tibetan Autonomous Prefecture</field>
+            <field name="province_id" ref="wxpro0001" />
+        </record>
+
+        <record id="wxcit0021" model="tl.weixin.city">
+            <field name="name">阿坝</field>
+            <field name="name_en">Aba Tibetan-Qiang Autonomous Prefecture</field>
+            <field name="province_id" ref="wxpro0001" />
+        </record>
+
+        <record id="wxpro0002" model="tl.weixin.province">
+            <field name="name">重庆</field>
+            <field name="name_en">Chongqing</field>
+            <field name="country_id" ref="wxcou0001" />
+        </record>
+
+        <record id="wxcit0022" model="tl.weixin.city">
+            <field name="name">酉阳</field>
+            <field name="name_en">Youyang Tujia-Miao Autonomous Country</field>
+            <field name="province_id" ref="wxpro0002" />
+        </record>
+
+        <record id="wxcit0023" model="tl.weixin.city">
+            <field name="name">彭水</field>
+            <field name="name_en">Pengshui Miao-Tujia Autonomous Country</field>
+            <field name="province_id" ref="wxpro0002" />
+        </record>
+
+        <record id="wxcit0024" model="tl.weixin.city">
+            <field name="name">合川</field>
+            <field name="name_en">Hechuan</field>
+            <field name="province_id" ref="wxpro0002" />
+        </record>
+
+        <record id="wxcit0025" model="tl.weixin.city">
+            <field name="name">永川</field>
+            <field name="name_en">Yongchuan</field>
+            <field name="province_id" ref="wxpro0002" />
+        </record>
+
+        <record id="wxcit0026" model="tl.weixin.city">
+            <field name="name">江津</field>
+            <field name="name_en">Jiangjin</field>
+            <field name="province_id" ref="wxpro0002" />
+        </record>
+
+        <record id="wxcit0027" model="tl.weixin.city">
+            <field name="name">南川</field>
+            <field name="name_en">Nanchuan</field>
+            <field name="province_id" ref="wxpro0002" />
+        </record>
+
+        <record id="wxcit0028" model="tl.weixin.city">
+            <field name="name">铜梁</field>
+            <field name="name_en">Tongliang</field>
+            <field name="province_id" ref="wxpro0002" />
+        </record>
+
+        <record id="wxcit0029" model="tl.weixin.city">
+            <field name="name">大足</field>
+            <field name="name_en">Dazu</field>
+            <field name="province_id" ref="wxpro0002" />
+        </record>
+
+        <record id="wxcit0030" model="tl.weixin.city">
+            <field name="name">荣昌</field>
+            <field name="name_en">Rongchang</field>
+            <field name="province_id" ref="wxpro0002" />
+        </record>
+
+        <record id="wxcit0031" model="tl.weixin.city">
+            <field name="name">璧山</field>
+            <field name="name_en">Bishan</field>
+            <field name="province_id" ref="wxpro0002" />
+        </record>
+
+        <record id="wxcit0032" model="tl.weixin.city">
+            <field name="name">长寿</field>
+            <field name="name_en">Changshou</field>
+            <field name="province_id" ref="wxpro0002" />
+        </record>
+
+        <record id="wxcit0033" model="tl.weixin.city">
+            <field name="name">綦江</field>
+            <field name="name_en">Qijiang</field>
+            <field name="province_id" ref="wxpro0002" />
+        </record>
+
+        <record id="wxcit0034" model="tl.weixin.city">
+            <field name="name">潼南</field>
+            <field name="name_en">Tongnan</field>
+            <field name="province_id" ref="wxpro0002" />
+        </record>
+
+        <record id="wxcit0035" model="tl.weixin.city">
+            <field name="name">梁平</field>
+            <field name="name_en">Liangping</field>
+            <field name="province_id" ref="wxpro0002" />
+        </record>
+
+        <record id="wxcit0036" model="tl.weixin.city">
+            <field name="name">城口</field>
+            <field name="name_en">Chengkou</field>
+            <field name="province_id" ref="wxpro0002" />
+        </record>
+
+        <record id="wxcit0037" model="tl.weixin.city">
+            <field name="name">石柱</field>
+            <field name="name_en">Shizhu Tujia Autonomous Country</field>
+            <field name="province_id" ref="wxpro0002" />
+        </record>
+
+        <record id="wxcit0038" model="tl.weixin.city">
+            <field name="name">秀山</field>
+            <field name="name_en">Xiushan Tujia-Miao Autonomous Country</field>
+            <field name="province_id" ref="wxpro0002" />
+        </record>
+
+        <record id="wxcit0039" model="tl.weixin.city">
+            <field name="name">万州</field>
+            <field name="name_en">Wanzhou</field>
+            <field name="province_id" ref="wxpro0002" />
+        </record>
+
+        <record id="wxcit0040" model="tl.weixin.city">
+            <field name="name">渝中</field>
+            <field name="name_en">Yuzhong</field>
+            <field name="province_id" ref="wxpro0002" />
+        </record>
+
+        <record id="wxcit0041" model="tl.weixin.city">
+            <field name="name">涪陵</field>
+            <field name="name_en">Fuling</field>
+            <field name="province_id" ref="wxpro0002" />
+        </record>
+
+        <record id="wxcit0042" model="tl.weixin.city">
+            <field name="name">江北</field>
+            <field name="name_en">Jiangbei</field>
+            <field name="province_id" ref="wxpro0002" />
+        </record>
+
+        <record id="wxcit0043" model="tl.weixin.city">
+            <field name="name">大渡口</field>
+            <field name="name_en">Dadukou</field>
+            <field name="province_id" ref="wxpro0002" />
+        </record>
+
+        <record id="wxcit0044" model="tl.weixin.city">
+            <field name="name">九龙坡</field>
+            <field name="name_en">Jiulongpo</field>
+            <field name="province_id" ref="wxpro0002" />
+        </record>
+
+        <record id="wxcit0045" model="tl.weixin.city">
+            <field name="name">沙坪坝</field>
+            <field name="name_en">Shapingba</field>
+            <field name="province_id" ref="wxpro0002" />
+        </record>
+
+        <record id="wxcit0046" model="tl.weixin.city">
+            <field name="name">北碚</field>
+            <field name="name_en">Beibei</field>
+            <field name="province_id" ref="wxpro0002" />
+        </record>
+
+        <record id="wxcit0047" model="tl.weixin.city">
+            <field name="name">南岸</field>
+            <field name="name_en">Nan'an</field>
+            <field name="province_id" ref="wxpro0002" />
+        </record>
+
+        <record id="wxcit0048" model="tl.weixin.city">
+            <field name="name">黔江</field>
+            <field name="name_en">Qianjiang</field>
+            <field name="province_id" ref="wxpro0002" />
+        </record>
+
+        <record id="wxcit0049" model="tl.weixin.city">
+            <field name="name">巫溪</field>
+            <field name="name_en">Wuxi</field>
+            <field name="province_id" ref="wxpro0002" />
+        </record>
+
+        <record id="wxcit0050" model="tl.weixin.city">
+            <field name="name">双桥</field>
+            <field name="name_en">Shuangqiao</field>
+            <field name="province_id" ref="wxpro0002" />
+        </record>
+
+        <record id="wxcit0051" model="tl.weixin.city">
+            <field name="name">万盛</field>
+            <field name="name_en">Wansheng</field>
+            <field name="province_id" ref="wxpro0002" />
+        </record>
+
+        <record id="wxcit0052" model="tl.weixin.city">
+            <field name="name">巴南</field>
+            <field name="name_en">Ba'nan</field>
+            <field name="province_id" ref="wxpro0002" />
+        </record>
+
+        <record id="wxcit0053" model="tl.weixin.city">
+            <field name="name">渝北</field>
+            <field name="name_en">Yubei</field>
+            <field name="province_id" ref="wxpro0002" />
+        </record>
+
+        <record id="wxcit0054" model="tl.weixin.city">
+            <field name="name">忠县</field>
+            <field name="name_en">Zhongxian</field>
+            <field name="province_id" ref="wxpro0002" />
+        </record>
+
+        <record id="wxcit0055" model="tl.weixin.city">
+            <field name="name">武隆</field>
+            <field name="name_en">Wulong</field>
+            <field name="province_id" ref="wxpro0002" />
+        </record>
+
+        <record id="wxcit0056" model="tl.weixin.city">
+            <field name="name">垫江</field>
+            <field name="name_en">Dianjiang</field>
+            <field name="province_id" ref="wxpro0002" />
+        </record>
+
+        <record id="wxcit0057" model="tl.weixin.city">
+            <field name="name">丰都</field>
+            <field name="name_en">Fengdu</field>
+            <field name="province_id" ref="wxpro0002" />
+        </record>
+
+        <record id="wxcit0058" model="tl.weixin.city">
+            <field name="name">巫山</field>
+            <field name="name_en">Wushan</field>
+            <field name="province_id" ref="wxpro0002" />
+        </record>
+
+        <record id="wxcit0059" model="tl.weixin.city">
+            <field name="name">奉节</field>
+            <field name="name_en">Fengjie</field>
+            <field name="province_id" ref="wxpro0002" />
+        </record>
+
+        <record id="wxcit0060" model="tl.weixin.city">
+            <field name="name">云阳</field>
+            <field name="name_en">Yunyang</field>
+            <field name="province_id" ref="wxpro0002" />
+        </record>
+
+        <record id="wxcit0061" model="tl.weixin.city">
+            <field name="name">开县</field>
+            <field name="name_en">Kaixian</field>
+            <field name="province_id" ref="wxpro0002" />
+        </record>
+
+        <record id="wxpro0003" model="tl.weixin.province">
+            <field name="name">陕西</field>
+            <field name="name_en">Shaanxi</field>
+            <field name="country_id" ref="wxcou0001" />
+        </record>
+
+        <record id="wxcit0062" model="tl.weixin.city">
+            <field name="name">商洛</field>
+            <field name="name_en">Shangluo</field>
+            <field name="province_id" ref="wxpro0003" />
+        </record>
+
+        <record id="wxcit0063" model="tl.weixin.city">
+            <field name="name">西安</field>
+            <field name="name_en">Xi'an</field>
+            <field name="province_id" ref="wxpro0003" />
+        </record>
+
+        <record id="wxcit0064" model="tl.weixin.city">
+            <field name="name">宝鸡</field>
+            <field name="name_en">Baoji</field>
+            <field name="province_id" ref="wxpro0003" />
+        </record>
+
+        <record id="wxcit0065" model="tl.weixin.city">
+            <field name="name">铜川</field>
+            <field name="name_en">Tongchuan</field>
+            <field name="province_id" ref="wxpro0003" />
+        </record>
+
+        <record id="wxcit0066" model="tl.weixin.city">
+            <field name="name">渭南</field>
+            <field name="name_en">Weinan</field>
+            <field name="province_id" ref="wxpro0003" />
+        </record>
+
+        <record id="wxcit0067" model="tl.weixin.city">
+            <field name="name">咸阳</field>
+            <field name="name_en">Xianyang</field>
+            <field name="province_id" ref="wxpro0003" />
+        </record>
+
+        <record id="wxcit0068" model="tl.weixin.city">
+            <field name="name">汉中</field>
+            <field name="name_en">Hanzhong</field>
+            <field name="province_id" ref="wxpro0003" />
+        </record>
+
+        <record id="wxcit0069" model="tl.weixin.city">
+            <field name="name">延安</field>
+            <field name="name_en">Yan'an</field>
+            <field name="province_id" ref="wxpro0003" />
+        </record>
+
+        <record id="wxcit0070" model="tl.weixin.city">
+            <field name="name">安康</field>
+            <field name="name_en">Ankang</field>
+            <field name="province_id" ref="wxpro0003" />
+        </record>
+
+        <record id="wxcit0071" model="tl.weixin.city">
+            <field name="name">榆林</field>
+            <field name="name_en">Yulin</field>
+            <field name="province_id" ref="wxpro0003" />
+        </record>
+
+        <record id="wxpro0004" model="tl.weixin.province">
+            <field name="name">甘肃</field>
+            <field name="name_en">Gansu</field>
+            <field name="country_id" ref="wxcou0001" />
+        </record>
+
+        <record id="wxcit0072" model="tl.weixin.city">
+            <field name="name">定西</field>
+            <field name="name_en">Dingxi</field>
+            <field name="province_id" ref="wxpro0004" />
+        </record>
+
+        <record id="wxcit0073" model="tl.weixin.city">
+            <field name="name">庆阳</field>
+            <field name="name_en">Qingyang</field>
+            <field name="province_id" ref="wxpro0004" />
+        </record>
+
+        <record id="wxcit0074" model="tl.weixin.city">
+            <field name="name">陇南</field>
+            <field name="name_en">Longnan</field>
+            <field name="province_id" ref="wxpro0004" />
+        </record>
+
+        <record id="wxcit0075" model="tl.weixin.city">
+            <field name="name">甘南</field>
+            <field name="name_en">Gannan Tibetan Autonomous Prefecture</field>
+            <field name="province_id" ref="wxpro0004" />
+        </record>
+
+        <record id="wxcit0076" model="tl.weixin.city">
+            <field name="name">临夏</field>
+            <field name="name_en">Linxia Hui Autonomous Prefecture</field>
+            <field name="province_id" ref="wxpro0004" />
+        </record>
+
+        <record id="wxcit0077" model="tl.weixin.city">
+            <field name="name">兰州</field>
+            <field name="name_en">Lanzhou</field>
+            <field name="province_id" ref="wxpro0004" />
+        </record>
+
+        <record id="wxcit0078" model="tl.weixin.city">
+            <field name="name">金昌</field>
+            <field name="name_en">Baiyin</field>
+            <field name="province_id" ref="wxpro0004" />
+        </record>
+
+        <record id="wxcit0079" model="tl.weixin.city">
+            <field name="name">嘉峪关</field>
+            <field name="name_en">Jinchang</field>
+            <field name="province_id" ref="wxpro0004" />
+        </record>
+
+        <record id="wxcit0080" model="tl.weixin.city">
+            <field name="name">天水</field>
+            <field name="name_en">Jiayuguan</field>
+            <field name="province_id" ref="wxpro0004" />
+        </record>
+
+        <record id="wxcit0081" model="tl.weixin.city">
+            <field name="name">白银</field>
+            <field name="name_en">Tianshui</field>
+            <field name="province_id" ref="wxpro0004" />
+        </record>
+
+        <record id="wxcit0082" model="tl.weixin.city">
+            <field name="name">张掖</field>
+            <field name="name_en">Zhangye</field>
+            <field name="province_id" ref="wxpro0004" />
+        </record>
+
+        <record id="wxcit0083" model="tl.weixin.city">
+            <field name="name">武威</field>
+            <field name="name_en">Wuwei</field>
+            <field name="province_id" ref="wxpro0004" />
+        </record>
+
+        <record id="wxcit0084" model="tl.weixin.city">
+            <field name="name">酒泉</field>
+            <field name="name_en">Jiuquan</field>
+            <field name="province_id" ref="wxpro0004" />
+        </record>
+
+        <record id="wxcit0085" model="tl.weixin.city">
+            <field name="name">平凉</field>
+            <field name="name_en">Pingliang</field>
+            <field name="province_id" ref="wxpro0004" />
+        </record>
+
+        <record id="wxpro0005" model="tl.weixin.province">
+            <field name="name">青海</field>
+            <field name="name_en">Qinghai</field>
+            <field name="country_id" ref="wxcou0001" />
+        </record>
+
+        <record id="wxcit0086" model="tl.weixin.city">
+            <field name="name">海南</field>
+            <field name="name_en">Hainan Tibetan Autonomous Prefecture</field>
+            <field name="province_id" ref="wxpro0005" />
+        </record>
+
+        <record id="wxcit0087" model="tl.weixin.city">
+            <field name="name">果洛</field>
+            <field name="name_en">Guoluo Tibetan Autonomous Prefecture</field>
+            <field name="province_id" ref="wxpro0005" />
+        </record>
+
+        <record id="wxcit0088" model="tl.weixin.city">
+            <field name="name">玉树</field>
+            <field name="name_en">Yushu Tibetan Autonomous Prefecture</field>
+            <field name="province_id" ref="wxpro0005" />
+        </record>
+
+        <record id="wxcit0089" model="tl.weixin.city">
+            <field name="name">海东</field>
+            <field name="name_en">Haidong</field>
+            <field name="province_id" ref="wxpro0005" />
+        </record>
+
+        <record id="wxcit0090" model="tl.weixin.city">
+            <field name="name">海北</field>
+            <field name="name_en">Haibei Tibetan Autonomous Prefecture</field>
+            <field name="province_id" ref="wxpro0005" />
+        </record>
+
+        <record id="wxcit0091" model="tl.weixin.city">
+            <field name="name">黄南</field>
+            <field name="name_en">Huangnan Tibetan Autonomous Prefecture</field>
+            <field name="province_id" ref="wxpro0005" />
+        </record>
+
+        <record id="wxcit0092" model="tl.weixin.city">
+            <field name="name">海西</field>
+            <field name="name_en">Haixi Mongol-Tibetan Autonomous Prefecture</field>
+            <field name="province_id" ref="wxpro0005" />
+        </record>
+
+        <record id="wxcit0093" model="tl.weixin.city">
+            <field name="name">西宁</field>
+            <field name="name_en">Xining</field>
+            <field name="province_id" ref="wxpro0005" />
+        </record>
+
+        <record id="wxpro0006" model="tl.weixin.province">
+            <field name="name">宁夏</field>
+            <field name="name_en">Ningxia</field>
+            <field name="country_id" ref="wxcou0001" />
+        </record>
+
+        <record id="wxcit0094" model="tl.weixin.city">
+            <field name="name">银川</field>
+            <field name="name_en">Yinchuan</field>
+            <field name="province_id" ref="wxpro0006" />
+        </record>
+
+        <record id="wxcit0095" model="tl.weixin.city">
+            <field name="name">吴忠</field>
+            <field name="name_en">Wuzhong</field>
+            <field name="province_id" ref="wxpro0006" />
+        </record>
+
+        <record id="wxcit0096" model="tl.weixin.city">
+            <field name="name">石嘴山</field>
+            <field name="name_en">Shizuishan</field>
+            <field name="province_id" ref="wxpro0006" />
+        </record>
+
+        <record id="wxcit0097" model="tl.weixin.city">
+            <field name="name">中卫</field>
+            <field name="name_en">Zhongwei</field>
+            <field name="province_id" ref="wxpro0006" />
+        </record>
+
+        <record id="wxcit0098" model="tl.weixin.city">
+            <field name="name">固原</field>
+            <field name="name_en">Guyuan</field>
+            <field name="province_id" ref="wxpro0006" />
+        </record>
+
+        <record id="wxpro0007" model="tl.weixin.province">
+            <field name="name">云南</field>
+            <field name="name_en">Yunnan</field>
+            <field name="country_id" ref="wxcou0001" />
+        </record>
+
+        <record id="wxcit0099" model="tl.weixin.city">
+            <field name="name">红河</field>
+            <field name="name_en">Honghe Hani-Yi Autonomous Prefecture</field>
+            <field name="province_id" ref="wxpro0007" />
+        </record>
+
+        <record id="wxcit0100" model="tl.weixin.city">
+            <field name="name">文山</field>
+            <field name="name_en">Wenshan Zhuang-Miao Autonomous Prefecture</field>
+            <field name="province_id" ref="wxpro0007" />
+        </record>
+
+        <record id="wxcit0101" model="tl.weixin.city">
+            <field name="name">楚雄</field>
+            <field name="name_en">Chuxiong Yi Autonomous Prefecture</field>
+            <field name="province_id" ref="wxpro0007" />
+        </record>
+
+        <record id="wxcit0102" model="tl.weixin.city">
+            <field name="name">怒江</field>
+            <field name="name_en">Nujiang Lisu Autonomous Prefecture</field>
+            <field name="province_id" ref="wxpro0007" />
+        </record>
+
+        <record id="wxcit0103" model="tl.weixin.city">
+            <field name="name">德宏</field>
+            <field name="name_en">Dehong Dai-Jingpo Autonomous Prefecture</field>
+            <field name="province_id" ref="wxpro0007" />
+        </record>
+
+        <record id="wxcit0104" model="tl.weixin.city">
+            <field name="name">西双版纳</field>
+            <field name="name_en">Xishuangbanna Dai Autonomous Prefecture</field>
+            <field name="province_id" ref="wxpro0007" />
+        </record>
+
+        <record id="wxcit0105" model="tl.weixin.city">
+            <field name="name">大理</field>
+            <field name="name_en">Dali Bai Autonomous Prefecture</field>
+            <field name="province_id" ref="wxpro0007" />
+        </record>
+
+        <record id="wxcit0106" model="tl.weixin.city">
+            <field name="name">迪庆</field>
+            <field name="name_en">Diqing Tibetan Autonomous Prefecture</field>
+            <field name="province_id" ref="wxpro0007" />
+        </record>
+
+        <record id="wxcit0107" model="tl.weixin.city">
+            <field name="name">昆明</field>
+            <field name="name_en">Kunming</field>
+            <field name="province_id" ref="wxpro0007" />
+        </record>
+
+        <record id="wxcit0108" model="tl.weixin.city">
+            <field name="name">曲靖</field>
+            <field name="name_en">Qujing</field>
+            <field name="province_id" ref="wxpro0007" />
+        </record>
+
+        <record id="wxcit0109" model="tl.weixin.city">
+            <field name="name">保山</field>
+            <field name="name_en">Baoshan</field>
+            <field name="province_id" ref="wxpro0007" />
+        </record>
+
+        <record id="wxcit0110" model="tl.weixin.city">
+            <field name="name">玉溪</field>
+            <field name="name_en">Yuxi</field>
+            <field name="province_id" ref="wxpro0007" />
+        </record>
+
+        <record id="wxcit0111" model="tl.weixin.city">
+            <field name="name">丽江</field>
+            <field name="name_en">Lijiang</field>
+            <field name="province_id" ref="wxpro0007" />
+        </record>
+
+        <record id="wxcit0112" model="tl.weixin.city">
+            <field name="name">昭通</field>
+            <field name="name_en">Zhaotong</field>
+            <field name="province_id" ref="wxpro0007" />
+        </record>
+
+        <record id="wxcit0113" model="tl.weixin.city">
+            <field name="name">临沧</field>
+            <field name="name_en">Lincang</field>
+            <field name="province_id" ref="wxpro0007" />
+        </record>
+
+        <record id="wxcit0114" model="tl.weixin.city">
+            <field name="name">普洱</field>
+            <field name="name_en">Pu'er</field>
+            <field name="province_id" ref="wxpro0007" />
+        </record>
+
+        <record id="wxpro0008" model="tl.weixin.province">
+            <field name="name">澳门</field>
+            <field name="name_en">Macao SAR</field>
+            <field name="country_id" ref="wxcou0001" />
+        </record>
+
+        <record id="wxcit0115" model="tl.weixin.city">
+            <field name="name">No Value</field>
+            <field name="name_en">No Value</field>
+            <field name="province_id" ref="wxpro0008" />
+        </record>
+
+        <record id="wxpro0009" model="tl.weixin.province">
+            <field name="name">贵州</field>
+            <field name="name_en">Guizhou</field>
+            <field name="country_id" ref="wxcou0001" />
+        </record>
+
+        <record id="wxcit0116" model="tl.weixin.city">
+            <field name="name">毕节</field>
+            <field name="name_en">Bijie</field>
+            <field name="province_id" ref="wxpro0009" />
+        </record>
+
+        <record id="wxcit0117" model="tl.weixin.city">
+            <field name="name">黔东南</field>
+            <field name="name_en">Qiandongnan Miao-Dong Autonomous Prefecture</field>
+            <field name="province_id" ref="wxpro0009" />
+        </record>
+
+        <record id="wxcit0118" model="tl.weixin.city">
+            <field name="name">黔南</field>
+            <field name="name_en">Qiannan Buyi Autonomous Prefecture</field>
+            <field name="province_id" ref="wxpro0009" />
+        </record>
+
+        <record id="wxcit0119" model="tl.weixin.city">
+            <field name="name">铜仁</field>
+            <field name="name_en">Tongren</field>
+            <field name="province_id" ref="wxpro0009" />
+        </record>
+
+        <record id="wxcit0120" model="tl.weixin.city">
+            <field name="name">黔西南</field>
+            <field name="name_en">Qianxinan Buyi-Miao Autonomous Prefecture</field>
+            <field name="province_id" ref="wxpro0009" />
+        </record>
+
+        <record id="wxcit0121" model="tl.weixin.city">
+            <field name="name">贵阳</field>
+            <field name="name_en">Guiyang</field>
+            <field name="province_id" ref="wxpro0009" />
+        </record>
+
+        <record id="wxcit0122" model="tl.weixin.city">
+            <field name="name">遵义</field>
+            <field name="name_en">Zunyi</field>
+            <field name="province_id" ref="wxpro0009" />
+        </record>
+
+        <record id="wxcit0123" model="tl.weixin.city">
+            <field name="name">六盘水</field>
+            <field name="name_en">Liupanshui</field>
+            <field name="province_id" ref="wxpro0009" />
+        </record>
+
+        <record id="wxcit0124" model="tl.weixin.city">
+            <field name="name">安顺</field>
+            <field name="name_en">Anshun</field>
+            <field name="province_id" ref="wxpro0009" />
+        </record>
+
+        <record id="wxpro0010" model="tl.weixin.province">
+            <field name="name">香港</field>
+            <field name="name_en">Hongkong SAR</field>
+            <field name="country_id" ref="wxcou0001" />
+        </record>
+
+        <record id="wxcit0125" model="tl.weixin.city">
+            <field name="name">No Value</field>
+            <field name="name_en">No Value</field>
+            <field name="province_id" ref="wxpro0010" />
+        </record>
+
+        <record id="wxpro0011" model="tl.weixin.province">
+            <field name="name">辽宁</field>
+            <field name="name_en">Liaoning</field>
+            <field name="country_id" ref="wxcou0001" />
+        </record>
+
+        <record id="wxcit0126" model="tl.weixin.city">
+            <field name="name">盘锦</field>
+            <field name="name_en">Panjin</field>
+            <field name="province_id" ref="wxpro0011" />
+        </record>
+
+        <record id="wxcit0127" model="tl.weixin.city">
+            <field name="name">辽阳</field>
+            <field name="name_en">Liaoyang</field>
+            <field name="province_id" ref="wxpro0011" />
+        </record>
+
+        <record id="wxcit0128" model="tl.weixin.city">
+            <field name="name">朝阳</field>
+            <field name="name_en">Chaoyang</field>
+            <field name="province_id" ref="wxpro0011" />
+        </record>
+
+        <record id="wxcit0129" model="tl.weixin.city">
+            <field name="name">铁岭</field>
+            <field name="name_en">Tieling</field>
+            <field name="province_id" ref="wxpro0011" />
+        </record>
+
+        <record id="wxcit0130" model="tl.weixin.city">
+            <field name="name">葫芦岛</field>
+            <field name="name_en">Huludao</field>
+            <field name="province_id" ref="wxpro0011" />
+        </record>
+
+        <record id="wxcit0131" model="tl.weixin.city">
+            <field name="name">沈阳</field>
+            <field name="name_en">Shenyang</field>
+            <field name="province_id" ref="wxpro0011" />
+        </record>
+
+        <record id="wxcit0132" model="tl.weixin.city">
+            <field name="name">鞍山</field>
+            <field name="name_en">Anshan</field>
+            <field name="province_id" ref="wxpro0011" />
+        </record>
+
+        <record id="wxcit0133" model="tl.weixin.city">
+            <field name="name">大连</field>
+            <field name="name_en">Dalian</field>
+            <field name="province_id" ref="wxpro0011" />
+        </record>
+
+        <record id="wxcit0134" model="tl.weixin.city">
+            <field name="name">本溪</field>
+            <field name="name_en">Benxi</field>
+            <field name="province_id" ref="wxpro0011" />
+        </record>
+
+        <record id="wxcit0135" model="tl.weixin.city">
+            <field name="name">抚顺</field>
+            <field name="name_en">Fushun</field>
+            <field name="province_id" ref="wxpro0011" />
+        </record>
+
+        <record id="wxcit0136" model="tl.weixin.city">
+            <field name="name">锦州</field>
+            <field name="name_en">Jinzhou</field>
+            <field name="province_id" ref="wxpro0011" />
+        </record>
+
+        <record id="wxcit0137" model="tl.weixin.city">
+            <field name="name">丹东</field>
+            <field name="name_en">Dandong</field>
+            <field name="province_id" ref="wxpro0011" />
+        </record>
+
+        <record id="wxcit0138" model="tl.weixin.city">
+            <field name="name">阜新</field>
+            <field name="name_en">Fuxin</field>
+            <field name="province_id" ref="wxpro0011" />
+        </record>
+
+        <record id="wxcit0139" model="tl.weixin.city">
+            <field name="name">营口</field>
+            <field name="name_en">Yingkou</field>
+            <field name="province_id" ref="wxpro0011" />
+        </record>
+
+        <record id="wxpro0012" model="tl.weixin.province">
+            <field name="name">吉林</field>
+            <field name="name_en">Jilin</field>
+            <field name="country_id" ref="wxcou0001" />
+        </record>
+
+        <record id="wxcit0140" model="tl.weixin.city">
+            <field name="name">延边</field>
+            <field name="name_en">Yanbian Korean Autonomous Prefecture</field>
+            <field name="province_id" ref="wxpro0012" />
+        </record>
+
+        <record id="wxcit0141" model="tl.weixin.city">
+            <field name="name">长春</field>
+            <field name="name_en">Changchun</field>
+            <field name="province_id" ref="wxpro0012" />
+        </record>
+
+        <record id="wxcit0142" model="tl.weixin.city">
+            <field name="name">四平</field>
+            <field name="name_en">Siping</field>
+            <field name="province_id" ref="wxpro0012" />
+        </record>
+
+        <record id="wxcit0143" model="tl.weixin.city">
+            <field name="name">吉林</field>
+            <field name="name_en">Jilin</field>
+            <field name="province_id" ref="wxpro0012" />
+        </record>
+
+        <record id="wxcit0144" model="tl.weixin.city">
+            <field name="name">通化</field>
+            <field name="name_en">Tonghua</field>
+            <field name="province_id" ref="wxpro0012" />
+        </record>
+
+        <record id="wxcit0145" model="tl.weixin.city">
+            <field name="name">辽源</field>
+            <field name="name_en">Liaoyuan</field>
+            <field name="province_id" ref="wxpro0012" />
+        </record>
+
+        <record id="wxcit0146" model="tl.weixin.city">
+            <field name="name">松原</field>
+            <field name="name_en">Songyuan</field>
+            <field name="province_id" ref="wxpro0012" />
+        </record>
+
+        <record id="wxcit0147" model="tl.weixin.city">
+            <field name="name">白山</field>
+            <field name="name_en">Baishan</field>
+            <field name="province_id" ref="wxpro0012" />
+        </record>
+
+        <record id="wxcit0148" model="tl.weixin.city">
+            <field name="name">白城</field>
+            <field name="name_en">Baicheng</field>
+            <field name="province_id" ref="wxpro0012" />
+        </record>
+
+        <record id="wxpro0013" model="tl.weixin.province">
+            <field name="name">黑龙江</field>
+            <field name="name_en">Heilongjiang</field>
+            <field name="country_id" ref="wxcou0001" />
+        </record>
+
+        <record id="wxcit0149" model="tl.weixin.city">
+            <field name="name">黑河</field>
+            <field name="name_en">Heihe</field>
+            <field name="province_id" ref="wxpro0013" />
+        </record>
+
+        <record id="wxcit0150" model="tl.weixin.city">
+            <field name="name">牡丹江</field>
+            <field name="name_en">Mudanjiang</field>
+            <field name="province_id" ref="wxpro0013" />
+        </record>
+
+        <record id="wxcit0151" model="tl.weixin.city">
+            <field name="name">绥化</field>
+            <field name="name_en">Suihua</field>
+            <field name="province_id" ref="wxpro0013" />
+        </record>
+
+        <record id="wxcit0152" model="tl.weixin.city">
+            <field name="name">哈尔滨</field>
+            <field name="name_en">Harbin</field>
+            <field name="province_id" ref="wxpro0013" />
+        </record>
+
+        <record id="wxcit0153" model="tl.weixin.city">
+            <field name="name">大兴安岭</field>
+            <field name="name_en">Da Hinggan Ling</field>
+            <field name="province_id" ref="wxpro0013" />
+        </record>
+
+        <record id="wxcit0154" model="tl.weixin.city">
+            <field name="name">鸡西</field>
+            <field name="name_en">Jixi</field>
+            <field name="province_id" ref="wxpro0013" />
+        </record>
+
+        <record id="wxcit0155" model="tl.weixin.city">
+            <field name="name">齐齐哈尔</field>
+            <field name="name_en">Qiqihar</field>
+            <field name="province_id" ref="wxpro0013" />
+        </record>
+
+        <record id="wxcit0156" model="tl.weixin.city">
+            <field name="name">双鸭山</field>
+            <field name="name_en">Shuangyashan</field>
+            <field name="province_id" ref="wxpro0013" />
+        </record>
+
+        <record id="wxcit0157" model="tl.weixin.city">
+            <field name="name">鹤岗</field>
+            <field name="name_en">Hegang</field>
+            <field name="province_id" ref="wxpro0013" />
+        </record>
+
+        <record id="wxcit0158" model="tl.weixin.city">
+            <field name="name">伊春</field>
+            <field name="name_en">Yichun</field>
+            <field name="province_id" ref="wxpro0013" />
+        </record>
+
+        <record id="wxcit0159" model="tl.weixin.city">
+            <field name="name">大庆</field>
+            <field name="name_en">Daqing</field>
+            <field name="province_id" ref="wxpro0013" />
+        </record>
+
+        <record id="wxcit0160" model="tl.weixin.city">
+            <field name="name">七台河</field>
+            <field name="name_en">Qitaihe</field>
+            <field name="province_id" ref="wxpro0013" />
+        </record>
+
+        <record id="wxcit0161" model="tl.weixin.city">
+            <field name="name">佳木斯</field>
+            <field name="name_en">Jiamusi</field>
+            <field name="province_id" ref="wxpro0013" />
+        </record>
+
+        <record id="wxpro0014" model="tl.weixin.province">
+            <field name="name">海南</field>
+            <field name="name_en">Hainan</field>
+            <field name="country_id" ref="wxcou0001" />
+        </record>
+
+        <record id="wxcit0162" model="tl.weixin.city">
+            <field name="name">乐东</field>
+            <field name="name_en">Ledong Li Autonomous County</field>
+            <field name="province_id" ref="wxpro0014" />
+        </record>
+
+        <record id="wxcit0163" model="tl.weixin.city">
+            <field name="name">昌江</field>
+            <field name="name_en">Jiang Li Autonomous County</field>
+            <field name="province_id" ref="wxpro0014" />
+        </record>
+
+        <record id="wxcit0164" model="tl.weixin.city">
+            <field name="name">白沙</field>
+            <field name="name_en">Baisha Li Autonomous County</field>
+            <field name="province_id" ref="wxpro0014" />
+        </record>
+
+        <record id="wxcit0165" model="tl.weixin.city">
+            <field name="name">西沙</field>
+            <field name="name_en">Xisha Qundao</field>
+            <field name="province_id" ref="wxpro0014" />
+        </record>
+
+        <record id="wxcit0166" model="tl.weixin.city">
+            <field name="name">琼中</field>
+            <field name="name_en">Qiongzhong Li-Miao Autonomous County</field>
+            <field name="province_id" ref="wxpro0014" />
+        </record>
+
+        <record id="wxcit0167" model="tl.weixin.city">
+            <field name="name">保亭</field>
+            <field name="name_en">Baoting Li-Miao Autonomous County</field>
+            <field name="province_id" ref="wxpro0014" />
+        </record>
+
+        <record id="wxcit0168" model="tl.weixin.city">
+            <field name="name">陵水</field>
+            <field name="name_en">Lingshui Li Autonomous County</field>
+            <field name="province_id" ref="wxpro0014" />
+        </record>
+
+        <record id="wxcit0169" model="tl.weixin.city">
+            <field name="name">中沙</field>
+            <field name="name_en">Zhongsha Qundao</field>
+            <field name="province_id" ref="wxpro0014" />
+        </record>
+
+        <record id="wxcit0170" model="tl.weixin.city">
+            <field name="name">南沙</field>
+            <field name="name_en">Nansha Qundao</field>
+            <field name="province_id" ref="wxpro0014" />
+        </record>
+
+        <record id="wxcit0171" model="tl.weixin.city">
+            <field name="name">海口</field>
+            <field name="name_en">Haikou</field>
+            <field name="province_id" ref="wxpro0014" />
+        </record>
+
+        <record id="wxcit0172" model="tl.weixin.city">
+            <field name="name">三亚</field>
+            <field name="name_en">Sanya</field>
+            <field name="province_id" ref="wxpro0014" />
+        </record>
+
+        <record id="wxcit0173" model="tl.weixin.city">
+            <field name="name">五指山</field>
+            <field name="name_en">Wuzhishan</field>
+            <field name="province_id" ref="wxpro0014" />
+        </record>
+
+        <record id="wxcit0174" model="tl.weixin.city">
+            <field name="name">儋州</field>
+            <field name="name_en">Danzhou</field>
+            <field name="province_id" ref="wxpro0014" />
+        </record>
+
+        <record id="wxcit0175" model="tl.weixin.city">
+            <field name="name">琼海</field>
+            <field name="name_en">Qionghai</field>
+            <field name="province_id" ref="wxpro0014" />
+        </record>
+
+        <record id="wxcit0176" model="tl.weixin.city">
+            <field name="name">文昌</field>
+            <field name="name_en">Wenchang</field>
+            <field name="province_id" ref="wxpro0014" />
+        </record>
+
+        <record id="wxcit0177" model="tl.weixin.city">
+            <field name="name">东方</field>
+            <field name="name_en">Dongfang</field>
+            <field name="province_id" ref="wxpro0014" />
+        </record>
+
+        <record id="wxcit0178" model="tl.weixin.city">
+            <field name="name">万宁</field>
+            <field name="name_en">Wanning</field>
+            <field name="province_id" ref="wxpro0014" />
+        </record>
+
+        <record id="wxcit0179" model="tl.weixin.city">
+            <field name="name">定安</field>
+            <field name="name_en">Ding'an</field>
+            <field name="province_id" ref="wxpro0014" />
+        </record>
+
+        <record id="wxcit0180" model="tl.weixin.city">
+            <field name="name">屯昌</field>
+            <field name="name_en">Tunchang</field>
+            <field name="province_id" ref="wxpro0014" />
+        </record>
+
+        <record id="wxcit0181" model="tl.weixin.city">
+            <field name="name">澄迈</field>
+            <field name="name_en">Cengmai</field>
+            <field name="province_id" ref="wxpro0014" />
+        </record>
+
+        <record id="wxcit0182" model="tl.weixin.city">
+            <field name="name">临高</field>
+            <field name="name_en">Lingao</field>
+            <field name="province_id" ref="wxpro0014" />
+        </record>
+
+        <record id="wxpro0015" model="tl.weixin.province">
+            <field name="name">广东</field>
+            <field name="name_en">Guangdong</field>
+            <field name="country_id" ref="wxcou0001" />
+        </record>
+
+        <record id="wxcit0183" model="tl.weixin.city">
+            <field name="name">揭阳</field>
+            <field name="name_en">Jieyang</field>
+            <field name="province_id" ref="wxpro0015" />
+        </record>
+
+        <record id="wxcit0184" model="tl.weixin.city">
+            <field name="name">中山</field>
+            <field name="name_en">Zhongshan</field>
+            <field name="province_id" ref="wxpro0015" />
+        </record>
+
+        <record id="wxcit0185" model="tl.weixin.city">
+            <field name="name">广州</field>
+            <field name="name_en">Guangzhou</field>
+            <field name="province_id" ref="wxpro0015" />
+        </record>
+
+        <record id="wxcit0186" model="tl.weixin.city">
+            <field name="name">深圳</field>
+            <field name="name_en">Shenzhen</field>
+            <field name="province_id" ref="wxpro0015" />
+        </record>
+
+        <record id="wxcit0187" model="tl.weixin.city">
+            <field name="name">韶关</field>
+            <field name="name_en">Shaoguan</field>
+            <field name="province_id" ref="wxpro0015" />
+        </record>
+
+        <record id="wxcit0188" model="tl.weixin.city">
+            <field name="name">汕头</field>
+            <field name="name_en">Shantou</field>
+            <field name="province_id" ref="wxpro0015" />
+        </record>
+
+        <record id="wxcit0189" model="tl.weixin.city">
+            <field name="name">珠海</field>
+            <field name="name_en">Zhuhai</field>
+            <field name="province_id" ref="wxpro0015" />
+        </record>
+
+        <record id="wxcit0190" model="tl.weixin.city">
+            <field name="name">江门</field>
+            <field name="name_en">Jiangmen</field>
+            <field name="province_id" ref="wxpro0015" />
+        </record>
+
+        <record id="wxcit0191" model="tl.weixin.city">
+            <field name="name">佛山</field>
+            <field name="name_en">Foshan</field>
+            <field name="province_id" ref="wxpro0015" />
+        </record>
+
+        <record id="wxcit0192" model="tl.weixin.city">
+            <field name="name">茂名</field>
+            <field name="name_en">Maoming</field>
+            <field name="province_id" ref="wxpro0015" />
+        </record>
+
+        <record id="wxcit0193" model="tl.weixin.city">
+            <field name="name">湛江</field>
+            <field name="name_en">Zhanjiang</field>
+            <field name="province_id" ref="wxpro0015" />
+        </record>
+
+        <record id="wxcit0194" model="tl.weixin.city">
+            <field name="name">惠州</field>
+            <field name="name_en">Huizhou</field>
+            <field name="province_id" ref="wxpro0015" />
+        </record>
+
+        <record id="wxcit0195" model="tl.weixin.city">
+            <field name="name">肇庆</field>
+            <field name="name_en">Zhaoqing</field>
+            <field name="province_id" ref="wxpro0015" />
+        </record>
+
+        <record id="wxcit0196" model="tl.weixin.city">
+            <field name="name">汕尾</field>
+            <field name="name_en">Shanwei</field>
+            <field name="province_id" ref="wxpro0015" />
+        </record>
+
+        <record id="wxcit0197" model="tl.weixin.city">
+            <field name="name">梅州</field>
+            <field name="name_en">Meizhou</field>
+            <field name="province_id" ref="wxpro0015" />
+        </record>
+
+        <record id="wxcit0198" model="tl.weixin.city">
+            <field name="name">阳江</field>
+            <field name="name_en">Yangjiang</field>
+            <field name="province_id" ref="wxpro0015" />
+        </record>
+
+        <record id="wxcit0199" model="tl.weixin.city">
+            <field name="name">河源</field>
+            <field name="name_en">Heyuan</field>
+            <field name="province_id" ref="wxpro0015" />
+        </record>
+
+        <record id="wxcit0200" model="tl.weixin.city">
+            <field name="name">东莞</field>
+            <field name="name_en">Dongguan</field>
+            <field name="province_id" ref="wxpro0015" />
+        </record>
+
+        <record id="wxcit0201" model="tl.weixin.city">
+            <field name="name">清远</field>
+            <field name="name_en">Qingyuan</field>
+            <field name="province_id" ref="wxpro0015" />
+        </record>
+
+        <record id="wxcit0202" model="tl.weixin.city">
+            <field name="name">潮州</field>
+            <field name="name_en">Chaozhou</field>
+            <field name="province_id" ref="wxpro0015" />
+        </record>
+
+        <record id="wxcit0203" model="tl.weixin.city">
+            <field name="name">云浮</field>
+            <field name="name_en">Yunfu</field>
+            <field name="province_id" ref="wxpro0015" />
+        </record>
+
+        <record id="wxpro0016" model="tl.weixin.province">
+            <field name="name">广西</field>
+            <field name="name_en">Guangxi</field>
+            <field name="country_id" ref="wxcou0001" />
+        </record>
+
+        <record id="wxcit0204" model="tl.weixin.city">
+            <field name="name">贺州</field>
+            <field name="name_en">Hezhou</field>
+            <field name="province_id" ref="wxpro0016" />
+        </record>
+
+        <record id="wxcit0205" model="tl.weixin.city">
+            <field name="name">百色</field>
+            <field name="name_en">Baise</field>
+            <field name="province_id" ref="wxpro0016" />
+        </record>
+
+        <record id="wxcit0206" model="tl.weixin.city">
+            <field name="name">来宾</field>
+            <field name="name_en">Laibin</field>
+            <field name="province_id" ref="wxpro0016" />
+        </record>
+
+        <record id="wxcit0207" model="tl.weixin.city">
+            <field name="name">河池</field>
+            <field name="name_en">Hechi</field>
+            <field name="province_id" ref="wxpro0016" />
+        </record>
+
+        <record id="wxcit0208" model="tl.weixin.city">
+            <field name="name">崇左</field>
+            <field name="name_en">Chongzuo</field>
+            <field name="province_id" ref="wxpro0016" />
+        </record>
+
+        <record id="wxcit0209" model="tl.weixin.city">
+            <field name="name">南宁</field>
+            <field name="name_en">Nanning</field>
+            <field name="province_id" ref="wxpro0016" />
+        </record>
+
+        <record id="wxcit0210" model="tl.weixin.city">
+            <field name="name">桂林</field>
+            <field name="name_en">Guilin</field>
+            <field name="province_id" ref="wxpro0016" />
+        </record>
+
+        <record id="wxcit0211" model="tl.weixin.city">
+            <field name="name">柳州</field>
+            <field name="name_en">Liuzhou</field>
+            <field name="province_id" ref="wxpro0016" />
+        </record>
+
+        <record id="wxcit0212" model="tl.weixin.city">
+            <field name="name">北海</field>
+            <field name="name_en">Beihai</field>
+            <field name="province_id" ref="wxpro0016" />
+        </record>
+
+        <record id="wxcit0213" model="tl.weixin.city">
+            <field name="name">梧州</field>
+            <field name="name_en">Wuzhou</field>
+            <field name="province_id" ref="wxpro0016" />
+        </record>
+
+        <record id="wxcit0214" model="tl.weixin.city">
+            <field name="name">钦州</field>
+            <field name="name_en">Qinzhou</field>
+            <field name="province_id" ref="wxpro0016" />
+        </record>
+
+        <record id="wxcit0215" model="tl.weixin.city">
+            <field name="name">防城港</field>
+            <field name="name_en">Fangchenggang</field>
+            <field name="province_id" ref="wxpro0016" />
+        </record>
+
+        <record id="wxcit0216" model="tl.weixin.city">
+            <field name="name">玉林</field>
+            <field name="name_en">Yulin</field>
+            <field name="province_id" ref="wxpro0016" />
+        </record>
+
+        <record id="wxcit0217" model="tl.weixin.city">
+            <field name="name">贵港</field>
+            <field name="name_en">Guigang</field>
+            <field name="province_id" ref="wxpro0016" />
+        </record>
+
+        <record id="wxpro0017" model="tl.weixin.province">
+            <field name="name">湖北</field>
+            <field name="name_en">Hubei</field>
+            <field name="country_id" ref="wxcou0001" />
+        </record>
+
+        <record id="wxcit0218" model="tl.weixin.city">
+            <field name="name">黄冈</field>
+            <field name="name_en">Huanggang</field>
+            <field name="province_id" ref="wxpro0017" />
+        </record>
+
+        <record id="wxcit0219" model="tl.weixin.city">
+            <field name="name">荆州</field>
+            <field name="name_en">Jingzhou</field>
+            <field name="province_id" ref="wxpro0017" />
+        </record>
+
+        <record id="wxcit0220" model="tl.weixin.city">
+            <field name="name">随州</field>
+            <field name="name_en">Suizhou</field>
+            <field name="province_id" ref="wxpro0017" />
+        </record>
+
+        <record id="wxcit0221" model="tl.weixin.city">
+            <field name="name">咸宁</field>
+            <field name="name_en">Xianning</field>
+            <field name="province_id" ref="wxpro0017" />
+        </record>
+
+        <record id="wxcit0222" model="tl.weixin.city">
+            <field name="name">神农架</field>
+            <field name="name_en">Shennongjia</field>
+            <field name="province_id" ref="wxpro0017" />
+        </record>
+
+        <record id="wxcit0223" model="tl.weixin.city">
+            <field name="name">恩施</field>
+            <field name="name_en">Enshi Tujia-Miao Autonomous Prefecture</field>
+            <field name="province_id" ref="wxpro0017" />
+        </record>
+
+        <record id="wxcit0224" model="tl.weixin.city">
+            <field name="name">武汉</field>
+            <field name="name_en">Wuhan</field>
+            <field name="province_id" ref="wxpro0017" />
+        </record>
+
+        <record id="wxcit0225" model="tl.weixin.city">
+            <field name="name">十堰</field>
+            <field name="name_en">Shiyan</field>
+            <field name="province_id" ref="wxpro0017" />
+        </record>
+
+        <record id="wxcit0226" model="tl.weixin.city">
+            <field name="name">黄石</field>
+            <field name="name_en">Huangshi</field>
+            <field name="province_id" ref="wxpro0017" />
+        </record>
+
+        <record id="wxcit0227" model="tl.weixin.city">
+            <field name="name">宜昌</field>
+            <field name="name_en">Yichang</field>
+            <field name="province_id" ref="wxpro0017" />
+        </record>
+
+        <record id="wxcit0228" model="tl.weixin.city">
+            <field name="name">鄂州</field>
+            <field name="name_en">Ezhou</field>
+            <field name="province_id" ref="wxpro0017" />
+        </record>
+
+        <record id="wxcit0229" model="tl.weixin.city">
+            <field name="name">襄樊</field>
+            <field name="name_en">Xiangyang</field>
+            <field name="province_id" ref="wxpro0017" />
+        </record>
+
+        <record id="wxcit0230" model="tl.weixin.city">
+            <field name="name">孝感</field>
+            <field name="name_en">Xiaogan</field>
+            <field name="province_id" ref="wxpro0017" />
+        </record>
+
+        <record id="wxcit0231" model="tl.weixin.city">
+            <field name="name">荆门</field>
+            <field name="name_en">Jingmen</field>
+            <field name="province_id" ref="wxpro0017" />
+        </record>
+
+        <record id="wxcit0232" model="tl.weixin.city">
+            <field name="name">潜江</field>
+            <field name="name_en">Qianjiang</field>
+            <field name="province_id" ref="wxpro0017" />
+        </record>
+
+        <record id="wxcit0233" model="tl.weixin.city">
+            <field name="name">仙桃</field>
+            <field name="name_en">Xiantao</field>
+            <field name="province_id" ref="wxpro0017" />
+        </record>
+
+        <record id="wxcit0234" model="tl.weixin.city">
+            <field name="name">天门</field>
+            <field name="name_en">Tianmen</field>
+            <field name="province_id" ref="wxpro0017" />
+        </record>
+
+        <record id="wxpro0018" model="tl.weixin.province">
+            <field name="name">湖南</field>
+            <field name="name_en">Hunan</field>
+            <field name="country_id" ref="wxcou0001" />
+        </record>
+
+        <record id="wxcit0235" model="tl.weixin.city">
+            <field name="name">永州</field>
+            <field name="name_en">Yongzhou</field>
+            <field name="province_id" ref="wxpro0018" />
+        </record>
+
+        <record id="wxcit0236" model="tl.weixin.city">
+            <field name="name">郴州</field>
+            <field name="name_en">Chenzhou</field>
+            <field name="province_id" ref="wxpro0018" />
+        </record>
+
+        <record id="wxcit0237" model="tl.weixin.city">
+            <field name="name">娄底</field>
+            <field name="name_en">Loudi</field>
+            <field name="province_id" ref="wxpro0018" />
+        </record>
+
+        <record id="wxcit0238" model="tl.weixin.city">
+            <field name="name">怀化</field>
+            <field name="name_en">Huaihua</field>
+            <field name="province_id" ref="wxpro0018" />
+        </record>
+
+        <record id="wxcit0239" model="tl.weixin.city">
+            <field name="name">湘西</field>
+            <field name="name_en">Xiangxi Tujia-Miao Autonomous Prefecture</field>
+            <field name="province_id" ref="wxpro0018" />
+        </record>
+
+        <record id="wxcit0240" model="tl.weixin.city">
+            <field name="name">长沙</field>
+            <field name="name_en">Changsha</field>
+            <field name="province_id" ref="wxpro0018" />
+        </record>
+
+        <record id="wxcit0241" model="tl.weixin.city">
+            <field name="name">湘潭</field>
+            <field name="name_en">Xiangtan</field>
+            <field name="province_id" ref="wxpro0018" />
+        </record>
+
+        <record id="wxcit0242" model="tl.weixin.city">
+            <field name="name">株洲</field>
+            <field name="name_en">Zhuzhou</field>
+            <field name="province_id" ref="wxpro0018" />
+        </record>
+
+        <record id="wxcit0243" model="tl.weixin.city">
+            <field name="name">邵阳</field>
+            <field name="name_en">Shaoyang</field>
+            <field name="province_id" ref="wxpro0018" />
+        </record>
+
+        <record id="wxcit0244" model="tl.weixin.city">
+            <field name="name">衡阳</field>
+            <field name="name_en">Hengyang</field>
+            <field name="province_id" ref="wxpro0018" />
+        </record>
+
+        <record id="wxcit0245" model="tl.weixin.city">
+            <field name="name">常德</field>
+            <field name="name_en">Changde</field>
+            <field name="province_id" ref="wxpro0018" />
+        </record>
+
+        <record id="wxcit0246" model="tl.weixin.city">
+            <field name="name">岳阳</field>
+            <field name="name_en">Yueyang</field>
+            <field name="province_id" ref="wxpro0018" />
+        </record>
+
+        <record id="wxcit0247" model="tl.weixin.city">
+            <field name="name">益阳</field>
+            <field name="name_en">Yiyang</field>
+            <field name="province_id" ref="wxpro0018" />
+        </record>
+
+        <record id="wxcit0248" model="tl.weixin.city">
+            <field name="name">张家界</field>
+            <field name="name_en">Zhangjiajie</field>
+            <field name="province_id" ref="wxpro0018" />
+        </record>
+
+        <record id="wxpro0019" model="tl.weixin.province">
+            <field name="name">河南</field>
+            <field name="name_en">Henan</field>
+            <field name="country_id" ref="wxcou0001" />
+        </record>
+
+        <record id="wxcit0249" model="tl.weixin.city">
+            <field name="name">漯河</field>
+            <field name="name_en">Luohe</field>
+            <field name="province_id" ref="wxpro0019" />
+        </record>
+
+        <record id="wxcit0250" model="tl.weixin.city">
+            <field name="name">许昌</field>
+            <field name="name_en">Xuchang</field>
+            <field name="province_id" ref="wxpro0019" />
+        </record>
+
+        <record id="wxcit0251" model="tl.weixin.city">
+            <field name="name">南阳</field>
+            <field name="name_en">Nanyang</field>
+            <field name="province_id" ref="wxpro0019" />
+        </record>
+
+        <record id="wxcit0252" model="tl.weixin.city">
+            <field name="name">三门峡</field>
+            <field name="name_en">Sanmenxia</field>
+            <field name="province_id" ref="wxpro0019" />
+        </record>
+
+        <record id="wxcit0253" model="tl.weixin.city">
+            <field name="name">信阳</field>
+            <field name="name_en">Xinyang</field>
+            <field name="province_id" ref="wxpro0019" />
+        </record>
+
+        <record id="wxcit0254" model="tl.weixin.city">
+            <field name="name">商丘</field>
+            <field name="name_en">Shangqiu</field>
+            <field name="province_id" ref="wxpro0019" />
+        </record>
+
+        <record id="wxcit0255" model="tl.weixin.city">
+            <field name="name">驻马店</field>
+            <field name="name_en">Zhumadian</field>
+            <field name="province_id" ref="wxpro0019" />
+        </record>
+
+        <record id="wxcit0256" model="tl.weixin.city">
+            <field name="name">周口</field>
+            <field name="name_en">Zhoukou</field>
+            <field name="province_id" ref="wxpro0019" />
+        </record>
+
+        <record id="wxcit0257" model="tl.weixin.city">
+            <field name="name">济源</field>
+            <field name="name_en">Jiyuan</field>
+            <field name="province_id" ref="wxpro0019" />
+        </record>
+
+        <record id="wxcit0258" model="tl.weixin.city">
+            <field name="name">郑州</field>
+            <field name="name_en">Zhengzhou</field>
+            <field name="province_id" ref="wxpro0019" />
+        </record>
+
+        <record id="wxcit0259" model="tl.weixin.city">
+            <field name="name">洛阳</field>
+            <field name="name_en">Luoyang</field>
+            <field name="province_id" ref="wxpro0019" />
+        </record>
+
+        <record id="wxcit0260" model="tl.weixin.city">
+            <field name="name">开封</field>
+            <field name="name_en">Kaifeng</field>
+            <field name="province_id" ref="wxpro0019" />
+        </record>
+
+        <record id="wxcit0261" model="tl.weixin.city">
+            <field name="name">安阳</field>
+            <field name="name_en">Anyang</field>
+            <field name="province_id" ref="wxpro0019" />
+        </record>
+
+        <record id="wxcit0262" model="tl.weixin.city">
+            <field name="name">平顶山</field>
+            <field name="name_en">Pingdingshan</field>
+            <field name="province_id" ref="wxpro0019" />
+        </record>
+
+        <record id="wxcit0263" model="tl.weixin.city">
+            <field name="name">新乡</field>
+            <field name="name_en">Xinxiang</field>
+            <field name="province_id" ref="wxpro0019" />
+        </record>
+
+        <record id="wxcit0264" model="tl.weixin.city">
+            <field name="name">鹤壁</field>
+            <field name="name_en">Hebi</field>
+            <field name="province_id" ref="wxpro0019" />
+        </record>
+
+        <record id="wxcit0265" model="tl.weixin.city">
+            <field name="name">濮阳</field>
+            <field name="name_en">Puyang</field>
+            <field name="province_id" ref="wxpro0019" />
+        </record>
+
+        <record id="wxcit0266" model="tl.weixin.city">
+            <field name="name">焦作</field>
+            <field name="name_en">Jiaozuo</field>
+            <field name="province_id" ref="wxpro0019" />
+        </record>
+
+        <record id="wxpro0020" model="tl.weixin.province">
+            <field name="name">台湾</field>
+            <field name="name_en">Taiwan</field>
+            <field name="country_id" ref="wxcou0001" />
+        </record>
+
+        <record id="wxcit0267" model="tl.weixin.city">
+            <field name="name">屏东县</field>
+            <field name="name_en">Pingtung County</field>
+            <field name="province_id" ref="wxpro0020" />
+        </record>
+
+        <record id="wxcit0268" model="tl.weixin.city">
+            <field name="name">澎湖县</field>
+            <field name="name_en">Penghu County</field>
+            <field name="province_id" ref="wxpro0020" />
+        </record>
+
+        <record id="wxcit0269" model="tl.weixin.city">
+            <field name="name">台东县</field>
+            <field name="name_en">Taitung County</field>
+            <field name="province_id" ref="wxpro0020" />
+        </record>
+
+        <record id="wxcit0270" model="tl.weixin.city">
+            <field name="name">花莲县</field>
+            <field name="name_en">Hualian County</field>
+            <field name="province_id" ref="wxpro0020" />
+        </record>
+
+        <record id="wxcit0271" model="tl.weixin.city">
+            <field name="name">台北市</field>
+            <field name="name_en">Taipei City</field>
+            <field name="province_id" ref="wxpro0020" />
+        </record>
+
+        <record id="wxcit0272" model="tl.weixin.city">
+            <field name="name">基隆市</field>
+            <field name="name_en">Keelung City</field>
+            <field name="province_id" ref="wxpro0020" />
+        </record>
+
+        <record id="wxcit0273" model="tl.weixin.city">
+            <field name="name">高雄市</field>
+            <field name="name_en">Kaohsiung City</field>
+            <field name="province_id" ref="wxpro0020" />
+        </record>
+
+        <record id="wxcit0274" model="tl.weixin.city">
+            <field name="name">台南市</field>
+            <field name="name_en">Tainan City</field>
+            <field name="province_id" ref="wxpro0020" />
+        </record>
+
+        <record id="wxcit0275" model="tl.weixin.city">
+            <field name="name">台中市</field>
+            <field name="name_en">Taichung City</field>
+            <field name="province_id" ref="wxpro0020" />
+        </record>
+
+        <record id="wxcit0276" model="tl.weixin.city">
+            <field name="name">嘉义市</field>
+            <field name="name_en">Chiayi City</field>
+            <field name="province_id" ref="wxpro0020" />
+        </record>
+
+        <record id="wxcit0277" model="tl.weixin.city">
+            <field name="name">新竹市</field>
+            <field name="name_en">Hsinchu City</field>
+            <field name="province_id" ref="wxpro0020" />
+        </record>
+
+        <record id="wxcit0278" model="tl.weixin.city">
+            <field name="name">宜兰县</field>
+            <field name="name_en">Ilan County</field>
+            <field name="province_id" ref="wxpro0020" />
+        </record>
+
+        <record id="wxcit0279" model="tl.weixin.city">
+            <field name="name">台北县</field>
+            <field name="name_en">Taipei County</field>
+            <field name="province_id" ref="wxpro0020" />
+        </record>
+
+        <record id="wxcit0280" model="tl.weixin.city">
+            <field name="name">新竹县</field>
+            <field name="name_en">Hsinchu County</field>
+            <field name="province_id" ref="wxpro0020" />
+        </record>
+
+        <record id="wxcit0281" model="tl.weixin.city">
+            <field name="name">桃园县</field>
+            <field name="name_en">Taoyuan County</field>
+            <field name="province_id" ref="wxpro0020" />
+        </record>
+
+        <record id="wxcit0282" model="tl.weixin.city">
+            <field name="name">台中县</field>
+            <field name="name_en">Taichung County</field>
+            <field name="province_id" ref="wxpro0020" />
+        </record>
+
+        <record id="wxcit0283" model="tl.weixin.city">
+            <field name="name">苗栗县</field>
+            <field name="name_en">Miaoli County</field>
+            <field name="province_id" ref="wxpro0020" />
+        </record>
+
+        <record id="wxcit0284" model="tl.weixin.city">
+            <field name="name">南投县</field>
+            <field name="name_en">Nantou County</field>
+            <field name="province_id" ref="wxpro0020" />
+        </record>
+
+        <record id="wxcit0285" model="tl.weixin.city">
+            <field name="name">彰化县</field>
+            <field name="name_en">Changhwa County</field>
+            <field name="province_id" ref="wxpro0020" />
+        </record>
+
+        <record id="wxcit0286" model="tl.weixin.city">
+            <field name="name">嘉义县</field>
+            <field name="name_en">Chiayi County</field>
+            <field name="province_id" ref="wxpro0020" />
+        </record>
+
+        <record id="wxcit0287" model="tl.weixin.city">
+            <field name="name">云林县</field>
+            <field name="name_en">Yunnlin County</field>
+            <field name="province_id" ref="wxpro0020" />
+        </record>
+
+        <record id="wxcit0288" model="tl.weixin.city">
+            <field name="name">高雄县</field>
+            <field name="name_en">Kaohsiung County</field>
+            <field name="province_id" ref="wxpro0020" />
+        </record>
+
+        <record id="wxcit0289" model="tl.weixin.city">
+            <field name="name">台南县</field>
+            <field name="name_en">Tainan County</field>
+            <field name="province_id" ref="wxpro0020" />
+        </record>
+
+        <record id="wxpro0021" model="tl.weixin.province">
+            <field name="name">北京</field>
+            <field name="name_en">Beijing</field>
+            <field name="country_id" ref="wxcou0001" />
+        </record>
+
+        <record id="wxcit0290" model="tl.weixin.city">
+            <field name="name">房山</field>
+            <field name="name_en">Fangshan</field>
+            <field name="province_id" ref="wxpro0021" />
+        </record>
+
+        <record id="wxcit0291" model="tl.weixin.city">
+            <field name="name">大兴</field>
+            <field name="name_en">Daxing</field>
+            <field name="province_id" ref="wxpro0021" />
+        </record>
+
+        <record id="wxcit0292" model="tl.weixin.city">
+            <field name="name">顺义</field>
+            <field name="name_en">Shunyi</field>
+            <field name="province_id" ref="wxpro0021" />
+        </record>
+
+        <record id="wxcit0293" model="tl.weixin.city">
+            <field name="name">通州</field>
+            <field name="name_en">Tongzhou</field>
+            <field name="province_id" ref="wxpro0021" />
+        </record>
+
+        <record id="wxcit0294" model="tl.weixin.city">
+            <field name="name">昌平</field>
+            <field name="name_en">Changping</field>
+            <field name="province_id" ref="wxpro0021" />
+        </record>
+
+        <record id="wxcit0295" model="tl.weixin.city">
+            <field name="name">密云</field>
+            <field name="name_en">Miyun</field>
+            <field name="province_id" ref="wxpro0021" />
+        </record>
+
+        <record id="wxcit0296" model="tl.weixin.city">
+            <field name="name">平谷</field>
+            <field name="name_en">Pinggu</field>
+            <field name="province_id" ref="wxpro0021" />
+        </record>
+
+        <record id="wxcit0297" model="tl.weixin.city">
+            <field name="name">延庆</field>
+            <field name="name_en">Yanqing</field>
+            <field name="province_id" ref="wxpro0021" />
+        </record>
+
+        <record id="wxcit0298" model="tl.weixin.city">
+            <field name="name">东城</field>
+            <field name="name_en">Dongcheng</field>
+            <field name="province_id" ref="wxpro0021" />
+        </record>
+
+        <record id="wxcit0299" model="tl.weixin.city">
+            <field name="name">怀柔</field>
+            <field name="name_en">Huairou</field>
+            <field name="province_id" ref="wxpro0021" />
+        </record>
+
+        <record id="wxcit0300" model="tl.weixin.city">
+            <field name="name">崇文</field>
+            <field name="name_en">No Value</field>
+            <field name="province_id" ref="wxpro0021" />
+        </record>
+
+        <record id="wxcit0301" model="tl.weixin.city">
+            <field name="name">西城</field>
+            <field name="name_en">Xicheng</field>
+            <field name="province_id" ref="wxpro0021" />
+        </record>
+
+        <record id="wxcit0302" model="tl.weixin.city">
+            <field name="name">朝阳</field>
+            <field name="name_en">Chaoyang</field>
+            <field name="province_id" ref="wxpro0021" />
+        </record>
+
+        <record id="wxcit0303" model="tl.weixin.city">
+            <field name="name">宣武</field>
+            <field name="name_en">No Value</field>
+            <field name="province_id" ref="wxpro0021" />
+        </record>
+
+        <record id="wxcit0304" model="tl.weixin.city">
+            <field name="name">石景山</field>
+            <field name="name_en">Shijingshan</field>
+            <field name="province_id" ref="wxpro0021" />
+        </record>
+
+        <record id="wxcit0305" model="tl.weixin.city">
+            <field name="name">丰台</field>
+            <field name="name_en">Fengtai</field>
+            <field name="province_id" ref="wxpro0021" />
+        </record>
+
+        <record id="wxcit0306" model="tl.weixin.city">
+            <field name="name">门头沟</field>
+            <field name="name_en">Mentougou</field>
+            <field name="province_id" ref="wxpro0021" />
+        </record>
+
+        <record id="wxcit0307" model="tl.weixin.city">
+            <field name="name">海淀</field>
+            <field name="name_en">Haidian</field>
+            <field name="province_id" ref="wxpro0021" />
+        </record>
+
+        <record id="wxpro0022" model="tl.weixin.province">
+            <field name="name">河北</field>
+            <field name="name_en">Hebei</field>
+            <field name="country_id" ref="wxcou0001" />
+        </record>
+
+        <record id="wxcit0308" model="tl.weixin.city">
+            <field name="name">衡水</field>
+            <field name="name_en">Hengshui</field>
+            <field name="province_id" ref="wxpro0022" />
+        </record>
+
+        <record id="wxcit0309" model="tl.weixin.city">
+            <field name="name">廊坊</field>
+            <field name="name_en">Langfang</field>
+            <field name="province_id" ref="wxpro0022" />
+        </record>
+
+        <record id="wxcit0310" model="tl.weixin.city">
+            <field name="name">石家庄</field>
+            <field name="name_en">Shijiazhuang</field>
+            <field name="province_id" ref="wxpro0022" />
+        </record>
+
+        <record id="wxcit0311" model="tl.weixin.city">
+            <field name="name">秦皇岛</field>
+            <field name="name_en">Qinhuangdao</field>
+            <field name="province_id" ref="wxpro0022" />
+        </record>
+
+        <record id="wxcit0312" model="tl.weixin.city">
+            <field name="name">唐山</field>
+            <field name="name_en">Tangshan</field>
+            <field name="province_id" ref="wxpro0022" />
+        </record>
+
+        <record id="wxcit0313" model="tl.weixin.city">
+            <field name="name">邢台</field>
+            <field name="name_en">Xingtai</field>
+            <field name="province_id" ref="wxpro0022" />
+        </record>
+
+        <record id="wxcit0314" model="tl.weixin.city">
+            <field name="name">邯郸</field>
+            <field name="name_en">Handan</field>
+            <field name="province_id" ref="wxpro0022" />
+        </record>
+
+        <record id="wxcit0315" model="tl.weixin.city">
+            <field name="name">张家口</field>
+            <field name="name_en">Zhangjiakou</field>
+            <field name="province_id" ref="wxpro0022" />
+        </record>
+
+        <record id="wxcit0316" model="tl.weixin.city">
+            <field name="name">保定</field>
+            <field name="name_en">Baoding</field>
+            <field name="province_id" ref="wxpro0022" />
+        </record>
+
+        <record id="wxcit0317" model="tl.weixin.city">
+            <field name="name">沧州</field>
+            <field name="name_en">Cangzhou</field>
+            <field name="province_id" ref="wxpro0022" />
+        </record>
+
+        <record id="wxcit0318" model="tl.weixin.city">
+            <field name="name">承德</field>
+            <field name="name_en">Chengde</field>
+            <field name="province_id" ref="wxpro0022" />
+        </record>
+
+        <record id="wxpro0023" model="tl.weixin.province">
+            <field name="name">天津</field>
+            <field name="name_en">Tianjin</field>
+            <field name="country_id" ref="wxcou0001" />
+        </record>
+
+        <record id="wxcit0319" model="tl.weixin.city">
+            <field name="name">西青</field>
+            <field name="name_en">Xiqing</field>
+            <field name="province_id" ref="wxpro0023" />
+        </record>
+
+        <record id="wxcit0320" model="tl.weixin.city">
+            <field name="name">东丽</field>
+            <field name="name_en">Dongli</field>
+            <field name="province_id" ref="wxpro0023" />
+        </record>
+
+        <record id="wxcit0321" model="tl.weixin.city">
+            <field name="name">北辰</field>
+            <field name="name_en">Beichen</field>
+            <field name="province_id" ref="wxpro0023" />
+        </record>
+
+        <record id="wxcit0322" model="tl.weixin.city">
+            <field name="name">津南</field>
+            <field name="name_en">Jinnan</field>
+            <field name="province_id" ref="wxpro0023" />
+        </record>
+
+        <record id="wxcit0323" model="tl.weixin.city">
+            <field name="name">宁河</field>
+            <field name="name_en">Ninghe</field>
+            <field name="province_id" ref="wxpro0023" />
+        </record>
+
+        <record id="wxcit0324" model="tl.weixin.city">
+            <field name="name">武清</field>
+            <field name="name_en">Wuqing</field>
+            <field name="province_id" ref="wxpro0023" />
+        </record>
+
+        <record id="wxcit0325" model="tl.weixin.city">
+            <field name="name">静海</field>
+            <field name="name_en">Jinghai</field>
+            <field name="province_id" ref="wxpro0023" />
+        </record>
+
+        <record id="wxcit0326" model="tl.weixin.city">
+            <field name="name">宝坻</field>
+            <field name="name_en">Baodi</field>
+            <field name="province_id" ref="wxpro0023" />
+        </record>
+
+        <record id="wxcit0327" model="tl.weixin.city">
+            <field name="name">和平</field>
+            <field name="name_en">Heping</field>
+            <field name="province_id" ref="wxpro0023" />
+        </record>
+
+        <record id="wxcit0328" model="tl.weixin.city">
+            <field name="name">河西</field>
+            <field name="name_en">Hexi</field>
+            <field name="province_id" ref="wxpro0023" />
+        </record>
+
+        <record id="wxcit0329" model="tl.weixin.city">
+            <field name="name">河东</field>
+            <field name="name_en">Hedong</field>
+            <field name="province_id" ref="wxpro0023" />
+        </record>
+
+        <record id="wxcit0330" model="tl.weixin.city">
+            <field name="name">河北</field>
+            <field name="name_en">Hebei</field>
+            <field name="province_id" ref="wxpro0023" />
+        </record>
+
+        <record id="wxcit0331" model="tl.weixin.city">
+            <field name="name">南开</field>
+            <field name="name_en">Nankai</field>
+            <field name="province_id" ref="wxpro0023" />
+        </record>
+
+        <record id="wxcit0332" model="tl.weixin.city">
+            <field name="name">塘沽</field>
+            <field name="name_en">No Value</field>
+            <field name="province_id" ref="wxpro0023" />
+        </record>
+
+        <record id="wxcit0333" model="tl.weixin.city">
+            <field name="name">红桥</field>
+            <field name="name_en">Hongqiao</field>
+            <field name="province_id" ref="wxpro0023" />
+        </record>
+
+        <record id="wxcit0334" model="tl.weixin.city">
+            <field name="name">大港</field>
+            <field name="name_en">No Value</field>
+            <field name="province_id" ref="wxpro0023" />
+        </record>
+
+        <record id="wxcit0335" model="tl.weixin.city">
+            <field name="name">汉沽</field>
+            <field name="name_en">No Value</field>
+            <field name="province_id" ref="wxpro0023" />
+        </record>
+
+        <record id="wxcit0336" model="tl.weixin.city">
+            <field name="name">蓟县</field>
+            <field name="name_en">Jixian</field>
+            <field name="province_id" ref="wxpro0023" />
+        </record>
+
+        <record id="wxpro0024" model="tl.weixin.province">
+            <field name="name">内蒙古</field>
+            <field name="name_en">Inner Mongolia</field>
+            <field name="country_id" ref="wxcou0001" />
+        </record>
+
+        <record id="wxcit0337" model="tl.weixin.city">
+            <field name="name">锡林郭勒</field>
+            <field name="name_en">Xilin Gol</field>
+            <field name="province_id" ref="wxpro0024" />
+        </record>
+
+        <record id="wxcit0338" model="tl.weixin.city">
+            <field name="name">兴安</field>
+            <field name="name_en">Xing'an</field>
+            <field name="province_id" ref="wxpro0024" />
+        </record>
+
+        <record id="wxcit0339" model="tl.weixin.city">
+            <field name="name">阿拉善</field>
+            <field name="name_en">Alxa</field>
+            <field name="province_id" ref="wxpro0024" />
+        </record>
+
+        <record id="wxcit0340" model="tl.weixin.city">
+            <field name="name">呼和浩特</field>
+            <field name="name_en">Hohhot</field>
+            <field name="province_id" ref="wxpro0024" />
+        </record>
+
+        <record id="wxcit0341" model="tl.weixin.city">
+            <field name="name">乌海</field>
+            <field name="name_en">Wuhai</field>
+            <field name="province_id" ref="wxpro0024" />
+        </record>
+
+        <record id="wxcit0342" model="tl.weixin.city">
+            <field name="name">包头</field>
+            <field name="name_en">Baotou</field>
+            <field name="province_id" ref="wxpro0024" />
+        </record>
+
+        <record id="wxcit0343" model="tl.weixin.city">
+            <field name="name">通辽</field>
+            <field name="name_en">Tongliao</field>
+            <field name="province_id" ref="wxpro0024" />
+        </record>
+
+        <record id="wxcit0344" model="tl.weixin.city">
+            <field name="name">赤峰</field>
+            <field name="name_en">Chifeng</field>
+            <field name="province_id" ref="wxpro0024" />
+        </record>
+
+        <record id="wxcit0345" model="tl.weixin.city">
+            <field name="name">呼伦贝尔</field>
+            <field name="name_en">Hulun Buir</field>
+            <field name="province_id" ref="wxpro0024" />
+        </record>
+
+        <record id="wxcit0346" model="tl.weixin.city">
+            <field name="name">鄂尔多斯</field>
+            <field name="name_en">Ordos</field>
+            <field name="province_id" ref="wxpro0024" />
+        </record>
+
+        <record id="wxcit0347" model="tl.weixin.city">
+            <field name="name">乌兰察布</field>
+            <field name="name_en">Ulan Qab</field>
+            <field name="province_id" ref="wxpro0024" />
+        </record>
+
+        <record id="wxcit0348" model="tl.weixin.city">
+            <field name="name">巴彦淖尔</field>
+            <field name="name_en">Bayannur</field>
+            <field name="province_id" ref="wxpro0024" />
+        </record>
+
+        <record id="wxpro0025" model="tl.weixin.province">
+            <field name="name">山西</field>
+            <field name="name_en">Shanxi</field>
+            <field name="country_id" ref="wxcou0001" />
+        </record>
+
+        <record id="wxcit0349" model="tl.weixin.city">
+            <field name="name">吕梁</field>
+            <field name="name_en">luliang</field>
+            <field name="province_id" ref="wxpro0025" />
+        </record>
+
+        <record id="wxcit0350" model="tl.weixin.city">
+            <field name="name">临汾</field>
+            <field name="name_en">Linfen</field>
+            <field name="province_id" ref="wxpro0025" />
+        </record>
+
+        <record id="wxcit0351" model="tl.weixin.city">
+            <field name="name">太原</field>
+            <field name="name_en">Taiyuan</field>
+            <field name="province_id" ref="wxpro0025" />
+        </record>
+
+        <record id="wxcit0352" model="tl.weixin.city">
+            <field name="name">阳泉</field>
+            <field name="name_en">Yangquan</field>
+            <field name="province_id" ref="wxpro0025" />
+        </record>
+
+        <record id="wxcit0353" model="tl.weixin.city">
+            <field name="name">大同</field>
+            <field name="name_en">Datong</field>
+            <field name="province_id" ref="wxpro0025" />
+        </record>
+
+        <record id="wxcit0354" model="tl.weixin.city">
+            <field name="name">晋城</field>
+            <field name="name_en">Jincheng</field>
+            <field name="province_id" ref="wxpro0025" />
+        </record>
+
+        <record id="wxcit0355" model="tl.weixin.city">
+            <field name="name">长治</field>
+            <field name="name_en">Changzhi</field>
+            <field name="province_id" ref="wxpro0025" />
+        </record>
+
+        <record id="wxcit0356" model="tl.weixin.city">
+            <field name="name">晋中</field>
+            <field name="name_en">Jinzhong</field>
+            <field name="province_id" ref="wxpro0025" />
+        </record>
+
+        <record id="wxcit0357" model="tl.weixin.city">
+            <field name="name">朔州</field>
+            <field name="name_en">Shuozhou</field>
+            <field name="province_id" ref="wxpro0025" />
+        </record>
+
+        <record id="wxcit0358" model="tl.weixin.city">
+            <field name="name">忻州</field>
+            <field name="name_en">Xinzhou</field>
+            <field name="province_id" ref="wxpro0025" />
+        </record>
+
+        <record id="wxcit0359" model="tl.weixin.city">
+            <field name="name">运城</field>
+            <field name="name_en">Yuncheng</field>
+            <field name="province_id" ref="wxpro0025" />
+        </record>
+
+        <record id="wxpro0026" model="tl.weixin.province">
+            <field name="name">浙江</field>
+            <field name="name_en">Zhejiang</field>
+            <field name="country_id" ref="wxcou0001" />
+        </record>
+
+        <record id="wxcit0360" model="tl.weixin.city">
+            <field name="name">丽水</field>
+            <field name="name_en">Lishui</field>
+            <field name="province_id" ref="wxpro0026" />
+        </record>
+
+        <record id="wxcit0361" model="tl.weixin.city">
+            <field name="name">台州</field>
+            <field name="name_en">Taizhou</field>
+            <field name="province_id" ref="wxpro0026" />
+        </record>
+
+        <record id="wxcit0362" model="tl.weixin.city">
+            <field name="name">杭州</field>
+            <field name="name_en">Hangzhou</field>
+            <field name="province_id" ref="wxpro0026" />
+        </record>
+
+        <record id="wxcit0363" model="tl.weixin.city">
+            <field name="name">温州</field>
+            <field name="name_en">Wenzhou</field>
+            <field name="province_id" ref="wxpro0026" />
+        </record>
+
+        <record id="wxcit0364" model="tl.weixin.city">
+            <field name="name">宁波</field>
+            <field name="name_en">Ningbo</field>
+            <field name="province_id" ref="wxpro0026" />
+        </record>
+
+        <record id="wxcit0365" model="tl.weixin.city">
+            <field name="name">湖州</field>
+            <field name="name_en">Huzhou</field>
+            <field name="province_id" ref="wxpro0026" />
+        </record>
+
+        <record id="wxcit0366" model="tl.weixin.city">
+            <field name="name">嘉兴</field>
+            <field name="name_en">Jiaxing</field>
+            <field name="province_id" ref="wxpro0026" />
+        </record>
+
+        <record id="wxcit0367" model="tl.weixin.city">
+            <field name="name">金华</field>
+            <field name="name_en">Jinhua</field>
+            <field name="province_id" ref="wxpro0026" />
+        </record>
+
+        <record id="wxcit0368" model="tl.weixin.city">
+            <field name="name">绍兴</field>
+            <field name="name_en">Shaoxing</field>
+            <field name="province_id" ref="wxpro0026" />
+        </record>
+
+        <record id="wxcit0369" model="tl.weixin.city">
+            <field name="name">舟山</field>
+            <field name="name_en">Zhoushan</field>
+            <field name="province_id" ref="wxpro0026" />
+        </record>
+
+        <record id="wxcit0370" model="tl.weixin.city">
+            <field name="name">衢州</field>
+            <field name="name_en">Quzhou</field>
+            <field name="province_id" ref="wxpro0026" />
+        </record>
+
+        <record id="wxpro0027" model="tl.weixin.province">
+            <field name="name">江苏</field>
+            <field name="name_en">Jiangsu</field>
+            <field name="country_id" ref="wxcou0001" />
+        </record>
+
+        <record id="wxcit0371" model="tl.weixin.city">
+            <field name="name">镇江</field>
+            <field name="name_en">Zhenjiang</field>
+            <field name="province_id" ref="wxpro0027" />
+        </record>
+
+        <record id="wxcit0372" model="tl.weixin.city">
+            <field name="name">扬州</field>
+            <field name="name_en">Yangzhou</field>
+            <field name="province_id" ref="wxpro0027" />
+        </record>
+
+        <record id="wxcit0373" model="tl.weixin.city">
+            <field name="name">宿迁</field>
+            <field name="name_en">Suqian</field>
+            <field name="province_id" ref="wxpro0027" />
+        </record>
+
+        <record id="wxcit0374" model="tl.weixin.city">
+            <field name="name">泰州</field>
+            <field name="name_en">Taizhou</field>
+            <field name="province_id" ref="wxpro0027" />
+        </record>
+
+        <record id="wxcit0375" model="tl.weixin.city">
+            <field name="name">南京</field>
+            <field name="name_en">Nanjing</field>
+            <field name="province_id" ref="wxpro0027" />
+        </record>
+
+        <record id="wxcit0376" model="tl.weixin.city">
+            <field name="name">徐州</field>
+            <field name="name_en">Xuzhou</field>
+            <field name="province_id" ref="wxpro0027" />
+        </record>
+
+        <record id="wxcit0377" model="tl.weixin.city">
+            <field name="name">无锡</field>
+            <field name="name_en">Wuxi</field>
+            <field name="province_id" ref="wxpro0027" />
+        </record>
+
+        <record id="wxcit0378" model="tl.weixin.city">
+            <field name="name">苏州</field>
+            <field name="name_en">Suzhou</field>
+            <field name="province_id" ref="wxpro0027" />
+        </record>
+
+        <record id="wxcit0379" model="tl.weixin.city">
+            <field name="name">常州</field>
+            <field name="name_en">Changzhou</field>
+            <field name="province_id" ref="wxpro0027" />
+        </record>
+
+        <record id="wxcit0380" model="tl.weixin.city">
+            <field name="name">连云港</field>
+            <field name="name_en">Lianyungang</field>
+            <field name="province_id" ref="wxpro0027" />
+        </record>
+
+        <record id="wxcit0381" model="tl.weixin.city">
+            <field name="name">南通</field>
+            <field name="name_en">Nantong</field>
+            <field name="province_id" ref="wxpro0027" />
+        </record>
+
+        <record id="wxcit0382" model="tl.weixin.city">
+            <field name="name">盐城</field>
+            <field name="name_en">Yancheng</field>
+            <field name="province_id" ref="wxpro0027" />
+        </record>
+
+        <record id="wxcit0383" model="tl.weixin.city">
+            <field name="name">淮安</field>
+            <field name="name_en">Huai'an</field>
+            <field name="province_id" ref="wxpro0027" />
+        </record>
+
+        <record id="wxpro0028" model="tl.weixin.province">
+            <field name="name">上海</field>
+            <field name="name_en">Shanghai</field>
+            <field name="country_id" ref="wxcou0001" />
+        </record>
+
+        <record id="wxcit0384" model="tl.weixin.city">
+            <field name="name">杨浦</field>
+            <field name="name_en">Yangpu</field>
+            <field name="province_id" ref="wxpro0028" />
+        </record>
+
+        <record id="wxcit0385" model="tl.weixin.city">
+            <field name="name">南汇</field>
+            <field name="name_en">No Value</field>
+            <field name="province_id" ref="wxpro0028" />
+        </record>
+
+        <record id="wxcit0386" model="tl.weixin.city">
+            <field name="name">宝山</field>
+            <field name="name_en">Baoshan</field>
+            <field name="province_id" ref="wxpro0028" />
+        </record>
+
+        <record id="wxcit0387" model="tl.weixin.city">
+            <field name="name">闵行</field>
+            <field name="name_en">Minhang</field>
+            <field name="province_id" ref="wxpro0028" />
+        </record>
+
+        <record id="wxcit0388" model="tl.weixin.city">
+            <field name="name">浦东新</field>
+            <field name="name_en">Pudongxin</field>
+            <field name="province_id" ref="wxpro0028" />
+        </record>
+
+        <record id="wxcit0389" model="tl.weixin.city">
+            <field name="name">嘉定</field>
+            <field name="name_en">Jiading</field>
+            <field name="province_id" ref="wxpro0028" />
+        </record>
+
+        <record id="wxcit0390" model="tl.weixin.city">
+            <field name="name">松江</field>
+            <field name="name_en">Songjiang</field>
+            <field name="province_id" ref="wxpro0028" />
+        </record>
+
+        <record id="wxcit0391" model="tl.weixin.city">
+            <field name="name">金山</field>
+            <field name="name_en">Jinshan</field>
+            <field name="province_id" ref="wxpro0028" />
+        </record>
+
+        <record id="wxcit0392" model="tl.weixin.city">
+            <field name="name">崇明</field>
+            <field name="name_en">Chongming</field>
+            <field name="province_id" ref="wxpro0028" />
+        </record>
+
+        <record id="wxcit0393" model="tl.weixin.city">
+            <field name="name">奉贤</field>
+            <field name="name_en">Fengxian</field>
+            <field name="province_id" ref="wxpro0028" />
+        </record>
+
+        <record id="wxcit0394" model="tl.weixin.city">
+            <field name="name">青浦</field>
+            <field name="name_en">Qingpu</field>
+            <field name="province_id" ref="wxpro0028" />
+        </record>
+
+        <record id="wxcit0395" model="tl.weixin.city">
+            <field name="name">黄浦</field>
+            <field name="name_en">Huangpu</field>
+            <field name="province_id" ref="wxpro0028" />
+        </record>
+
+        <record id="wxcit0396" model="tl.weixin.city">
+            <field name="name">卢湾</field>
+            <field name="name_en">Luwan</field>
+            <field name="province_id" ref="wxpro0028" />
+        </record>
+
+        <record id="wxcit0397" model="tl.weixin.city">
+            <field name="name">长宁</field>
+            <field name="name_en">Changning</field>
+            <field name="province_id" ref="wxpro0028" />
+        </record>
+
+        <record id="wxcit0398" model="tl.weixin.city">
+            <field name="name">徐汇</field>
+            <field name="name_en">Xuhui</field>
+            <field name="province_id" ref="wxpro0028" />
+        </record>
+
+        <record id="wxcit0399" model="tl.weixin.city">
+            <field name="name">普陀</field>
+            <field name="name_en">Putuo</field>
+            <field name="province_id" ref="wxpro0028" />
+        </record>
+
+        <record id="wxcit0400" model="tl.weixin.city">
+            <field name="name">静安</field>
+            <field name="name_en">Jing'an</field>
+            <field name="province_id" ref="wxpro0028" />
+        </record>
+
+        <record id="wxcit0401" model="tl.weixin.city">
+            <field name="name">虹口</field>
+            <field name="name_en">Hongkou</field>
+            <field name="province_id" ref="wxpro0028" />
+        </record>
+
+        <record id="wxcit0402" model="tl.weixin.city">
+            <field name="name">闸北</field>
+            <field name="name_en">Zhabei</field>
+            <field name="province_id" ref="wxpro0028" />
+        </record>
+
+        <record id="wxpro0029" model="tl.weixin.province">
+            <field name="name">山东</field>
+            <field name="name_en">Shandong</field>
+            <field name="country_id" ref="wxcou0001" />
+        </record>
+
+        <record id="wxcit0403" model="tl.weixin.city">
+            <field name="name">日照</field>
+            <field name="name_en">Rizhao</field>
+            <field name="province_id" ref="wxpro0029" />
+        </record>
+
+        <record id="wxcit0404" model="tl.weixin.city">
+            <field name="name">威海</field>
+            <field name="name_en">Weihai</field>
+            <field name="province_id" ref="wxpro0029" />
+        </record>
+
+        <record id="wxcit0405" model="tl.weixin.city">
+            <field name="name">临沂</field>
+            <field name="name_en">Linyi</field>
+            <field name="province_id" ref="wxpro0029" />
+        </record>
+
+        <record id="wxcit0406" model="tl.weixin.city">
+            <field name="name">莱芜</field>
+            <field name="name_en">Laiwu</field>
+            <field name="province_id" ref="wxpro0029" />
+        </record>
+
+        <record id="wxcit0407" model="tl.weixin.city">
+            <field name="name">聊城</field>
+            <field name="name_en">Liaocheng</field>
+            <field name="province_id" ref="wxpro0029" />
+        </record>
+
+        <record id="wxcit0408" model="tl.weixin.city">
+            <field name="name">德州</field>
+            <field name="name_en">Dezhou</field>
+            <field name="province_id" ref="wxpro0029" />
+        </record>
+
+        <record id="wxcit0409" model="tl.weixin.city">
+            <field name="name">菏泽</field>
+            <field name="name_en">Heze</field>
+            <field name="province_id" ref="wxpro0029" />
+        </record>
+
+        <record id="wxcit0410" model="tl.weixin.city">
+            <field name="name">滨州</field>
+            <field name="name_en">Binzhou</field>
+            <field name="province_id" ref="wxpro0029" />
+        </record>
+
+        <record id="wxcit0411" model="tl.weixin.city">
+            <field name="name">济南</field>
+            <field name="name_en">Jinan</field>
+            <field name="province_id" ref="wxpro0029" />
+        </record>
+
+        <record id="wxcit0412" model="tl.weixin.city">
+            <field name="name">淄博</field>
+            <field name="name_en">Zibo</field>
+            <field name="province_id" ref="wxpro0029" />
+        </record>
+
+        <record id="wxcit0413" model="tl.weixin.city">
+            <field name="name">青岛</field>
+            <field name="name_en">Qingdao</field>
+            <field name="province_id" ref="wxpro0029" />
+        </record>
+
+        <record id="wxcit0414" model="tl.weixin.city">
+            <field name="name">东营</field>
+            <field name="name_en">Dongying</field>
+            <field name="province_id" ref="wxpro0029" />
+        </record>
+
+        <record id="wxcit0415" model="tl.weixin.city">
+            <field name="name">枣庄</field>
+            <field name="name_en">Zaozhuang</field>
+            <field name="province_id" ref="wxpro0029" />
+        </record>
+
+        <record id="wxcit0416" model="tl.weixin.city">
+            <field name="name">潍坊</field>
+            <field name="name_en">Weifang</field>
+            <field name="province_id" ref="wxpro0029" />
+        </record>
+
+        <record id="wxcit0417" model="tl.weixin.city">
+            <field name="name">烟台</field>
+            <field name="name_en">Yantai</field>
+            <field name="province_id" ref="wxpro0029" />
+        </record>
+
+        <record id="wxcit0418" model="tl.weixin.city">
+            <field name="name">泰安</field>
+            <field name="name_en">Tai'an</field>
+            <field name="province_id" ref="wxpro0029" />
+        </record>
+
+        <record id="wxcit0419" model="tl.weixin.city">
+            <field name="name">济宁</field>
+            <field name="name_en">Jining</field>
+            <field name="province_id" ref="wxpro0029" />
+        </record>
+
+        <record id="wxpro0030" model="tl.weixin.province">
+            <field name="name">江西</field>
+            <field name="name_en">Jiangxi</field>
+            <field name="country_id" ref="wxcou0001" />
+        </record>
+
+        <record id="wxcit0420" model="tl.weixin.city">
+            <field name="name">上饶</field>
+            <field name="name_en">Shangrao</field>
+            <field name="province_id" ref="wxpro0030" />
+        </record>
+
+        <record id="wxcit0421" model="tl.weixin.city">
+            <field name="name">抚州</field>
+            <field name="name_en">Fuzhou</field>
+            <field name="province_id" ref="wxpro0030" />
+        </record>
+
+        <record id="wxcit0422" model="tl.weixin.city">
+            <field name="name">南昌</field>
+            <field name="name_en">Nanchang</field>
+            <field name="province_id" ref="wxpro0030" />
+        </record>
+
+        <record id="wxcit0423" model="tl.weixin.city">
+            <field name="name">萍乡</field>
+            <field name="name_en">Pingxiang</field>
+            <field name="province_id" ref="wxpro0030" />
+        </record>
+
+        <record id="wxcit0424" model="tl.weixin.city">
+            <field name="name">景德镇</field>
+            <field name="name_en">Jingdezhen</field>
+            <field name="province_id" ref="wxpro0030" />
+        </record>
+
+        <record id="wxcit0425" model="tl.weixin.city">
+            <field name="name">新余</field>
+            <field name="name_en">Xinyu</field>
+            <field name="province_id" ref="wxpro0030" />
+        </record>
+
+        <record id="wxcit0426" model="tl.weixin.city">
+            <field name="name">九江</field>
+            <field name="name_en">Jiujiang</field>
+            <field name="province_id" ref="wxpro0030" />
+        </record>
+
+        <record id="wxcit0427" model="tl.weixin.city">
+            <field name="name">赣州</field>
+            <field name="name_en">Ganzhou</field>
+            <field name="province_id" ref="wxpro0030" />
+        </record>
+
+        <record id="wxcit0428" model="tl.weixin.city">
+            <field name="name">鹰潭</field>
+            <field name="name_en">Yingtan</field>
+            <field name="province_id" ref="wxpro0030" />
+        </record>
+
+        <record id="wxcit0429" model="tl.weixin.city">
+            <field name="name">宜春</field>
+            <field name="name_en">Yichun</field>
+            <field name="province_id" ref="wxpro0030" />
+        </record>
+
+        <record id="wxcit0430" model="tl.weixin.city">
+            <field name="name">吉安</field>
+            <field name="name_en">Ji'an</field>
+            <field name="province_id" ref="wxpro0030" />
+        </record>
+
+        <record id="wxpro0031" model="tl.weixin.province">
+            <field name="name">福建</field>
+            <field name="name_en">Fujian</field>
+            <field name="country_id" ref="wxcou0001" />
+        </record>
+
+        <record id="wxcit0431" model="tl.weixin.city">
+            <field name="name">福州</field>
+            <field name="name_en">Fuzhou</field>
+            <field name="province_id" ref="wxpro0031" />
+        </record>
+
+        <record id="wxcit0432" model="tl.weixin.city">
+            <field name="name">莆田</field>
+            <field name="name_en">Putian</field>
+            <field name="province_id" ref="wxpro0031" />
+        </record>
+
+        <record id="wxcit0433" model="tl.weixin.city">
+            <field name="name">厦门</field>
+            <field name="name_en">Xiamen</field>
+            <field name="province_id" ref="wxpro0031" />
+        </record>
+
+        <record id="wxcit0434" model="tl.weixin.city">
+            <field name="name">泉州</field>
+            <field name="name_en">Quanzhou</field>
+            <field name="province_id" ref="wxpro0031" />
+        </record>
+
+        <record id="wxcit0435" model="tl.weixin.city">
+            <field name="name">三明</field>
+            <field name="name_en">Sanming</field>
+            <field name="province_id" ref="wxpro0031" />
+        </record>
+
+        <record id="wxcit0436" model="tl.weixin.city">
+            <field name="name">南平</field>
+            <field name="name_en">Nanping</field>
+            <field name="province_id" ref="wxpro0031" />
+        </record>
+
+        <record id="wxcit0437" model="tl.weixin.city">
+            <field name="name">漳州</field>
+            <field name="name_en">Zhangzhou</field>
+            <field name="province_id" ref="wxpro0031" />
+        </record>
+
+        <record id="wxcit0438" model="tl.weixin.city">
+            <field name="name">宁德</field>
+            <field name="name_en">Ningde</field>
+            <field name="province_id" ref="wxpro0031" />
+        </record>
+
+        <record id="wxcit0439" model="tl.weixin.city">
+            <field name="name">龙岩</field>
+            <field name="name_en">Longyan</field>
+            <field name="province_id" ref="wxpro0031" />
+        </record>
+
+        <record id="wxpro0032" model="tl.weixin.province">
+            <field name="name">安徽</field>
+            <field name="name_en">Anhui</field>
+            <field name="country_id" ref="wxcou0001" />
+        </record>
+
+        <record id="wxcit0440" model="tl.weixin.city">
+            <field name="name">滁州</field>
+            <field name="name_en">Chuzhou</field>
+            <field name="province_id" ref="wxpro0032" />
+        </record>
+
+        <record id="wxcit0441" model="tl.weixin.city">
+            <field name="name">黄山</field>
+            <field name="name_en">Huangshan</field>
+            <field name="province_id" ref="wxpro0032" />
+        </record>
+
+        <record id="wxcit0442" model="tl.weixin.city">
+            <field name="name">宿州</field>
+            <field name="name_en">Suzhou</field>
+            <field name="province_id" ref="wxpro0032" />
+        </record>
+
+        <record id="wxcit0443" model="tl.weixin.city">
+            <field name="name">阜阳</field>
+            <field name="name_en">Fuyang</field>
+            <field name="province_id" ref="wxpro0032" />
+        </record>
+
+        <record id="wxcit0444" model="tl.weixin.city">
+            <field name="name">六安</field>
+            <field name="name_en">Lu'an</field>
+            <field name="province_id" ref="wxpro0032" />
+        </record>
+
+        <record id="wxcit0445" model="tl.weixin.city">
+            <field name="name">巢湖</field>
+            <field name="name_en">Chaohu</field>
+            <field name="province_id" ref="wxpro0032" />
+        </record>
+
+        <record id="wxcit0446" model="tl.weixin.city">
+            <field name="name">池州</field>
+            <field name="name_en">Chizhou</field>
+            <field name="province_id" ref="wxpro0032" />
+        </record>
+
+        <record id="wxcit0447" model="tl.weixin.city">
+            <field name="name">亳州</field>
+            <field name="name_en">Bozhou</field>
+            <field name="province_id" ref="wxpro0032" />
+        </record>
+
+        <record id="wxcit0448" model="tl.weixin.city">
+            <field name="name">宣城</field>
+            <field name="name_en">Xuancheng</field>
+            <field name="province_id" ref="wxpro0032" />
+        </record>
+
+        <record id="wxcit0449" model="tl.weixin.city">
+            <field name="name">合肥</field>
+            <field name="name_en">Hefei</field>
+            <field name="province_id" ref="wxpro0032" />
+        </record>
+
+        <record id="wxcit0450" model="tl.weixin.city">
+            <field name="name">蚌埠</field>
+            <field name="name_en">Bengbu</field>
+            <field name="province_id" ref="wxpro0032" />
+        </record>
+
+        <record id="wxcit0451" model="tl.weixin.city">
+            <field name="name">芜湖</field>
+            <field name="name_en">Wuhu</field>
+            <field name="province_id" ref="wxpro0032" />
+        </record>
+
+        <record id="wxcit0452" model="tl.weixin.city">
+            <field name="name">马鞍山</field>
+            <field name="name_en">Ma'anshan</field>
+            <field name="province_id" ref="wxpro0032" />
+        </record>
+
+        <record id="wxcit0453" model="tl.weixin.city">
+            <field name="name">淮南</field>
+            <field name="name_en">Huainan</field>
+            <field name="province_id" ref="wxpro0032" />
+        </record>
+
+        <record id="wxcit0454" model="tl.weixin.city">
+            <field name="name">铜陵</field>
+            <field name="name_en">Tongling</field>
+            <field name="province_id" ref="wxpro0032" />
+        </record>
+
+        <record id="wxcit0455" model="tl.weixin.city">
+            <field name="name">淮北</field>
+            <field name="name_en">Huaibei</field>
+            <field name="province_id" ref="wxpro0032" />
+        </record>
+
+        <record id="wxcit0456" model="tl.weixin.city">
+            <field name="name">安庆</field>
+            <field name="name_en">Anqing</field>
+            <field name="province_id" ref="wxpro0032" />
+        </record>
+
+        <record id="wxpro0033" model="tl.weixin.province">
+            <field name="name">西藏</field>
+            <field name="name_en">Tibet</field>
+            <field name="country_id" ref="wxcou0001" />
+        </record>
+
+        <record id="wxcit0457" model="tl.weixin.city">
+            <field name="name">那曲</field>
+            <field name="name_en">Nagqu</field>
+            <field name="province_id" ref="wxpro0033" />
+        </record>
+
+        <record id="wxcit0458" model="tl.weixin.city">
+            <field name="name">阿里</field>
+            <field name="name_en">Ngari</field>
+            <field name="province_id" ref="wxpro0033" />
+        </record>
+
+        <record id="wxcit0459" model="tl.weixin.city">
+            <field name="name">林芝</field>
+            <field name="name_en">Nyingchi</field>
+            <field name="province_id" ref="wxpro0033" />
+        </record>
+
+        <record id="wxcit0460" model="tl.weixin.city">
+            <field name="name">昌都</field>
+            <field name="name_en">Qamdo</field>
+            <field name="province_id" ref="wxpro0033" />
+        </record>
+
+        <record id="wxcit0461" model="tl.weixin.city">
+            <field name="name">山南</field>
+            <field name="name_en">Shannan</field>
+            <field name="province_id" ref="wxpro0033" />
+        </record>
+
+        <record id="wxcit0462" model="tl.weixin.city">
+            <field name="name">日喀则</field>
+            <field name="name_en">Xigaze</field>
+            <field name="province_id" ref="wxpro0033" />
+        </record>
+
+        <record id="wxcit0463" model="tl.weixin.city">
+            <field name="name">拉萨</field>
+            <field name="name_en">Lhasa</field>
+            <field name="province_id" ref="wxpro0033" />
+        </record>
+
+        <record id="wxpro0034" model="tl.weixin.province">
+            <field name="name">新疆</field>
+            <field name="name_en">Xinjiang</field>
+            <field name="country_id" ref="wxcou0001" />
+        </record>
+
+        <record id="wxcit0464" model="tl.weixin.city">
+            <field name="name">博尔塔拉</field>
+            <field name="name_en">Bortala Mongol Autonomous Prefecture</field>
+            <field name="province_id" ref="wxpro0034" />
+        </record>
+
+        <record id="wxcit0465" model="tl.weixin.city">
+            <field name="name">吐鲁番</field>
+            <field name="name_en">Turpan</field>
+            <field name="province_id" ref="wxpro0034" />
+        </record>
+
+        <record id="wxcit0466" model="tl.weixin.city">
+            <field name="name">哈密</field>
+            <field name="name_en">Hami</field>
+            <field name="province_id" ref="wxpro0034" />
+        </record>
+
+        <record id="wxcit0467" model="tl.weixin.city">
+            <field name="name">昌吉</field>
+            <field name="name_en">Changji Hui Autonomous Prefecture</field>
+            <field name="province_id" ref="wxpro0034" />
+        </record>
+
+        <record id="wxcit0468" model="tl.weixin.city">
+            <field name="name">和田</field>
+            <field name="name_en">Hotan</field>
+            <field name="province_id" ref="wxpro0034" />
+        </record>
+
+        <record id="wxcit0469" model="tl.weixin.city">
+            <field name="name">喀什</field>
+            <field name="name_en">Kashi</field>
+            <field name="province_id" ref="wxpro0034" />
+        </record>
+
+        <record id="wxcit0470" model="tl.weixin.city">
+            <field name="name">克孜勒苏</field>
+            <field name="name_en">Kizilsu Kirgiz Autonomous Prefecture</field>
+            <field name="province_id" ref="wxpro0034" />
+        </record>
+
+        <record id="wxcit0471" model="tl.weixin.city">
+            <field name="name">巴音郭楞</field>
+            <field name="name_en">Bayingolin Mongol Autonomous Prefecture</field>
+            <field name="province_id" ref="wxpro0034" />
+        </record>
+
+        <record id="wxcit0472" model="tl.weixin.city">
+            <field name="name">阿克苏</field>
+            <field name="name_en">Aksu</field>
+            <field name="province_id" ref="wxpro0034" />
+        </record>
+
+        <record id="wxcit0473" model="tl.weixin.city">
+            <field name="name">伊犁</field>
+            <field name="name_en">Ili Kazakh Autonomous Prefecture</field>
+            <field name="province_id" ref="wxpro0034" />
+        </record>
+
+        <record id="wxcit0474" model="tl.weixin.city">
+            <field name="name">塔城</field>
+            <field name="name_en">Tacheng</field>
+            <field name="province_id" ref="wxpro0034" />
+        </record>
+
+        <record id="wxcit0475" model="tl.weixin.city">
+            <field name="name">乌鲁木齐</field>
+            <field name="name_en">Urumqi</field>
+            <field name="province_id" ref="wxpro0034" />
+        </record>
+
+        <record id="wxcit0476" model="tl.weixin.city">
+            <field name="name">阿勒泰</field>
+            <field name="name_en">Altay</field>
+            <field name="province_id" ref="wxpro0034" />
+        </record>
+
+        <record id="wxcit0477" model="tl.weixin.city">
+            <field name="name">克拉玛依</field>
+            <field name="name_en">Karamay</field>
+            <field name="province_id" ref="wxpro0034" />
+        </record>
+
+        <record id="wxcit0478" model="tl.weixin.city">
+            <field name="name">石河子</field>
+            <field name="name_en">Shihezi</field>
+            <field name="province_id" ref="wxpro0034" />
+        </record>
+
+        <record id="wxcit0479" model="tl.weixin.city">
+            <field name="name">图木舒克</field>
+            <field name="name_en">Tumsuk</field>
+            <field name="province_id" ref="wxpro0034" />
+        </record>
+
+        <record id="wxcit0480" model="tl.weixin.city">
+            <field name="name">阿拉尔</field>
+            <field name="name_en">Alar</field>
+            <field name="province_id" ref="wxpro0034" />
+        </record>
+
+        <record id="wxcit0481" model="tl.weixin.city">
+            <field name="name">五家渠</field>
+            <field name="name_en">Wujiaqu</field>
+            <field name="province_id" ref="wxpro0034" />
+        </record>
+
+
+
+
+
+
+
+
+
+    </data>
+</openerp>

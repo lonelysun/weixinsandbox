@@ -22,6 +22,8 @@ import json
 import string
 import random
 from openerp import SUPERUSER_ID
+from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
+
 from openerp import _
 from openerp.exceptions import UserError, ValidationError
 from openerp import api, fields, models
@@ -52,10 +54,13 @@ class tl_weixin_app(models.Model):
     appid = fields.Char(u'AppID(应用ID)', required=True)
     appsecret = fields.Char(u'AppSecret(应用密钥)', required=True)
     date_token = fields.Datetime(u'Token生效时间', readonly="1")
-    token_expires_at = fields.Integer(u'Token失效时间', readonly="1")
+    # token_expires_at = fields.Integer(u'Token失效时间', readonly="1")
+    token_expires_at = fields.Datetime(u'Token失效时间', readonly="1")
+
     jsapi_ticket = fields.Text(u'JsApi Ticket', help=u"jsapi_ticket是公众号用于调用微信JS接口的临时票据。正常情况下，jsapi_ticket的有效期为7200秒.")
     jsapi_ticket_date = fields.Datetime(u'JsApi Ticket生效时间', readonly="1")
-    jsapi_ticket_expires_at = fields.Integer(u'JsApi Ticket失效时间', readonly="1")
+    # jsapi_ticket_expires_at = fields.Integer(u'JsApi Ticket失效时间', readonly="1")
+    jsapi_ticket_expires_at = fields.Datetime(u'JsApi Ticket失效时间', readonly="1")
     company_id = fields.Many2one('res.company', u'公司', select=True)
     # page_ids = fields.One2many('tl.weixin.page', 'app_id', u'摇一摇页面', )
     # device_ids = fields.One2many('tl.device', 'app_id', u'设备', )
@@ -65,10 +70,11 @@ class tl_weixin_app(models.Model):
     mch_id = fields.Char(u'微信支付商户号', help=u"微信支付分配的商户号")
     security_key = fields.Char(u'加密KEY', help=u"key设置路径：微信商户平台(pay.weixin.qq.com)-->账户设置-->API安全-->密钥设置")
     image = openerp.fields.Binary(u"微信公众二维码", attachment=True, help=u"建议尺寸：宽60像素，高60像素")
-    primary_industry = fields.Many2one('tl.weixin.industry', string=u'主营行业', domain=[('code', '>', 0)],
-                                       help=u'需要选择公众账号服务所处的2个行业，每月可更改1次所选行业')
-    secondary_industry = fields.Many2one('tl.weixin.industry', string=u'副营行业', domain=[('code', '>', 0)],
-                                         help=u'需要选择公众账号服务所处的2个行业，每月可更改1次所选行业')
+    primary_industry = fields.Many2one('tl.weixin.industry', string=u'主营行业', domain=[('code','>',0)], help=u'需要选择公众账号服务所处的2个行业，每月可更改1次所选行业')
+    secondary_industry = fields.Many2one('tl.weixin.industry', string=u'副营行业', domain=[('code','>',0)], help=u'需要选择公众账号服务所处的2个行业，每月可更改1次所选行业')
+    user_group_ids = fields.One2many('tl.weixin.users.groups', 'app_id', u'用户分组')
+    account_name = fields.Char(u'微信号')
+
 
     _defaults = {
         'company_id': _default_company_id,
@@ -85,10 +91,12 @@ class tl_weixin_app(models.Model):
             _logger.warn(u"获取Access Token失败，%s[%s]" % (json["errmsg"], json["errcode"]))
             return False
         else:
+            stamp = int(json["expires_in"])
             parm = {
                 'access_token': json["access_token"],
                 'date_token': datetime.now(),
-                'token_expires_at': int(time.time()) + json["expires_in"]
+                # 'token_expires_at': int(time.time()) + json["expires_in"]
+                'token_expires_at':datetime.now() + timedelta(seconds=stamp)
             }
             self.write(cr, uid, ids, parm)
             return json["access_token"]
@@ -139,10 +147,13 @@ class tl_weixin_app(models.Model):
         if "errcode" in json and json["errcode"] != 0:
             raise UserError(_(json["errmsg"]))
         else:
+            stamp = int(time.time()) + json["expires_in"]
+
             parm = {
                 'jsapi_ticket': json["ticket"],
                 'jsapi_ticket_date': datetime.now(),
-                'jsapi_ticket_expires_at': int(time.time()) + json["expires_in"]
+                # 'jsapi_ticket_expires_at': int(time.time()) + json["expires_in"]
+                'token_expires_at':datetime.now() + timedelta(seconds=stamp)
             }
             self.write(cr, uid, id, parm)
             return json["ticket"]
@@ -156,10 +167,15 @@ class tl_weixin_app(models.Model):
         if records:
             id = records[0].get('app_id')[0]
             o = self.browse(cr, uid, id, context)
+
+
+
             if (o.jsapi_ticket):
-                if o.jsapi_ticket_expires_at > 0:
+                timeArray = time.strptime(o.jsapi_ticket_expires_at, "%Y-%m-%d %H:%M:%S")
+                time_stamp = int(time.mktime(timeArray))
+                if time_stamp > 0:
                     now = time.time()
-                    if o.jsapi_ticket_expires_at - now > 60:
+                    if time_stamp - now > 60:
                         return o.jsapi_ticket
                     else:
                         return self.grant_jsapi_ticket(cr, uid, id, o)
@@ -171,7 +187,7 @@ class tl_weixin_app(models.Model):
     # 测试连接是否正常
     def test_weixin_app(self, cr, uid, ids, context=None):
         self.grant_token(cr, uid, ids, context=context)
-        self.sync_weixin_get_industry(cr, uid, ids, context=context)
+        # self.sync_weixin_get_industry(cr, uid, ids, context=context)
         return True
 
     # 同步微信摇一摇入口画面
@@ -409,6 +425,7 @@ class tl_weixin_app(models.Model):
                     # print groupid
                     if groupid != 'NoGroupId':
                         ids = group_obj.search(cr, uid, [('groupid', '=', groupid)], limit=1, context=context)
+
                         if ids:
                             group_id = group_obj.browse(cr, uid, ids[0]).id
                         else:
@@ -680,9 +697,10 @@ class tl_weixin_app(models.Model):
                 raise ValidationError(_(u'没有分组'))
             else:
                 for each_group in groups_list:
-                    domain = [('groupid', '=', int(each_group['id']))]
+                    domain = [('groupid', '=', int(each_group['id'])), ('app_id', '=', self.id)]
 
                     group = self.env['tl.weixin.users.groups'].search(domain, limit=1)
+
 
                     if group:
                         group.write({
@@ -699,6 +717,261 @@ class tl_weixin_app(models.Model):
                             "app_id": self.id,
                             "auto": True
                         })
+        return
+
+
+    # 同步客服
+    @api.multi
+    def sync_weixin_kfaccount(self):
+        client_obj = Client(self.pool, self._cr, self.id, self.appid, self.appsecret, self.access_token, self.token_expires_at)
+        json = client_obj.getkflist()
+
+        if "errcode" in json and json["errcode"] != 0:
+            raise UserError(_(json["errmsg"]))
+        else:
+            kf_list = json.get("kf_list", False)
+            if not kf_list:
+                raise ValidationError(_(u'没有客服'))
+            else:
+                for each_account in kf_list:
+                    domain = [('kf_id', '=', int(each_account['kf_id'])), ('app_id', '=', self.id)]
+
+                    kfaccount = self.env['tl.weixin.kfaccount'].search(domain, limit=1)
+
+
+                    if kfaccount:
+                        kfaccount.write({
+                            "kf_account": each_account['kf_account'],
+                            "kf_nick": each_account['kf_nick'],
+                            "kf_id": each_account['kf_id'],
+                            "kf_headimgurl": each_account['kf_headimgurl'],
+                            "auto": True
+                        })
+                    else:
+                        self.env['tl.weixin.kfaccount'].create({
+                            "kf_account": each_account['kf_account'],
+                            "kf_nick": each_account['kf_nick'],
+                            "kf_id": each_account['kf_id'],
+                            "kf_headimgurl": each_account['kf_headimgurl'],
+                            "app_id":self.id,
+                            "auto": True
+                        })
+        return
+
+
+
+    # 同步自定义菜单
+    # 同步的策略是:先删除此公众号本地的菜单, 然后拉取服务器上的菜单
+    @api.multi
+    def sync_weixin_menu(self):
+        client_obj = Client(self.pool, self._cr, self.id, self.appid, self.appsecret, self.access_token, self.token_expires_at)
+        json = client_obj.get_menu()
+
+        if "errcode" in json and json["errcode"] != 0:
+            raise UserError(_(json["errmsg"]))
+        else:
+
+            menu = json.get("menu", False)
+            if not menu:
+                raise UserError(_(u'不存在有效的菜单'))
+            else:
+
+                # 判断是否该app_id已经存在menu,如果已存在,则删除所有该app_id的所有menu
+                menu_set = self.env['tl.weixin.menu'].search([('app_id', '=', self.id)])
+                if menu_set:
+                    menu_set.unlink()
+
+
+                button_lst = []
+                for each_button in menu['button']:
+
+                    sub_button = each_button.get('sub_button', False)
+                    sub_button_lst = []
+                    if sub_button:
+                        # 存在二级菜单
+
+                        for each_sub in sub_button:
+                            # 根据服务器返回的key值查询本地的key值,如果查不到则存空
+                            if each_sub.get('key', False):
+                                key = self.env['tl.weixin.eventkey'].search([('value','=', each_sub.get('key'))])
+                                if key:
+                                    key_id = key.id
+                                else:
+                                    key_id = ''
+                            else:
+                                key_id = ''
+
+                            sub_button_vals = {
+                                'name': each_sub.get('name', ''),
+                                'type': each_sub.get('type', ''),
+                                'url': each_sub.get('url', ''),
+                                'key': key_id,
+                                'media_id': each_sub.get('media_id', ''),
+
+                            }
+                            sub_button_lst.append((0, 0, sub_button_vals))
+
+                    # 根据服务器返回的key值查询本地的key值,如果查不到则存空
+                    if each_button.get('key', False):
+                        key = self.env['tl.weixin.eventkey'].search([('value','=', each_button.get('key'))])
+                        if key:
+                            key_id = key.id
+                        else:
+                            key_id = ''
+                    else:
+                        key_id = ''
+                    button_vals = {
+                        'name': each_button.get('name', ''),
+                        'type': each_button.get('type', ''),
+                        'url': each_button.get('url', ''),
+                        'key': key_id,
+                        'media_id': each_button.get('media_id', ''),
+                        'child_ids': sub_button_lst,
+
+                    }
+                    button_lst.append((0, 0, button_vals))
+
+                vals = {
+                    'app_id': self.id,
+                    'button_ids': button_lst,
+                    'menuid': menu.get('menuid', ''),
+                    'auto': True
+                }
+
+                self.env['tl.weixin.menu'].create(vals)
+
+
+                # 判断是否存在个性化菜单
+                conditionalmenu = json.get("conditionalmenu", False)
+                if conditionalmenu:
+                    # 这是一个个性化菜单
+                    for each_conditional in conditionalmenu:
+
+                        button_lst = []
+                        for each_button in each_conditional['button']:
+
+                            sub_button = each_button.get('sub_button', False)
+                            sub_button_lst = []
+                            if sub_button:
+                                # 存在二级菜单
+
+                                for each_sub in sub_button:
+                                    # 根据服务器返回的key值查询本地的key值,如果查不到则设为空
+                                    if sub_button.get('key', False):
+                                        key = self.env['tl.weixin.eventkey'].search([('value','=', each_sub.get('key'))])
+                                        if key:
+                                            key_id = key.id
+                                        else:
+                                            key_id = ''
+                                    else:
+                                        key_id = ''
+
+                                    sub_button_vals = {
+                                        'name': each_sub.get('name', ''),
+                                        'type': each_sub.get('type', ''),
+                                        'url': each_sub.get('url', ''),
+                                        'key': key_id,
+                                        'media_id': each_sub.get('media_id', ''),
+                                        'is_sub': True
+                                    }
+                                    sub_button_lst.append((0, 0, sub_button_vals))
+
+                            if each_button.get('key', False):
+                                key = self.env['tl.weixin.eventkey'].search([('value','=', each_button.get('key'))])
+                                if key:
+                                    key_id = key.id
+                                else:
+                                    key_id = ''
+                            else:
+                                key_id = ''
+                            button_vals = {
+                                'name': each_button.get('name', ''),
+                                'type': each_button.get('type', ''),
+                                'url': each_button.get('url', ''),
+                                'key': key_id,
+                                'media_id': each_button.get('media_id', ''),
+                                'is_sub': False,
+                                'child_ids': sub_button_lst,
+                            }
+                            button_lst.append((0, 0, button_vals))
+
+                        # 解析matchrule
+                        #API文档有问题, 说"matchrule共六个字段", 但实际有7个
+                        matchrule = each_conditional['matchrule']
+
+                        if matchrule.get('group_id', False):
+                            # 查询表得到对应的group_id
+                            group = self.env['tl.weixin.users.groups'].search([('groupid','=',int(matchrule.get('group_id')))])
+                            if group:
+                                group_id = group.id
+                            else:
+                                group_id = ''
+                                
+                        else:
+                            group_id = ''
+
+                        if matchrule.get('country', False):
+                            country = self.env['tl.weixin.country'].search([('name','=',matchrule.get('country'))])
+                            if country:
+                                country_id = country.id
+                            else:
+                                country_id = ''
+                        else:
+                            country_id = ''
+
+                        if matchrule.get('province', False):
+                            province = self.env['tl.weixin.province'].search([('name','=',matchrule.get('province'))])
+                            if province:
+                                province_id = province.id
+                            else:
+                                province_id = ''
+                        else:
+                            province_id = ''
+
+                        if matchrule.get('city', False):
+                            # 查询表得到对应的city_id
+                            city = self.env['tl.weixin.city'].search([('name','=',matchrule.get('city'))])
+                            if city:
+                                city_id = city.id
+                            else:
+                                city_id = ''
+                        else:
+                            city_id = ''
+
+                        vals = {
+                            'app_id': self.id,
+                            'button_ids': button_lst,
+                            'menuid': each_conditional.get('menuid', ''),
+
+                            'is_conditional': True,
+                            'group_id': group_id,
+                            'sex': matchrule.get('sex', ''),
+                            'country_id': country_id,
+                            'province_id': province_id,
+                            'city_id': city_id,
+                            'client_platform_type': matchrule.get('client_platform_type', ''),
+                            'language': matchrule.get('language', ''),
+                            'auto': True
+
+                        }
+
+                        self.env['tl.weixin.menu'].create(vals)
+
+        return
+
+    # 删除自定义菜单
+    @api.multi
+    def sync_weixin_menu_delete(self):
+        client_obj = Client(self.pool, self._cr, self.id, self.appid, self.appsecret, self.access_token, self.token_expires_at)
+        json = client_obj.delete_menu()
+
+        if "errcode" in json and json["errcode"] != 0:
+            raise UserError(_(json["errmsg"]))
+        else:
+            menu_set = self.env['tl.weixin.menu'].search([('app_id', '=', self.id)])
+            if menu_set:
+                menu_set.unlink()
+
         return
 
     @api.multi
@@ -1364,6 +1637,7 @@ class tl_weixin_material(models.Model):
 
 
 # 图文素材
+# TODO 增加上传内容中图片的接口, 因为content中可能需要图片
 class tl_weixin_articles(models.Model):
     _name = "tl.weixin.articles"
     _description = u'图文素材'
@@ -1375,6 +1649,7 @@ class tl_weixin_articles(models.Model):
     show_cover_pic = fields.Boolean(u'是否显示封面', required=True, help=u'是否显示封面，0为false，即不显示，1为true，即显示')
     author = fields.Char(u'作者', size=255, help=u"作者", required=True, )
     digest = fields.Char(u'摘要', help=u"图文消息的摘要，仅有单图文消息才有摘要，多图文此处为空", required=True, )
+
     content = fields.Text(u'内容', help=u"图文消息的具体内容，支持HTML标签，必须少于2万字符，小于1M，且此处会去除JS", required=True, )
     content_source_url = fields.Char(u'原文地址', help=u"图文消息的原文地址，即点击“阅读原文”后的URL", required=True, )
 

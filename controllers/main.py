@@ -5,13 +5,11 @@ import logging
 import os
 import re
 import uuid
-import time
 import werkzeug.utils
 import werkzeug.wrappers
 from mako import exceptions
 from mako.lookup import TemplateLookup
 # from openerp.addons.web import http
-
 import openerp
 from openerp import SUPERUSER_ID
 from openerp.http import request
@@ -20,10 +18,14 @@ from ..tools.client import Client
 from openerp import http
 import base64
 import urllib2
-from WXBizMsgCrypt import WXBizMsgCrypt
 # from WXBizMsgCrypt import WXBizMsgCrypt
+from openerp.tools.translate import _
+import time,datetime,calendar
+import boto3,os
+from PIL import Image, ImageFont, ImageDraw
+from openerp import tools
+import cStringIO
 
-_logger = logging.getLogger(__name__)
 
 MsgId = {}
 
@@ -606,3 +608,127 @@ class Home(http.Controller):
                                             context=context)
                 return ''
         return ''
+
+
+
+
+class TlweixinClient(http.Controller):
+
+    # __bucketname=openerp.tools.config['s3_bucketname']
+    # __region = openerp.tools.config['s3_region']
+    # __aws_access_key_id = openerp.tools.config['s3_access_key_id']
+    # __aws_secret_access_key = openerp.tools.config['s3_secret_access_key']
+    # __session = boto3.Session(aws_access_key_id=__aws_access_key_id,
+    #               aws_secret_access_key=__aws_secret_access_key,
+    #               region_name=__region)
+    # __s3=__session.resource('s3')
+
+    @http.route('/web_editor/attachment/add', type='http', auth='user', methods=['POST'])
+    def attach(self, func, upload=None, url=None, disable_optimization=None, **kwargs):
+        # the upload argument doesn't allow us to access the files if more than
+        # one file is uploaded, as upload references the first file
+        # therefore we have to recover the files from the request object
+        Attachments = request.registry['ir.attachment']  # registry for the attachment table
+
+        uploads = []
+        message = None
+        if not upload: # no image provided, storing the link and the image name
+            name = url.split("/").pop()                       # recover filename
+            attachment_id = Attachments.create(request.cr, request.uid, {
+                'name': name,
+                'type': 'url',
+                'url': url,
+                'public': True,
+                'res_model': 'ir.ui.view',
+            }, request.context)
+            uploads += Attachments.read(request.cr, request.uid, [attachment_id], ['name', 'mimetype', 'checksum', 'url'], request.context)
+        else:                                                  # images provided
+            try:
+                attachment_ids = []
+
+                for c_file in request.httprequest.files.getlist('upload'):
+                    pngtype = c_file.filename.split('.')[1]
+                    if pngtype in ['png','jpg', u'png', u'jpg', 'JPEG', u'JPEG']:
+                        url, read_data = self.imageUploadS3(c_file)
+                        exit_args = [('url', '=', str(url))]
+                        exit_ids = Attachments.search(request.cr, request.uid, exit_args)
+                        if not exit_ids:
+                            len_data = base64.encodestring(read_data)
+                            file_size = len(len_data.decode('base64'))
+                            attachment_id = Attachments.create(request.cr, request.uid, {
+                                'name': c_file.filename,
+                                # 'datas': read_data.encode('base64'),
+                                'datas_fname': c_file.filename,
+                                'public': True,
+                                'res_model': 'ir.ui.view',
+                                's3_file_size': file_size,
+                                'type': 'url',
+                                'url': url,
+                                's3target': 's3',
+                            }, request.context)
+                            attachment_ids.append(attachment_id)
+                        else:
+                            attachment_ids += exit_ids
+
+                    else:
+                        data = c_file.read()
+                        try:
+                            image = Image.open(cStringIO.StringIO(data))
+                            w, h = image.size
+                            if w*h > 42e6: # Nokia Lumia 1020 photo resolution
+                                raise ValueError(
+                                    u"Image size excessive, uploaded images must be smaller "
+                                    u"than 42 million pixel")
+                            if not disable_optimization and image.format in ('PNG', 'JPEG'):
+                                data = tools.image_save_for_web(image)
+                        except IOError, e:
+                            pass
+
+                        attachment_id = Attachments.create(request.cr, request.uid, {
+                            'name': c_file.filename,
+                            'datas': data.encode('base64'),
+                            'datas_fname': c_file.filename,
+                            'public': True,
+                            'res_model': 'ir.ui.view',
+                        }, request.context)
+                        attachment_ids.append(attachment_id)
+
+                uploads += Attachments.read(request.cr, request.uid, attachment_ids, ['name', 'mimetype', 'checksum', 'url'], request.context)
+            except Exception, e:
+                _logger.exception("Failed to upload image to attachment")
+                message = unicode(e)
+
+        return """<script type='text/javascript'>
+            window.parent['%s'](%s, %s);
+        </script>""" % (func, json.dumps(uploads), json.dumps(message))
+
+    #图片上传s3
+    def imageUploadS3(self, ufile, permision="public-read"):
+        if(permision not in ("public-read","private","bucket-owner-read")):
+            return "指定的权限不存在！"
+        pngtype = ufile.filename.split('.')[1]
+        read_data = ufile.read()
+        datas = base64.encodestring(read_data)
+        sha = hashlib.sha1(datas).hexdigest()
+        uid = request.session.uid
+        company_id = request.registry['res.users'].browse(request.cr, uid, uid, context=request.context).company_id.id
+        born_uuid = request.registry['res.company'].browse(request.cr,uid,company_id,context=request.context).born_uuid
+        dir = born_uuid
+        cname = sha
+        uploadfile=dir.strip()+"/"+cname.strip()+"."+pngtype
+        # 是否已经上传过
+        # bol = self.isexists(uploadfile)
+        ob=self.__s3.Object(self.__bucketname, uploadfile)
+        ufile.seek(0)
+        result=ob.put(Body=ufile.stream,ServerSideEncryption='AES256',StorageClass='STANDARD',ACL=permision)
+
+        return 'https://s3.cn-north-1.amazonaws.com.cn/'+self.__bucketname+'/'+uploadfile, read_data
+
+        
+    def isexists(self,uploadfile):
+        try:
+            self.__s3.Object(self.__bucketname,uploadfile).get()
+            return True
+        except:
+            return False
+        
