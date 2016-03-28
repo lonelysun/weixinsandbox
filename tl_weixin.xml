@@ -39,6 +39,10 @@
                                     icon="fa-strikethrough"/>
                             <button name="sync_weixin_menu_delete" string="删除自定义菜单" type="object" class="oe_inline oe_stat_button"
                                     icon="fa-strikethrough"/>
+                            <button name="get_user_data" string="获取用户数据" type="object" class="oe_inline oe_stat_button"
+                                    icon="fa-strikethrough"/>
+
+
 
                         </div>
                         <field name="image" widget='image' class="oe_avatar"/>
@@ -52,8 +56,8 @@
                             <group>
                                 <!--<field name="shop_id" options="{'no_create': True,'no_open':True}"/>  -->
                                 <field name="account_name"/>
-                                <field name="appid"/>
-                                <field name="appsecret"/>
+                                <field name="appid" required="1"/>
+                                <field name="appsecret" required="1"/>
                                 <field name="access_token" style="width:90%%"/>
                                 <field name="date_token"/>
                                 <field name="token_expires_at"/>
@@ -525,6 +529,83 @@
             </field>
         </record>
 
+		        <record id="view_tl_weixin_msg_history_form" model="ir.ui.view">
+            <field name="name">微信消息事件历史</field>
+            <field name="model">tl.weixin.msg.history</field>
+            <field name="arch" type="xml">
+                <form string="消息事件历史表单">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="msg_type" />
+                                <field name="msg_id"/>
+                                <field name="to_user_name"/>
+                                <field name="app_id" options="{'no_create': True,'no_open': True}"/>
+                                <field name="location_x"/>
+                                <field name="precision"/>
+                                <field name="title"/>
+                                <field name="format"/>
+                                <field name="label"/>
+                                <field name="description"/>
+                            </group>
+                            <group>
+                                <field name="create_time"/>
+                                <field name="msg_event_id"/>
+                                <field name="from_user_name"/>
+                                <field name="user_id" options="{'no_create': True,'no_open': True}"/>
+                                <field name="location_y"/>
+                                <field name="event_key"/>
+                                <field name="scale"/>
+                                <field name="url"/>
+                                <field name="ticket"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="media_url"/>
+                            <field name="content"/>
+                            <field name="xml_content"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_tl_weixin_msg_history_tree" model="ir.ui.view">
+            <field name="name">微信消息事件历史</field>
+            <field name="model">tl.weixin.msg.history</field>
+            <field name="priority">1</field>
+            <field name="arch" type="xml">
+                <tree string="List Tree">
+                    <field name="msg_id"/>
+                    <field name="msg_event_id"/>
+                    <field name="msg_type"/>
+                    <field name="create_time" string="创建时间"/>
+                    <field name="to_user_name"/>
+                    <field name="from_user_name"/>
+                    <field name="create_date"/>
+                    <field name="app_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_tl_weixin_msg_history" model="ir.actions.act_window">
+            <field name="name">微信消息事件历史</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">tl.weixin.msg.history</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+
+
+            <field name="view_id" ref="view_tl_weixin_msg_history_tree"/>
+
+            <field name="help" type="html">
+
+                <p>
+                    微信消息事件历史,消息记录与事件记录。
+                </p>
+            </field>
+        </record>
+		
 
         <menuitem name="微信门店" id="menu_tl_weixin_poi" action="action_tl_weixin_poi" parent="menu_tl_weixin_poi_root"
                   sequence="2"/>
@@ -536,6 +617,8 @@
                   parent="menu_tl_weixin_setting_root" sequence="2"/>
         <menuitem name="图片" id="menu_tl_weixin_image" action="action_tl_weixin_image"
                   parent="menu_tl_weixin_setting_root" sequence="3"/>
+        <menuitem name="微信消息事件历史" id="menu_tl_weixin_history" action="action_tl_weixin_msg_history"
+                  parent="menu_tl_weixin_setting_root" sequence="5"/>
 
     </data>
 </openerp>

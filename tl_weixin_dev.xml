@@ -43,7 +43,7 @@
             <field name="arch" type="xml">
                 <tree string="List Tree">
                     <field name="title"/>
-                    <field name="company_id"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
                     <field name="app_id"/>
                     <field name="template_id"/>
                 </tree>
@@ -132,14 +132,14 @@
 
 
         <!--微信模板消息-->
-        <record id="view_tl_weixin_message_form" model="ir.ui.view">
+        <record id="view_tl_weixin_template_message_form" model="ir.ui.view">
             <field name="name">微信消息表单</field>
-            <field name="model">tl.weixin.message</field>
+            <field name="model">tl.weixin.template.message</field>
             <field name="arch" type="xml">
                 <form string="微信消息表单">
                     <header>
 						<button name="send_message_button" style="float:left;" string="发送信息"
-							states="draft,faild" type="object" class="oe_highlight" />
+							states="draft,failed" type="object" class="oe_highlight" />
 						<field name="state" widget="statusbar" statusbar_visible="draft,send,failed,cancel" />
 					</header>
 
@@ -147,8 +147,8 @@
 
                         <group>
                             <group>
-                                <field name="template_id" options="{'no_create': True,'no_open': True}"/>
                                 <field name="app_id" options="{'no_create': True,'no_open': True}"/>
+                                <field name="template_id" options="{'no_create': True,'no_open': True}"/>
                                 <field name="template_content" readonly="1"/>
                                 <field name="url"/>
                             </group>
@@ -218,13 +218,13 @@
             </field>
         </record>
 
-        <record id="view_tl_weixin_message_tree" model="ir.ui.view">
+        <record id="view_tl_weixin_template_message_tree" model="ir.ui.view">
             <field name="name">微信消息</field>
-            <field name="model">tl.weixin.message</field>
+            <field name="model">tl.weixin.template.message</field>
             <field name="priority">1</field>
             <field name="arch" type="xml">
                 <tree>
-                    <field name="company_id"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
                     <field name="template_id"/>
                     <field name="user_ids"/>
                     <field name="create_date" string="创建时间"/>
@@ -232,13 +232,13 @@
             </field>
         </record>
 
-        <record id="action_tl_weixin_message" model="ir.actions.act_window">
+        <record id="action_tl_weixin_template_message" model="ir.actions.act_window">
             <field name="name">微信消息</field>
             <field name="type">ir.actions.act_window</field>
-            <field name="res_model">tl.weixin.message</field>
+            <field name="res_model">tl.weixin.template.message</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
-            <field name="view_id" ref="view_tl_weixin_message_tree"/>
+            <field name="view_id" ref="view_tl_weixin_template_message_tree"/>
             <field name="help" type="html">
                 <p>
                     模板消息仅用于公众号向用户发送重要的服务通知，只能用于符合其要求的服务场景中，如信用卡刷卡通知，商品购买成功通知等。不支持广告等营销类消息以及其它所有可能对用户造成骚扰的消息。具体模板消息运营规则请读模板消息运营规范
@@ -381,17 +381,776 @@
 
 
 
+        <!--群发消息-->
+        <record id="view_tl_weixin_group_message_form" model="ir.ui.view">
+            <field name="name">群发消息表单</field>
+            <field name="model">tl.weixin.group.message</field>
+            <field name="arch" type="xml">
+                <form string="群发消息">
+                    <header>
+						<button name="send_group_message_button" style="float:left;"
+                                states="draft" string="发送信息" type="object" class="oe_highlight" />
+                        <field name="state" widget="statusbar"/>
+					</header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="delete_message_button" string="删除群发" type="object" class="oe_inline oe_stat_button"
+                                    icon="fa-refresh"
+                                    attrs="{'invisible':['|',('state','not in',('send','finished')),('msgtype','not in',('mpnews', 'mpvideo'))]}"/>
+                            <button name="get_state_button" string="查询群发状态" type="object" class="oe_inline oe_stat_button"
+                                    states="send" icon="fa-refresh"/>
+                        </div>
+                        <div class="oe_button_box" name="button_box">
+                        </div>
+                        <div class="oe_title">
+                            <label for="app_id" class="oe_edit_only"/>
+                            <h1>
+                                <field name="app_id" options="{'no_create': True,'no_open': True}"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="send_type"/>
+                                <field name="group_id"
+                                       attrs="{'invisible':[('send_type','!=','group')],'required':[('send_type','=','group')]}"
+                                        options="{'no_create': True,'no_open': True}"/>
+                                <field name="msgtype"/>
+                                <field name="material_id" options="{'no_create': True,'no_open': True}"
+                                       attrs="{'invisible':[('msgtype','=','text')], 'required':[('msgtype','!=','text')]}"/>
+                            </group>
+                            <group>
+                                <field name="company_id" options="{'no_create': True,'no_open': True}" groups="base.group_multi_company" />
+                                <field name="send_time" attrs="{'invisible':[('send_time','=',False)]}" />
+
+                            </group>
+                        </group>
+                        <group>
+                            <field name="content" attrs="{'invisible':[('msgtype','!=','text')]}"/>
+                        </group>
+
+                        <field name="group_user_ids" attrs="{'invisible':[('send_type','!=','group')]}"/>
+                        <field name="user_ids" attrs="{'invisible':[('send_type','!=','openid')]}">
+                            <form>
+                                <group>
+                                    <field name="name"/>
+                                    <field name="realname"/>
+                                    <field name="phone"/>
+                                </group>
+                            </form>
+                            <tree>
+                                <field name="name"/>
+                                <field name="realname"/>
+                                <field name="phone"/>
+                            </tree>
+                        </field>
+
+
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_tl_weixin_group_message_tree" model="ir.ui.view">
+            <field name="name">群发消息</field>
+            <field name="model">tl.weixin.group.message</field>
+            <field name="priority">1</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="app_id"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="group_id" />
+                    <field name="send_type"/>
+                    <field name="msgtype"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_tl_weixin_group_message" model="ir.actions.act_window">
+            <field name="name">群发消息</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">tl.weixin.group.message</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_tl_weixin_group_message_tree"/>
+            <field name="help" type="html">
+                <p>
+                    在公众平台网站上，为订阅号提供了每天一条的群发权限，为服务号提供每月（自然月）4条的群发权限。
+                </p>
+                <p>
+                    请注意：
+                </p>
+               <p>
+                   1、对于认证订阅号，群发接口每天可成功调用1次，此次群发可选择发送给全部用户或某个分组；
+               </p>
+               <p>
+                   2、对于认证服务号虽然开发者使用高级群发接口的每日调用限制为100次，但是用户每月只能接收4条，无论在公众平台
+               </p>
+               <p>
+                   3、具备微信支付权限的公众号，在使用群发接口上传、群发图文消息类型时，可使用 a 标签加入外链；
+               </p>
+               <p>
+                   4、开发者可以使用预览接口校对消息样式和排版，通过预览接口可发送编辑好的消息给指定用户校验效果。
+               </p>
+               <p>
+                   关于删除群发
+               </p>
+                <p>
+                   1、只有已经发送成功的消息才能删除
+               </p>
+                <p>
+                   2、删除消息是将消息的图文详情页失效，已经收到的用户，还是能在其本地看到消息卡片
+               </p>
+                <p>
+                   3、删除群发消息只能删除图文消息和视频消息，其他类型的消息一经发送，无法删除。
+               </p>
+                <p>
+                    4、如果多次群发发送的是一个图文消息，那么删除其中一次群发，就会删除掉这个图文消息也，导致所有群发都失效
+                </p>
+            </field>
+        </record>
+
+
+        <!--发送预览消息-->
+        <record id="view_tl_weixin_preview_message_form" model="ir.ui.view">
+            <field name="name">预览表单</field>
+            <field name="model">tl.weixin.preview.message</field>
+            <field name="arch" type="xml">
+                <form string="预览消息">
+                    <header>
+                        <button name="send_preview_message_button" style="float:left;"
+                                states="draft" string="发送预览消息" type="object" class="oe_highlight" />
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                        </div>
+                        <div class="oe_title">
+                            <label for="app_id" class="oe_edit_only"/>
+                            <h1>
+                                <field name="app_id" options="{'no_create': True,'no_open': True}"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="user_id" required="1" options="{'no_create': True,'no_open': True}"/>
+                                <field name="msgtype"/>
+                                <field name="material_id" options="{'no_create': True,'no_open': True}"
+                                           attrs="{'invisible':[('msgtype','=','text')], 'required':[('msgtype','!=','text')]}"/>
+                            </group>
+                            <group>
+                                <field name="company_id" options="{'no_create': True,'no_open': True}" groups="base.group_multi_company" />
+                                <field name="send_time" attrs="{'invisible':[('send_time','=',False)]}"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="content" attrs="{'invisible':[('msgtype','!=','text')]}"/>
+                        </group>
+
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_tl_weixin_preview_message_tree" model="ir.ui.view">
+            <field name="name">预览表单</field>
+            <field name="model">tl.weixin.preview.message</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="app_id"/>
+                    <field name="company_id" groups="base.group_multi_company" />
+                    <field name="msgtype" />
+                    <field name="send_time" />
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_tl_weixin_preview_message" model="ir.actions.act_window">
+            <field name="name">预览消息</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">tl.weixin.preview.message</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_tl_weixin_preview_message_tree"/>
+            <field name="help" type="html">
+                <p>
+                    可发送消息给指定用户，在手机端查看消息的样式和排版
+                </p>
+                <p>
+                    每日使用次数有限制（100次），请勿滥用。
+                </p>
+            </field>
+        </record>
+
+
+
+
+        <!--客服账号-->
+        <record id="view_tl_weixin_kfaccount_form" model="ir.ui.view">
+            <field name="name">客服账号</field>
+            <field name="model">tl.weixin.kfaccount</field>
+            <field name="arch" type="xml">
+                <form string="预览消息">
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                        </div>
+                        <field name="image" widget='image' class="oe_avatar"/>
+                        <div class="oe_title">
+                            <label for="app_id" class="oe_edit_only"/>
+                            <h1>
+                                <field name="app_id" required="1" options="{'no_create': True,'no_open': True}"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <separator style="font-size:13px;" colspan="4"
+                                   string="完整客服账号，格式为：账号前缀@公众号的微信号"/>
+                                <field name="kf_account" />
+                                <field name="password" />
+                                <field name="company_id" options="{'no_create': True,'no_open': True}" groups="base.group_multi_company" />
+                                <field name="kf_nick" />
+                                <field name="kf_headimgurl" readonly="1"/>
+                            </group>
+                            <group>
+
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_tl_weixin_kfaccount_tree" model="ir.ui.view">
+            <field name="name">客服账号</field>
+            <field name="model">tl.weixin.kfaccount</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="app_id" />
+                    <field name="company_id" />
+                    <field name="kf_account" />
+                    <field name="kf_nick" />
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_tl_weixin_kfaccount" model="ir.actions.act_window">
+            <field name="name">客服账号</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">tl.weixin.kfaccount</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_tl_weixin_kfaccount_tree"/>
+
+        </record>
+
+
+
+        <!--发送客服消息-->
+        <record id="view_tl_weixin_kfaccount_message_form" model="ir.ui.view">
+            <field name="name">客服消息表单</field>
+            <field name="model">tl.weixin.kfaccount.message</field>
+            <field name="arch" type="xml">
+                <form string="客服消息">
+                    <header>
+                        <button name="send_kfaccount_message_button" style="float:left;"
+                                states="draft" string="发送客服消息" type="object" class="oe_highlight" />
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                        </div>
+                        <div class="oe_title">
+                            <label for="app_id" class="oe_edit_only"/>
+                            <h1>
+                                <field name="app_id" options="{'no_create': True,'no_open': True}"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="user_id" required="1" options="{'no_create': True,'no_open': True}"/>
+                                <field name="kf_id" options="{'no_create': True,'no_open': True}"/>
+                                <field name="msgtype"/>
+                                <field name="material_id" options="{'no_create': True,'no_open': True}"
+                                           attrs="{'invisible':[('msgtype','=','text')], 'required':[('msgtype','!=','text')]}"/>
+                            </group>
+                            <group>
+                                <field name="company_id" options="{'no_create': True,'no_open': True}" groups="base.group_multi_company" />
+                                <field name="send_time" attrs="{'invisible':[('send_time','=',False)]}"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="content" attrs="{'invisible':[('msgtype','!=','text')]}"/>
+                        </group>
+
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_tl_weixin_kfaccount_message_tree" model="ir.ui.view">
+            <field name="name">客服消息</field>
+            <field name="model">tl.weixin.kfaccount.message</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="app_id"/>
+                    <field name="company_id" groups="base.group_multi_company" />
+                    <field name="kf_id" />
+                    <field name="msgtype" />
+                    <field name="send_time" />
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_tl_weixin_kfaccount_message" model="ir.actions.act_window">
+            <field name="name">客服消息</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">tl.weixin.kfaccount.message</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_tl_weixin_kfaccount_message_tree"/>
+        </record>
+
+
+
+
+        <!--自定义菜单-->
+        <record id="view_tl_weixin_menu_form" model="ir.ui.view">
+            <field name="name">自定义菜单</field>
+            <field name="model">tl.weixin.menu</field>
+            <field name="arch" type="xml">
+                <form string="自定义菜单">
+                    <sheet>
+
+                        <div class="oe_button_box" name="button_box">
+                            <button name="delete_conditional_menu" string="删除个性化菜单" type="object" class="oe_inline oe_stat_button"
+                                    icon="fa-refresh"
+                            attrs="{'invisible':[('is_conditional','=',False)]}"/>
+                        </div>
+
+
+                        <div class="oe_button_box" name="button_box">
+                        </div>
+                        <div class="oe_title">
+                            <label for="app_id" class="oe_edit_only"/>
+                            <h1>
+                                <field name="app_id" options="{'no_create': True,'no_open': True}"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+
+                                <field name="company_id" options="{'no_create': True,'no_open': True}" groups="base.group_multi_company" />
+                                <separator style="font-size:13px;" colspan="4"
+                                   string="注意:如果创建的不是个性化菜单,那么将会覆盖原有的非个性化的自定义菜单"/>
+                                <field name="is_conditional" />
+
+                                <separator style="font-size:13px;" colspan="4"
+                                   string="在以下选项配置个性化选项" attrs="{'invisible':[('is_conditional','=',False)]}"/>
+                                <field name="group_id" attrs="{'invisible':[('is_conditional','=',False)]}"
+                                       options="{'no_create': True,'no_open': True}"/>
+                                <field name="sex" attrs="{'invisible':[('is_conditional','=',False)]}"/>
+                                <field name="country_id" attrs="{'invisible':[('is_conditional','=',False)]}"
+                                       options="{'no_create': True,'no_open': True}"/>
+                                <field name="province_id" attrs="{'invisible':[('is_conditional','=',False)]}"
+                                       options="{'no_create': True,'no_open': True}"/>
+                                <field name="city_id" attrs="{'invisible':[('is_conditional','=',False)]}"
+                                       options="{'no_create': True,'no_open': True}"/>
+                                <field name="client_platform_type" attrs="{'invisible':[('is_conditional','=',False)]}"
+                                       options="{'no_create': True,'no_open': True}"/>
+                                <field name="language" attrs="{'invisible':[('is_conditional','=',False)]}"
+                                       options="{'no_create': True,'no_open': True}"/>
+
+                            </group>
+                            <group>
+
+                            </group>
+                        </group>
+                        <group>
+                            <field name="button_ids" string="一级菜单">
+
+                                <form>
+                                    <group>
+                                        <field name="name" required="1"/>
+                                        <field name="type" />
+                                        <field name="key" options="{'no_create': True}"
+                                               attrs="{'invisible':[('type','not in',('click','scancode_push','scancode_waitmsg','pic_sysphoto','pic_photo_or_album','pic_weixin'))],
+                                                           'required':[('type','in',('click','scancode_push','scancode_waitmsg','pic_sysphoto','pic_photo_or_album','pic_weixin'))]}"/>
+                                        <field name="url" attrs="{'invisible':[('type','!=','view')]}"/>
+                                        <field name="media_id"
+                                               attrs="{'invisible':[('type','not in',('location_select','media_id','view_limited'))],
+                                               'required':[('type','in',('location_select','media_id','view_limited'))]}"/>
+                                        <field name="child_ids" string="二级菜单">
+
+
+                                            <form>
+                                                <group>
+                                                    <field name="name" required="1"/>
+                                                    <field name="type" />
+                                                    <field name="key" options="{'no_create': True}"
+                                                           attrs="{'invisible':[('type','not in',('click','scancode_push','scancode_waitmsg','pic_sysphoto','pic_photo_or_album','pic_weixin'))],
+                                                           'required':[('type','in',('click','scancode_push','scancode_waitmsg','pic_sysphoto','pic_photo_or_album','pic_weixin'))]}" />
+                                                    <field name="url" attrs="{'invisible':[('type','!=','view')]}"/>
+                                                    <field name="media_id"
+                                                        attrs="{'invisible':[('type','not in',('location_select','media_id','view_limited'))],
+                                                        'required':[('type','in',('location_select','media_id','view_limited'))]}"/>
+
+                                                </group>
+                                            </form>
+                                            <tree>
+                                                <field name="name" />
+
+                                            </tree>
+
+
+                                        </field>
+                                    </group>
+                                </form>
+                                <tree>
+                                    <field name="name" />
+
+                                </tree>
+                            </field>
+                        </group>
+
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_tl_weixin_menu_tree" model="ir.ui.view">
+            <field name="name">自定义菜单</field>
+            <field name="model">tl.weixin.menu</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="app_id" />
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="is_conditional" />
+
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_tl_weixin_menu" model="ir.actions.act_window">
+            <field name="name">自定义菜单</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">tl.weixin.menu</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_tl_weixin_menu_tree"/>
+            <field name="help" type="html">
+                <p>
+                    自定义菜单最多包括3个一级菜单，每个一级菜单最多包含5个二级菜单。
+                </p>
+                <p>
+                    一级菜单最多4个汉字，二级菜单最多7个汉字，多出来的部分将会以“...”代替。
+                </p>
+               <p>
+                    个性化菜单接口说明：
+               </p>
+               <p>
+                   1 个性化菜单要求用户的微信客户端版本在iPhone6.2.2，Android 6.2.4以上。
+               </p>
+               <p>
+                   2 出于安全考虑，一个公众号的所有个性化菜单，最多只能设置为跳转到3个域名下的链接
+               </p>
+               <p>
+                   3 创建个性化菜单之前必须先创建默认菜单（默认菜单是指使用普通自定义菜单创建接口创建的菜单）。如果删除默认菜单，个性化菜单也会全部删除
+               </p>
+               <p>
+                   个性化菜单匹配规则说明：
+               </p>
+                <p>
+                   当公众号创建多个个性化菜单时，将按照发布顺序，由新到旧逐一匹配，直到用户信息与matchrule相符合。如果全部个性化菜单都没有匹配成功，则返回默认菜单
+               </p>
+                <p>
+                   当公众号创建多个个性化菜单时，将按照发布顺序，由新到旧逐一匹配，直到用户信息与matchrule相符合。如果全部个性化菜单都没有匹配成功，则返回默认菜单
+               </p>
+
+            </field>
+        </record>
+
+
+
+
+
+        <!--配置key表-->
+        <record id="view_tl_weixin_eventkey_form" model="ir.ui.view">
+            <field name="name">自定义菜单</field>
+            <field name="model">tl.weixin.eventkey</field>
+            <field name="arch" type="xml">
+                <form string="自定义菜单">
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                        </div>
+                        <div class="oe_title">
+                            <label for="app_id" class="oe_edit_only"/>
+                            <h1>
+                                <field name="app_id" options="{'no_create': True,'no_open': True}"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+
+                                <field name="company_id"  options="{'no_create': True,'no_open': True}" groups="base.group_multi_company"/>
+                                <field name="name" />
+                                <field name="value" />
+                                <field name="menu_type" />
+                                <field name="reply_type" />
+                                <field name="text" />
+                                <field name="media_id" />
+
+                            </group>
+                            <group>
+
+                            </group>
+                        </group>
+
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_tl_weixin_eventkey_tree" model="ir.ui.view">
+            <field name="name">自定义菜单</field>
+            <field name="model">tl.weixin.eventkey</field>
+            <field name="arch" type="xml">
+                <tree>
+
+                    <field name="app_id" />
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="name" />
+                    <field name="value" />
+                    <field name="menu_type" />
+                    <field name="reply_type" />
+                    <field name="text" />
+                    <field name="media_id" />
+
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_tl_weixin_eventkey" model="ir.actions.act_window">
+            <field name="name">自定义菜单</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">tl.weixin.eventkey</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_tl_weixin_eventkey_tree"/>
+            <field name="help" type="html">
+                <p>
+                    菜单KEY值，用于消息接口推送，不超过128字节
+                </p>
+                <p>
+                    服务器会根据原先设定好的KEY作出相应的反应
+                </p>
+            </field>
+        </record>
+        
+        
+        
+        <!--测试个性化菜单匹配结果-->
+        <record id="view_tl_weixin_matchmenu_form" model="ir.ui.view">
+            <field name="name">匹配结果</field>
+            <field name="model">tl.weixin.matchmenu</field>
+            <field name="arch" type="xml">
+                <form string="自定义菜单">
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="match_menu_button" string="测试匹配" type="object" class="oe_inline oe_stat_button"
+                                    icon="fa-refresh"/>
+                        </div>
+                        <div class="oe_button_box" name="button_box">
+                        </div>
+                        <div class="oe_title">
+                            <label for="app_id" class="oe_edit_only"/>
+                            <h1>
+                                <field name="app_id" options="{'no_create': True,'no_open': True}"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                                <field name="user_id" options="{'no_create': True,'no_open': True}"/>
+                                <field name="result" />
+                            </group>
+                            <group>
+
+                            </group>
+                        </group>
+
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_tl_weixin_matchmenu_tree" model="ir.ui.view">
+            <field name="name">匹配结果</field>
+            <field name="model">tl.weixin.matchmenu</field>
+            <field name="arch" type="xml">
+                <tree>
+
+                    <field name="app_id" />
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="user_id" />
+
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_tl_weixin_matchmenu" model="ir.actions.act_window">
+            <field name="name">匹配结果</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">tl.weixin.matchmenu</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_tl_weixin_matchmenu_tree"/>
+        </record>
+
+
+
+
+        <!--获取用户数据向导-->
+        <record id="view_tl_weixin_userdata_wizard_form" model="ir.ui.view">
+            <field name="name">获取用户数据向导</field>
+            <field name="model">tl.weixin.userdata.wizard</field>
+            <field name="arch" type="xml">
+                <form string="自定义菜单">
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                        </div>
+                        <div class="oe_title">
+                            <label for="app_id" class="oe_edit_only"/>
+                            <h1>
+                                <field name="app_id" options="{'no_create': True,'no_open': True}"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="company_id" groups="base.group_multi_company"/>
+
+                                <separator style="font-size:13px;" colspan="4"
+                                   string="注意: 结束日期最大值为昨天且结束日期和开始日期差值需要小于7天"/>
+                                <field name="begin_date" />
+                                <field name="end_date" />
+                            </group>
+                            <group>
+                            </group>
+                        </group>
+                        <footer>
+                            <button string="确认" name="get_userdata" type="object" class="btn-primary"/>
+                            <button string="取消" class="btn-default" special="cancel" />
+                        </footer>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <!--用户数据-->
+        <record id="view_tl_weixin_userdata_form" model="ir.ui.view">
+            <field name="name">用户数据</field>
+            <field name="model">tl.weixin.userdata</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                        </div>
+                        <div class="oe_title">
+                            <label for="app_id" class="oe_edit_only"/>
+                            <h1>
+                                <field name="app_id" options="{'no_create': True,'no_open': True}"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                                <field name="ref_date" />
+                                <field name="new_user" />
+                                <field name="cancel_user" />
+                                <field name="cumulate_user" />
+                                <field name="user_source" />
+                            </group>
+                            <group>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+
+
+        <record id="view_tl_weixin_userdata_tree" model="ir.ui.view">
+            <field name="name">用户数据</field>
+            <field name="model">tl.weixin.userdata</field>
+            <field name="arch" type="xml">
+                <tree>
+
+                    <field name="app_id" />
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="ref_date" />
+                    <field name="new_user" />
+                    <field name="cancel_user" />
+                    <field name="cumulate_user" />
+                    <field name="user_source" />
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_tl_weixin_userdata" model="ir.actions.act_window">
+            <field name="name">用户数据</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">tl.weixin.userdata</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_tl_weixin_userdata_tree"/>
+        </record>
+
+
+
+
+
+
+
+
+
+
         <menuitem name="模板" id="menu_tl_weixin_template" action="action_tl_weixin_template"
                   parent="menu_tl_weixin_setting_root" sequence="4"/>
 
         <menuitem name="行业代码" id="menu_tl_weixin_industry" action="action_tl_weixin_industry"
                   parent="menu_tl_weixin_setting_root" sequence="5"/>
 
-        <menuitem name="模板信息" id="menu_tl_weixin_message" action="action_tl_weixin_message"
+        <menuitem name="模板信息" id="menu_tl_weixin_template_message" action="action_tl_weixin_template_message"
                   parent="menu_tl_weixin_setting_root" sequence="６"/>
 
         <menuitem name="组" id="menu_tl_weixin_users_groups" action="action_tl_weixin_users_groups"
                   parent="menu_tl_weixin_users_root" sequence="3"/>
+
+        <menuitem name="群发消息" id="menu_tl_weixin_group_message" action="action_tl_weixin_group_message"
+                  parent="menu_tl_weixin_setting_root" sequence="7"/>
+
+        <menuitem name="预览消息" id="menu_tl_weixin_preview_message" action="action_tl_weixin_preview_message"
+                  parent="menu_tl_weixin_setting_root" sequence="9"/>
+
+        <menuitem name="客服账号" id="menu_tl_weixin_kfaccount" action="action_tl_weixin_kfaccount"
+                  parent="menu_tl_weixin_setting_root" sequence="10"/>
+
+        <menuitem name="客服消息" id="menu_tl_weixin_kfaccount_message" action="action_tl_weixin_kfaccount_message"
+                  parent="menu_tl_weixin_setting_root" sequence="11"/>
+
+        <menuitem name="定义事件Key" id="menu_tl_weixin_eventkey" action="action_tl_weixin_eventkey"
+                  parent="menu_tl_weixin_setting_root" sequence="12"/>
+
+        <menuitem name="自定义菜单" id="menu_tl_weixin_menu" action="action_tl_weixin_menu"
+                  parent="menu_tl_weixin_setting_root" sequence="13"/>
+
+        <menuitem name="测试匹配结果" id="menu_tl_weixin_matchmenu" action="action_tl_weixin_matchmenu"
+                  parent="menu_tl_weixin_setting_root" sequence="14"/>
+
+        <menuitem name="用户分析数据" id="menu_tl_weixin_userdata" action="action_tl_weixin_userdata"
+                  parent="menu_tl_weixin_setting_root" sequence="15"/>
 
     </data>
 </openerp>

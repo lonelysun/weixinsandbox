@@ -11,3 +11,4 @@
 import tl_weixin
 import tl_weixin_dev
 import controllers
+import open_weixin

@@ -49,10 +49,10 @@ class tl_weixin_app(models.Model):
             company_id = context.get('company_id', False)
         return company_id
 
-    name = fields.Char(u'公众号', required=True)
+    name = fields.Char(u'公众号')
     access_token = fields.Text(u'Access Token')
     appid = fields.Char(u'AppID(应用ID)', required=True)
-    appsecret = fields.Char(u'AppSecret(应用密钥)', required=True)
+    appsecret = fields.Char(u'AppSecret(应用密钥)')
     date_token = fields.Datetime(u'Token生效时间', readonly="1")
     # token_expires_at = fields.Integer(u'Token失效时间', readonly="1")
     token_expires_at = fields.Datetime(u'Token失效时间', readonly="1")
@@ -74,6 +74,7 @@ class tl_weixin_app(models.Model):
     secondary_industry = fields.Many2one('tl.weixin.industry', string=u'副营行业', domain=[('code','>',0)], help=u'需要选择公众账号服务所处的2个行业，每月可更改1次所选行业')
     user_group_ids = fields.One2many('tl.weixin.users.groups', 'app_id', u'用户分组')
     account_name = fields.Char(u'微信号')
+    # is_sub_merchant = fields.Boolean(u'是否为子商户')
 
 
     _defaults = {
@@ -96,7 +97,7 @@ class tl_weixin_app(models.Model):
                 'access_token': json["access_token"],
                 'date_token': datetime.now(),
                 # 'token_expires_at': int(time.time()) + json["expires_in"]
-                'token_expires_at':datetime.now() + timedelta(seconds=stamp)
+                'token_expires_at': datetime.now() + timedelta(seconds=stamp)
             }
             self.write(cr, uid, ids, parm)
             return json["access_token"]
@@ -171,8 +172,7 @@ class tl_weixin_app(models.Model):
 
 
             if (o.jsapi_ticket):
-                timeArray = time.strptime(o.jsapi_ticket_expires_at, "%Y-%m-%d %H:%M:%S")
-                time_stamp = int(time.mktime(timeArray))
+                time_stamp = int(time.mktime(time.strptime(o.jsapi_ticket_expires_at, DEFAULT_SERVER_DATETIME_FORMAT)))
                 if time_stamp > 0:
                     now = time.time()
                     if time_stamp - now > 60:
@@ -412,61 +412,61 @@ class tl_weixin_app(models.Model):
                     # 验证该画面是否已经存在
                     user_ids = user_obj.search(cr, uid, [('openid', '=', openid)], context=context)
 
-                    o = client_obj.get_user_info(openid)
-                    if "errcode" in o and o["errcode"] != 0:
+                    info_json = client_obj.get_user_info(openid)
+                    if "errcode" in info_json and info_json["errcode"] != 0:
                         continue
 
-                    if isinstance(o.get('subscribe_time', False), (int, long, float)):
-                        subscribe_time = datetime.fromtimestamp(o.get('subscribe_time', False))
+                    if isinstance(info_json.get('subscribe_time', False), (int, long, float)):
+                        subscribe_time = datetime.fromtimestamp(info_json.get('subscribe_time', False))
                     else:
                         subscribe_time = False
 
-                    groupid = o.get('groupid', 'NoGroupId')
+                    groupid = info_json.get('groupid', 'NoGroupId')
                     # print groupid
                     if groupid != 'NoGroupId':
-                        ids = group_obj.search(cr, uid, [('groupid', '=', groupid)], limit=1, context=context)
+                        ids = group_obj.search(cr, uid, [('groupid', '=', groupid), ('app_id', '=', o.id)], limit=1, context=context)
 
                         if ids:
                             group_id = group_obj.browse(cr, uid, ids[0]).id
                         else:
-                            group_id = False
+                            group_id = ''
                     else:
-                        group_id = False
+                        group_id = ''
 
                     if not user_ids:
 
                         val_users.append((0, 0, {
-                            'subscribe': o.get('subscribe', False),
-                            'openid': o.get('openid', False),
-                            'name': o.get('nickname', False),
-                            'sex': o.get('sex', False),
-                            'city': o.get('city', False),
-                            'country': o.get('country', False),
-                            'province': o.get('province', False),
-                            'language': o.get('language', False),
-                            'headimgurl': o.get('headimgurl', False),
+                            'subscribe': info_json.get('subscribe', False),
+                            'openid': info_json.get('openid', False),
+                            'name': info_json.get('nickname', False),
+                            'sex': info_json.get('sex', False),
+                            'city': info_json.get('city', False),
+                            'country': info_json.get('country', False),
+                            'province': info_json.get('province', False),
+                            'language': info_json.get('language', False),
+                            'headimgurl': info_json.get('headimgurl', False),
                             'subscribe_time': subscribe_time,
-                            'unionid': o.get('unionid', False),
-                            'remark': o.get('remark', False),
-                            # 'groupid': o.get('groupid', False),
+                            'unionid': info_json.get('unionid', False),
+                            'remark': info_json.get('remark', False),
+                            # 'groupid': json.get('groupid', False),
                             'group_id': group_id,
 
                         }))
                     else:
                         vals = {
-                            'subscribe': o.get('subscribe', False),
-                            'openid': o.get('openid', False),
-                            'name': o.get('nickname', False),
-                            'sex': o.get('sex', False),
-                            'city': o.get('city', False),
-                            'country': o.get('country', False),
-                            'province': o.get('province', False),
-                            'language': o.get('language', False),
-                            'headimgurl': o.get('headimgurl', False),
+                            'subscribe': info_json.get('subscribe', False),
+                            'openid': info_json.get('openid', False),
+                            'name': info_json.get('nickname', False),
+                            'sex': info_json.get('sex', False),
+                            'city': info_json.get('city', False),
+                            'country': info_json.get('country', False),
+                            'province': info_json.get('province', False),
+                            'language': info_json.get('language', False),
+                            'headimgurl': info_json.get('headimgurl', False),
                             'subscribe_time': subscribe_time,
-                            'unionid': o.get('unionid', False),
-                            'remark': o.get('remark', False),
-                            # 'groupid': o.get('groupid', False),
+                            'unionid': info_json.get('unionid', False),
+                            'remark': info_json.get('remark', False),
+                            # 'groupid': info_json.get('groupid', False),
                             'group_id': group_id,
                             'auto': True
                         }
@@ -973,6 +973,21 @@ class tl_weixin_app(models.Model):
                 menu_set.unlink()
 
         return
+
+    # 获取用户数据
+    @api.multi
+    def get_user_data(self):
+
+        return {
+            'name': _(u'获取用户数据'),
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'tl.weixin.userdata.wizard',
+            'view_id': False,
+            'type': 'ir.actions.act_window',
+            'target': 'new'
+        }
+
 
     @api.multi
     def write(self, vals):
@@ -1684,7 +1699,7 @@ class tl_weixin_msg_history(models.Model):
                                 u'消息类型', help=u"消息类型", required=True, )
     msg_id = fields.Char(u'消息id', size=128, help=u"消息id，64位整型")
     content = fields.Text(u'文本消息内容', help=u"文本消息内容")
-    pic_url = fields.Text(u'图片链接', help=u"图片链接")
+    media_url = fields.Text(u'文件链接', help=u"图片，视频，语音等多媒体文件本地链接")
     media_id = fields.Text(u'消息媒体id', help=u"消息媒体id，可以调用多媒体文件下载接口拉取数据。")
     format = fields.Char(u'语音格式', size=255, help=u"语音格式，如amr，speex等", )
     thumb_media_id = fields.Text(u'缩略图的媒体id', help=u"缩略图的媒体id，可以调用多媒体文件下载接口拉取数据。")

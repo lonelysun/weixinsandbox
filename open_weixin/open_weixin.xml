@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="view_open_weixin_app_form" model="ir.ui.view">
+            <field name="name">开放平台配置表单</field>
+            <field name="model">tl.open.weixin.app</field>
+            <field name="arch" type="xml">
+                <form string="开放平台配置表单">
+                    <sheet>
+
+                        <div class="oe_button_box" name="button_box">
+                            <button name="grant_token" string="测试连接" type="object" class="oe_inline oe_stat_button"
+                                    icon="fa-refresh"/>
+                            <button name="get_pre_auth_page_url" string="授权页" type="object" class="oe_inline oe_stat_button"
+                                    icon="fa-strikethrough"/>
+                        </div>
+
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name" required="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <field name="app_id"/>
+                            <field name="app_secret"/>
+                            <field name="component_access_token" style="width:100%%"/>
+                            <field name="date_token"/>
+                            <field name="token_expires_at"/>
+                            <field name="encoding_AES_key"/>
+                            <field name="last_encoding_AES_key"/>
+                            <field name="component_verify_ticket"/>
+                        </group>
+
+
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_tl_open_weixin_app_tree" model="ir.ui.view">
+            <field name="name">开放平台配置</field>
+            <field name="model">tl.open.weixin.app</field>
+            <field name="priority">1</field>
+            <field name="arch" type="xml">
+                <tree string="List Tree">
+                    <field name="name"/>
+                    <field name="app_id"/>
+                    <field name="app_secret"/>
+                    <field name="date_token"/>
+                    <field name="write_date" string="更新日期"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_tl_open_weixin_app" model="ir.actions.act_window">
+            <field name="name">开放平台配置</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">tl.open.weixin.app</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_tl_open_weixin_app_tree"/>
+            <field name="help">配置开放平台参数</field>
+        </record>
+
+        <menuitem name="开放平台配置" id="menu_open_weixin_app" action="action_tl_open_weixin_app"
+                  parent="menu_tl_weixin_setting_root" sequence="2"/>
+
+    </data>
+</openerp>

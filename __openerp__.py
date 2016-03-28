@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 ##############################################################################
+#  COMPANY: BONN
 #  AUTHOR: KIWI
 #  EMAIL: arborous@gmail.com
 #  VERSION : 1.0   NEW  2015/12/12
@@ -9,7 +10,7 @@
 
 {
     'name': "微信",
-    'author': '',  # 作者
+    'author': '上海波恩网络科技服务有限公司',  # 作者
     'summary': 'BORN',
     'description': """
          微信管理
@@ -18,7 +19,7 @@
     'sequence': 8,
     'website': 'http://www.mychinavip.com',
     'images': [],
-    'depends': ['odoo'],
+    'depends': ['born_odoo'],
     'demo': [],
     'init_xml': [],
     'data': [
@@ -28,6 +29,7 @@
         'data/weixin_region_data.xml',
         # 'data/color_data.xml',
         # 'security/groups.xml',
+        'open_weixin/open_weixin.xml',
 
     ],
     'auto_install': False,

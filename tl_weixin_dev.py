@@ -27,7 +27,7 @@ import uuid
 from openerp import _
 from openerp.exceptions import UserError, ValidationError
 from openerp import api, fields, models
-from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
+from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT
 try:
     import cStringIO as StringIO
 except ImportError:
@@ -308,7 +308,6 @@ class tl_weixin_users_groups(models.Model):
 
 # 移动用户到组wizard
 class tl_weixin_users_groups_wizard(osv.TransientModel):
-
 
     _name = "tl.weixin.users.groups.wizard"
     _description = u"更改用户组的向导"
@@ -1412,10 +1411,7 @@ class tl_weixin_matchmenu(models.Model):
 
             self.result_json = json
             self.result = result
-
-
         return
-
 
     # 选择公众号筛选用户
     @api.onchange('app_id')
@@ -1426,3 +1422,138 @@ class tl_weixin_matchmenu(models.Model):
             user_ids = [user.id for user in users]
 
             return {'domain':{'user_id':[('id','in',user_ids)]}}
+
+
+
+class tl_weixin_userdata_wizard(osv.TransientModel):
+    """
+    获取用户数据的模板
+    """
+    _name = 'tl.weixin.userdata.wizard'
+    _rec_name = 'app_id'
+
+    # 获取选中的默认账号id
+    @api.multi
+    def _get_default_app_id(self):
+
+        context = dict(self._context or {})
+        app_id = context.get('active_model') == 'tl.weixin.app' and context.get('active_id') or []
+        return app_id
+
+    app_id = fields.Many2one('tl.weixin.app', required=True, default=_get_default_app_id,string=u'微信公众号', help=u'发送消息的公众号')
+    company_id = fields.Many2one('res.company', u'公司', default=lambda self: self.env.user.company_id, help=u"所属公司")
+
+    begin_date = fields.Date(u'开始日期', required=True)
+    end_date = fields.Date(u'结束日期', required=True)
+    # detail_ids = fields.One2many('tl.weixin.userdata.detail', 'userdata_id', string=u'用户分析数据详细')
+
+
+
+    @api.multi
+    def get_userdata(self):
+        # str格式转化成datetime格式来判断end_time最大为昨天,以及两者只差少于7天
+        time_list = []
+        for x in [self.begin_date, self.end_date]:
+            y, m, d = time.strptime(x, DEFAULT_SERVER_DATE_FORMAT)[0:3]
+            time_list.append(datetime(y, m, d))
+        begin_date = time_list[0]
+        end_date = time_list[1]
+        yesterday = (datetime.today() + timedelta(-1))
+
+        if end_date < begin_date:
+            raise ValidationError(u'结束日期不能小于开始日期')
+        if end_date > yesterday and end_date.day != yesterday.day:
+            raise ValidationError(u'结束日期最大为昨天!')
+        if end_date - begin_date > timedelta(6):
+            raise ValidationError(u'结束日期最多比开始日期多6天!')
+
+        o = self.app_id
+        client_obj = Client(self.pool, self._cr, o.id, o.appid, o.appsecret, o.access_token, o.token_expires_at)
+
+        # 先获取用户增减数据
+        json1 = client_obj.datacube_getuser_summary(self.begin_date, self.end_date)
+        # json1 = {u'list': []}
+        if "errcode" in json1 and json1["errcode"] != 0:
+            raise ValidationError(_(json1["errmsg"]))
+        else:
+
+            # 再获取用户累计用户数据
+            json2 = client_obj.datacube_getuser_cumulate(self.begin_date, self.end_date)
+            # json2 = {u'list': [{u'user_source': 0, u'cumulate_user': 97, u'ref_date': u'2016-03-22'}, {u'user_source': 0, u'cumulate_user': 97, u'ref_date': u'2016-03-23'}]}
+            if "errcode" in json2 and json2["errcode"] != 0:
+                raise ValidationError(_(json2["errmsg"]))
+            else:
+
+                # 处理两次请求得到的数据,不能直接根据返回的json来循环ref_date,因为,当没有值时,json['list']为空,
+                # 微信文档也没说明,几天中如果有一天没数据该如何处理, 所有这里是考虑了这种情况
+                # 找出self.begin_date 和self.end_date之间的日期的字符串
+                range_list = []
+                while begin_date <= end_date:
+                    range_list.append(str(begin_date.year) + '-' + str(str(begin_date.month).rjust(2,'0'))+ '-' +str(str(begin_date.day).rjust(2,'0')))
+                    begin_date += timedelta(1)
+
+                # vals_list = []
+                for each_day in range_list:
+                    # 判断tl.weixin.userdata.detail表上是否已经有这天的数据,如果有,则不再再本地生成
+                    if self.env['tl.weixin.userdata'].search([('app_id', '=', self.app_id.id),('ref_date', '=', each_day)]):
+                        continue
+
+                    user_source = 0
+                    cancel_user = 0
+                    new_user = 0
+                    cumulate_user = 0
+
+                    # 遍历json1找到对应each_day的值
+                    if json1['list']:
+                        for each1 in json1['list']:
+                            if each1['ref_date'] == each_day:
+                                user_source = each1.get('user_source', 0)
+                                cancel_user = each1.get('cancel_user', 0)
+                                new_user = each1.get('new_user', 0)
+
+                    # 遍历json2找到对应each_day的值
+                    if json2['list']:
+                        for each2 in json2['list']:
+
+                            if str(each2['ref_date']) == each_day:
+                                cumulate_user = each2.get('cumulate_user', 0)
+
+                    vals = {
+                        'ref_date': each_day,
+                        'user_source': str(user_source),
+                        'new_user': new_user,
+                        'cancel_user': cancel_user,
+                        'app_id': self.app_id.id,
+                        'company_id': self.company_id.id or '',
+                        'cumulate_user': cumulate_user,
+
+                    }
+                    self.env['tl.weixin.userdata'].create(vals)
+
+        return
+
+
+
+class tl_weixin_userdata(models.Model):
+    """
+    用户分析数据
+    """
+    _name = 'tl.weixin.userdata'
+    _rec_name = 'ref_date'
+    _order = 'ref_date'
+
+    app_id = fields.Many2one('tl.weixin.app', required=True, string=u'微信公众号', help=u'发送消息的公众号')
+    company_id = fields.Many2one('res.company', u'公司', default=lambda self: self.env.user.company_id, help=u"所属公司")
+
+    # userdata_id = fields.Many2one('tl.weixin.userdata', string=u'用户分析数据')
+    ref_date = fields.Date(u'数据的日期')
+    # TODO user source 不是指单一用户的吗, 对一个用户群是什么含义
+    user_source = fields.Selection(
+        [('0', u'其他合计'), ('1', u'公众号搜索'), ('17', u'名片分享'),
+         ('30', u'扫描二维码'), ('43', u'图文页右上角菜单'), ('51', u'支付后关注（在支付完成页）'),
+         ('57', u'图文页内公众号名称'), ('75', u'公众号文章广告'), ('78', u'表朋友圈广告'),], string=u'用户的渠道',
+        help=u"0代表其他合计 1代表公众号搜索 17代表名片分享 30代表扫描二维码 43代表图文页右上角菜单 51代表支付后关注（在支付完成页） 57代表图文页内公众号名称 75代表公众号文章广告 78代表朋友圈广告")
+    new_user = fields.Integer(u'新增的用户数量', help=u'新增的用户数量')
+    cancel_user = fields.Integer(u'取消关注的用户数量', help=u'取消关注的用户数量，new_user减去cancel_user即为净增用户数量')
+    cumulate_user = fields.Integer(u'总用户量', help=u'总用户量')
+
