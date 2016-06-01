@@ -70,8 +70,10 @@ class tl_weixin_app(models.Model):
     mch_id = fields.Char(u'微信支付商户号', help=u"微信支付分配的商户号")
     security_key = fields.Char(u'加密KEY', help=u"key设置路径：微信商户平台(pay.weixin.qq.com)-->账户设置-->API安全-->密钥设置")
     image = openerp.fields.Binary(u"微信公众二维码", attachment=True, help=u"建议尺寸：宽60像素，高60像素")
-    primary_industry = fields.Many2one('tl.weixin.industry', string=u'主营行业', domain=[('code','>',0)], help=u'需要选择公众账号服务所处的2个行业，每月可更改1次所选行业')
-    secondary_industry = fields.Many2one('tl.weixin.industry', string=u'副营行业', domain=[('code','>',0)], help=u'需要选择公众账号服务所处的2个行业，每月可更改1次所选行业')
+    primary_industry = fields.Many2one('tl.weixin.industry', string=u'模板消息主营行业', domain=[('code', '>', 0)],
+                                       help=u'需要选择公众账号服务所处的2个行业，每月可更改1次所选行业')
+    secondary_industry = fields.Many2one('tl.weixin.industry', string=u'模板消息副营行业', domain=[('code', '>', 0)],
+                                         help=u'需要选择公众账号服务所处的2个行业，每月可更改1次所选行业')
     user_group_ids = fields.One2many('tl.weixin.users.groups', 'app_id', u'用户分组')
     account_name = fields.Char(u'微信号')
     # is_sub_merchant = fields.Boolean(u'是否为子商户')
@@ -153,11 +155,13 @@ class tl_weixin_app(models.Model):
             parm = {
                 'jsapi_ticket': json["ticket"],
                 'jsapi_ticket_date': datetime.now(),
-                # 'jsapi_ticket_expires_at': int(time.time()) + json["expires_in"]
-                'token_expires_at':datetime.now() + timedelta(seconds=stamp)
+
+                'jsapi_ticket_expires_at': datetime.now() + timedelta(seconds=int(json["expires_in"])),
+                'token_expires_at': datetime.now() + timedelta(seconds=stamp)
             }
             self.write(cr, uid, id, parm)
-            return json["ticket"]
+            json['app_id'] = o.appid
+            return json
 
     def get_jsapi_ticket(self, cr, uid, openid, context=None):
         """
@@ -169,14 +173,12 @@ class tl_weixin_app(models.Model):
             id = records[0].get('app_id')[0]
             o = self.browse(cr, uid, id, context)
 
-
-
-            if (o.jsapi_ticket):
+            if o.jsapi_ticket:
                 time_stamp = int(time.mktime(time.strptime(o.jsapi_ticket_expires_at, DEFAULT_SERVER_DATETIME_FORMAT)))
                 if time_stamp > 0:
                     now = time.time()
                     if time_stamp - now > 60:
-                        return o.jsapi_ticket
+                        return {'ticket': o.jsapi_ticket, 'app_id': o.appid}
                     else:
                         return self.grant_jsapi_ticket(cr, uid, id, o)
             else:
@@ -424,7 +426,8 @@ class tl_weixin_app(models.Model):
                     groupid = info_json.get('groupid', 'NoGroupId')
                     # print groupid
                     if groupid != 'NoGroupId':
-                        ids = group_obj.search(cr, uid, [('groupid', '=', groupid), ('app_id', '=', o.id)], limit=1, context=context)
+                        ids = group_obj.search(cr, uid, [('groupid', '=', groupid), ('app_id', '=', o.id)], limit=1,
+                                               context=context)
 
                         if ids:
                             group_id = group_obj.browse(cr, uid, ids[0]).id
@@ -701,7 +704,6 @@ class tl_weixin_app(models.Model):
 
                     group = self.env['tl.weixin.users.groups'].search(domain, limit=1)
 
-
                     if group:
                         group.write({
                             "name": each_group['name'],
@@ -719,11 +721,11 @@ class tl_weixin_app(models.Model):
                         })
         return
 
-
     # 同步客服
     @api.multi
     def sync_weixin_kfaccount(self):
-        client_obj = Client(self.pool, self._cr, self.id, self.appid, self.appsecret, self.access_token, self.token_expires_at)
+        client_obj = Client(self.pool, self._cr, self.id, self.appid, self.appsecret, self.access_token,
+                            self.token_expires_at)
         json = client_obj.getkflist()
 
         if "errcode" in json and json["errcode"] != 0:
@@ -737,7 +739,6 @@ class tl_weixin_app(models.Model):
                     domain = [('kf_id', '=', int(each_account['kf_id'])), ('app_id', '=', self.id)]
 
                     kfaccount = self.env['tl.weixin.kfaccount'].search(domain, limit=1)
-
 
                     if kfaccount:
                         kfaccount.write({
@@ -753,18 +754,17 @@ class tl_weixin_app(models.Model):
                             "kf_nick": each_account['kf_nick'],
                             "kf_id": each_account['kf_id'],
                             "kf_headimgurl": each_account['kf_headimgurl'],
-                            "app_id":self.id,
+                            "app_id": self.id,
                             "auto": True
                         })
         return
-
-
 
     # 同步自定义菜单
     # 同步的策略是:先删除此公众号本地的菜单, 然后拉取服务器上的菜单
     @api.multi
     def sync_weixin_menu(self):
-        client_obj = Client(self.pool, self._cr, self.id, self.appid, self.appsecret, self.access_token, self.token_expires_at)
+        client_obj = Client(self.pool, self._cr, self.id, self.appid, self.appsecret, self.access_token,
+                            self.token_expires_at)
         json = client_obj.get_menu()
 
         if "errcode" in json and json["errcode"] != 0:
@@ -781,7 +781,6 @@ class tl_weixin_app(models.Model):
                 if menu_set:
                     menu_set.unlink()
 
-
                 button_lst = []
                 for each_button in menu['button']:
 
@@ -793,7 +792,7 @@ class tl_weixin_app(models.Model):
                         for each_sub in sub_button:
                             # 根据服务器返回的key值查询本地的key值,如果查不到则存空
                             if each_sub.get('key', False):
-                                key = self.env['tl.weixin.eventkey'].search([('value','=', each_sub.get('key'))])
+                                key = self.env['tl.weixin.eventkey'].search([('value', '=', each_sub.get('key'))])
                                 if key:
                                     key_id = key.id
                                 else:
@@ -813,7 +812,7 @@ class tl_weixin_app(models.Model):
 
                     # 根据服务器返回的key值查询本地的key值,如果查不到则存空
                     if each_button.get('key', False):
-                        key = self.env['tl.weixin.eventkey'].search([('value','=', each_button.get('key'))])
+                        key = self.env['tl.weixin.eventkey'].search([('value', '=', each_button.get('key'))])
                         if key:
                             key_id = key.id
                         else:
@@ -840,7 +839,6 @@ class tl_weixin_app(models.Model):
 
                 self.env['tl.weixin.menu'].create(vals)
 
-
                 # 判断是否存在个性化菜单
                 conditionalmenu = json.get("conditionalmenu", False)
                 if conditionalmenu:
@@ -858,7 +856,8 @@ class tl_weixin_app(models.Model):
                                 for each_sub in sub_button:
                                     # 根据服务器返回的key值查询本地的key值,如果查不到则设为空
                                     if sub_button.get('key', False):
-                                        key = self.env['tl.weixin.eventkey'].search([('value','=', each_sub.get('key'))])
+                                        key = self.env['tl.weixin.eventkey'].search(
+                                            [('value', '=', each_sub.get('key'))])
                                         if key:
                                             key_id = key.id
                                         else:
@@ -877,7 +876,7 @@ class tl_weixin_app(models.Model):
                                     sub_button_lst.append((0, 0, sub_button_vals))
 
                             if each_button.get('key', False):
-                                key = self.env['tl.weixin.eventkey'].search([('value','=', each_button.get('key'))])
+                                key = self.env['tl.weixin.eventkey'].search([('value', '=', each_button.get('key'))])
                                 if key:
                                     key_id = key.id
                                 else:
@@ -896,22 +895,23 @@ class tl_weixin_app(models.Model):
                             button_lst.append((0, 0, button_vals))
 
                         # 解析matchrule
-                        #API文档有问题, 说"matchrule共六个字段", 但实际有7个
+                        # API文档有问题, 说"matchrule共六个字段", 但实际有7个
                         matchrule = each_conditional['matchrule']
 
                         if matchrule.get('group_id', False):
                             # 查询表得到对应的group_id
-                            group = self.env['tl.weixin.users.groups'].search([('groupid','=',int(matchrule.get('group_id')))])
+                            group = self.env['tl.weixin.users.groups'].search(
+                                [('groupid', '=', int(matchrule.get('group_id')))])
                             if group:
                                 group_id = group.id
                             else:
                                 group_id = ''
-                                
+
                         else:
                             group_id = ''
 
                         if matchrule.get('country', False):
-                            country = self.env['tl.weixin.country'].search([('name','=',matchrule.get('country'))])
+                            country = self.env['tl.weixin.country'].search([('name', '=', matchrule.get('country'))])
                             if country:
                                 country_id = country.id
                             else:
@@ -920,7 +920,7 @@ class tl_weixin_app(models.Model):
                             country_id = ''
 
                         if matchrule.get('province', False):
-                            province = self.env['tl.weixin.province'].search([('name','=',matchrule.get('province'))])
+                            province = self.env['tl.weixin.province'].search([('name', '=', matchrule.get('province'))])
                             if province:
                                 province_id = province.id
                             else:
@@ -930,7 +930,7 @@ class tl_weixin_app(models.Model):
 
                         if matchrule.get('city', False):
                             # 查询表得到对应的city_id
-                            city = self.env['tl.weixin.city'].search([('name','=',matchrule.get('city'))])
+                            city = self.env['tl.weixin.city'].search([('name', '=', matchrule.get('city'))])
                             if city:
                                 city_id = city.id
                             else:
@@ -962,7 +962,8 @@ class tl_weixin_app(models.Model):
     # 删除自定义菜单
     @api.multi
     def sync_weixin_menu_delete(self):
-        client_obj = Client(self.pool, self._cr, self.id, self.appid, self.appsecret, self.access_token, self.token_expires_at)
+        client_obj = Client(self.pool, self._cr, self.id, self.appid, self.appsecret, self.access_token,
+                            self.token_expires_at)
         json = client_obj.delete_menu()
 
         if "errcode" in json and json["errcode"] != 0:
@@ -982,12 +983,169 @@ class tl_weixin_app(models.Model):
             'name': _(u'获取用户数据'),
             'view_type': 'form',
             'view_mode': 'form',
-            'res_model': 'tl.weixin.userdata.wizard',
-            'view_id': False,
+            'res_model': 'tl.weixin.data.wizard',
+            'view_id': '',
             'type': 'ir.actions.act_window',
-            'target': 'new'
+            'target': 'new',
+            'context': {'wizard_code': '1'}
         }
 
+    # 获取图文群发每日数据
+    @api.multi
+    def get_articlesummary_data(self):
+
+        return {
+            'name': _(u'获取图文群发每日数据'),
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'tl.weixin.data.wizard',
+            'view_id': '',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'context': {'wizard_code': '2'}
+        }
+
+    # 获取图文群发总数据
+    @api.multi
+    def get_articletotal_data(self):
+
+        return {
+            'name': _(u'获取图文群发总数据'),
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'tl.weixin.data.wizard',
+            'view_id': '',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'context': {'wizard_code': '3'}
+        }
+
+    # 获取图文群发总数据
+    @api.multi
+    def get_userread_data(self):
+
+        return {
+            'name': _(u'获取图文统计数据'),
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'tl.weixin.data.wizard',
+            'view_id': '',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'context': {'wizard_code': '4'}
+        }
+
+    @api.multi
+    def get_userreadhour_data(self):
+
+        return {
+            'name': _(u'获取图文统计分时数据'),
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'tl.weixin.data.wizard',
+            'view_id': '',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'context': {'wizard_code': '5'}
+        }
+
+    @api.multi
+    def get_usershare_data(self):
+
+        return {
+            'name': _(u'获取图文分享转发数据'),
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'tl.weixin.data.wizard',
+            'view_id': '',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'context': {'wizard_code': '6'}
+        }
+
+    @api.multi
+    def get_usersharehour_data(self):
+
+        return {
+            'name': _(u'获取图文分享转发分时数据'),
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'tl.weixin.data.wizard',
+            'view_id': '',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'context': {'wizard_code': '7'}
+        }
+
+    @api.multi
+    def get_upstreammsg_data(self):
+
+        return {
+            'name': _(u'获取消息发送概况数据'),
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'tl.weixin.data.wizard',
+            'view_id': '',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'context': {'wizard_code': '8'}
+        }
+
+    @api.multi
+    def get_upstreammsghour_data(self):
+
+        return {
+            'name': _(u'获取消息分送分时数据'),
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'tl.weixin.data.wizard',
+            'view_id': '',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'context': {'wizard_code': '9'}
+        }
+
+    @api.multi
+    def get_upstreammsgweek_data(self):
+
+        return {
+            'name': _(u'获取消息发送周数据'),
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'tl.weixin.data.wizard',
+            'view_id': '',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'context': {'wizard_code': '10'}
+        }
+
+    @api.multi
+    def get_upstreammsgmonth_data(self):
+
+        return {
+            'name': _(u'获取消息发送月数据'),
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'tl.weixin.data.wizard',
+            'view_id': '',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'context': {'wizard_code': '11'}
+        }
+
+    @api.multi
+    def get_interfacesummary_data(self):
+
+        return {
+            'name': _(u'获取接口分析数据'),
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'tl.weixin.data.wizard',
+            'view_id': '',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'context': {'wizard_code': '12'}
+        }
 
     @api.multi
     def write(self, vals):
@@ -1661,7 +1819,7 @@ class tl_weixin_articles(models.Model):
     name = fields.Char(u'标题', size=255, help=u"图文消息的标题", required=True)
     thumb_media_id = fields.Many2one('tl.weixin.material', u'封面图片素材编号', help=u'图文消息的封面图片素材id（必须是永久mediaID）',
                                      select=True, required=True)
-    show_cover_pic = fields.Boolean(u'是否显示封面', required=True, help=u'是否显示封面，0为false，即不显示，1为true，即显示')
+    show_cover_pic = fields.Boolean(u'是否显示封面', help=u'是否显示封面，0为false，即不显示，1为true，即显示')
     author = fields.Char(u'作者', size=255, help=u"作者", required=True, )
     digest = fields.Char(u'摘要', help=u"图文消息的摘要，仅有单图文消息才有摘要，多图文此处为空", required=True, )
 
@@ -1693,7 +1851,7 @@ class tl_weixin_msg_history(models.Model):
                                  ('unsubscribe', u'取消关注事件'),
                                  ('SCAN', u'扫描带参数二维码事件'),
                                  ('LOCATION', u'上报地理位置事件'),
-                                 ('CLICK', u'点击菜单拉取消息时的事件推送'),
+                                 ('click', u'点击菜单拉取消息时的事件推送'),
                                  ('VIEW', u'点击菜单跳转链接时的事件推送'),
                                  ],
                                 u'消息类型', help=u"消息类型", required=True, )
@@ -1706,7 +1864,7 @@ class tl_weixin_msg_history(models.Model):
 
     location_x = fields.Char(u'地理位置维度', size=255, help=u"地理位置维度", )
     location_y = fields.Char(u'地理位置经度', size=255, help=u"地理位置经度", )
-    precision = fields.Char(u'地理位置精度',size=255,help=u'地理位置精度')
+    precision = fields.Char(u'地理位置精度', size=255, help=u'地理位置精度')
     scale = fields.Char(u'地图缩放大小', size=255, help=u"地图缩放大小", )
     label = fields.Char(u'地理位置信息', help=u"地理位置信息", )
     title = fields.Char(u'消息标题', help=u"消息标题", )
@@ -1718,7 +1876,5 @@ class tl_weixin_msg_history(models.Model):
     app_id = fields.Many2one('tl.weixin.app', u'公众号', select=True)
     user_id = fields.Many2one('tl.weixin.users', u'关注者', select=True, )
 
-    msg_event_id = fields.Char(u'事件id',size=255 ,help=u"事件id，由FromUserName+CreateTime组成")
-    xml_content = fields.Text(u'XML数据包原始内容',help=u"微信服务器POST的XML数据包")
-
-
+    msg_event_id = fields.Char(u'事件id', size=255, help=u"事件id，由FromUserName+CreateTime组成")
+    xml_content = fields.Text(u'XML数据包原始内容', help=u"微信服务器POST的XML数据包")

@@ -11,8 +11,13 @@
                         <div class="oe_button_box" name="button_box">
                             <button name="grant_token" string="测试连接" type="object" class="oe_inline oe_stat_button"
                                     icon="fa-refresh"/>
-                            <button name="get_pre_auth_page_url" string="授权页" type="object" class="oe_inline oe_stat_button"
+                            <button name="get_pre_auth_page_url" string="授权页" type="object"
+                                    class="oe_inline oe_stat_button"
                                     icon="fa-strikethrough"/>
+
+                            <button name="%(action_pull_card_merchant_info)d" type="action" icon="fa-strikethrough"
+                                    string="拉取单个子商户信息"  class="oe_inline oe_stat_button"/>
+
                         </div>
 
                         <div class="oe_title">
@@ -63,8 +68,186 @@
             <field name="help">配置开放平台参数</field>
         </record>
 
+        <menuitem name="公众号第三方平" id="menu_tl_open_weixin_setting_root" parent="menu_tl_weixin_root" sequence="12"/>
+
         <menuitem name="开放平台配置" id="menu_open_weixin_app" action="action_tl_open_weixin_app"
-                  parent="menu_tl_weixin_setting_root" sequence="2"/>
+                  parent="menu_tl_open_weixin_setting_root" sequence="1"/>
+
+        <record id="view_tl_open_weixin_material_form" model="ir.ui.view">
+            <field name="name">开放平台临时素材表单</field>
+            <field name="model">tl.open.weixin.material</field>
+            <field name="arch" type="xml">
+                <form string="开放平台临时素材表单">
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="do_re_upload" string="重新上传" type="object" class="oe_inline oe_stat_button"
+                                    icon="fa-refresh" attrs="{'invisible':[('media_id','=',False)]}"/>
+                        </div>
+
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name" required="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="media_id" attrs="{'invisible':[('media_id','=',False)]}"/>
+                                <field name="app_id"/>
+                                <field name="type"/>
+
+                                <field name="annex" filename="file_name"
+                                       attrs="{'invisible':[('type','in',['image','thumb'])],'required':[('type','in',['video','voice'])]}"/>
+
+                                <field name="image" filename="file_name"
+                                       attrs="{'invisible':[('type','in',['video','voice'])],'required':[('type','in',['image','thumb'])]}"
+                                       widget='image'/>
+
+                                <field name="file_name" invisible="1"/>
+                                <field name="created_at" attrs="{'invisible':[('created_at','=',False)]}"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="introduction" attrs="{'required':[('type','=','video')]}"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_tl_open_weixin_material_tree" model="ir.ui.view">
+            <field name="name">开放平台临时素材</field>
+            <field name="model">tl.open.weixin.material</field>
+            <field name="priority">1</field>
+            <field name="arch" type="xml">
+                <tree string="List Tree">
+                    <field name="app_id"/>
+                    <field name="name"/>
+                    <field name="type"/>
+                    <field name="created_at" string="上传时间"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_tl_open_weixin_material" model="ir.actions.act_window">
+            <field name="name">开放平台临时素材</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">tl.open.weixin.material</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_tl_open_weixin_material_tree"/>
+
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    1、对于临时素材，每个素材（media_id）会在开发者上传或粉丝发送到微信服务器3天后自动删除（所以用户发送给开发者的素材，若开发者需要，应尽快下载到本地），以节省服务器资源。
+                </p>
+                <p>
+                    2、素材的格式大小等要求与公众平台官网一致。具体是，图片大小不超过2M，支持bmp/png/jpeg/jpg/gif格式，语音大小不超过5M，长度不超过60秒（公众平台官网可以在文章中插入小于30分钟的语音，但这些语音不能用于群发等场景，只能放在文章内，这方面接口暂不支持），支持mp3/wma/wav/amr格式
+                </p>
+                <p>
+                    3、素材的类型，图片（image）、视频（video）、语音 （voice）和缩略图（thumb）
+                </p>
+            </field>
+        </record>
+
+        <menuitem name="临时素材" id="menu_tl_open_weixin_material" action="action_tl_open_weixin_material"
+                  parent="menu_tl_open_weixin_setting_root" sequence="2"/>
+
+        <record id="view_tl_open_weixin_merchant_form" model="ir.ui.view">
+            <field name="name">开放平台子商户管理表单</field>
+            <field name="model">tl.open.weixin.merchant</field>
+            <field name="arch" type="xml">
+                <form string="开放平台子商户管理表单">
+                    <header>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,RESULT_CHECKING,RESULT_PASS"/>
+                    </header>
+
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="qualification_apply" string="提交申请" type="object"
+                                    class="oe_inline oe_stat_button"
+                                    icon="fa-refresh" states="draft,RESULT_NOT_PASS,RESULT_NOTHING_TO_CHECK"/>
+
+                            <button name="qualification_query" string="审核查询" type="object"
+                                    class="oe_inline oe_stat_button"
+                                    icon="fa-refresh" states="RESULT_CHECKING"/>
+                        </div>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name" required="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="agent_id" required="1"/>
+                                <field name="app_id" required="1"/>
+                                <field name="reason" attrs="{'invisible':[('reason','=',False)]}"/>
+                                <field name="logo_meida_id" domain="[('type','=','image')]"
+                                       attrs="{'required':[('state','in',('draft','RESULT_NOT_PASS','RESULT_NOTHING_TO_CHECK'))]}"/>
+                                <field name="business_license_media_id"
+                                       attrs="{'required':[('state','in',('draft','RESULT_NOT_PASS','RESULT_NOTHING_TO_CHECK'))]}"
+                                       domain="[('type','=','image')]"/>
+                                <field name="agreement_file_media_id"
+                                       attrs="{'required':[('state','in',('draft','RESULT_NOT_PASS','RESULT_NOTHING_TO_CHECK'))]}"
+                                       domain="[('type','=','image')]"/>
+                                <field name="is_individually_owned"/>
+                                <field name="operator_id_card_media_id" domain="[('type','=','image')]"
+                                       attrs="{'invisible':[('is_individually_owned','=',False)],'required':[('is_individually_owned','=',True),('state','in',('draft','RESULT_NOT_PASS','RESULT_NOTHING_TO_CHECK'))]}"/>
+                                <field name="is_update_merchant_apply_protocol"/>
+                                <field name="primary_category_id" options="{'no_create': True}"
+                                       domain="[('parent_category_id','=',False)]"
+                                       attrs="{'required':[('state','in',('draft','RESULT_NOT_PASS','RESULT_NOTHING_TO_CHECK'))]}"/>
+                                <field name="secondary_category_id" options="{'no_create': True}"
+                                       attrs="{'required':[('state','in',('draft','RESULT_NOT_PASS','RESULT_NOTHING_TO_CHECK'))]}"
+                                       domain="[('parent_category_id','=',primary_category_id)]"/>
+                                <field name="company_id" options="{'no_create': True}"/>
+                                <field name="reason" attrs="{'invisible':[('reason','=',False)]}"/>
+                            </group>
+                        </group>
+
+                        <div style="padding:5px 0px;">
+                            <p style="color:red;">*当子商户为个体工商户且无公章时，授权函须签名，并额外提交该个体工商户经营者身份证的扫描件</p>
+                            <p style="color:red;">*同一个APP_ID的申请，仅当驳回时可再次提交，审核中和审核通过时不可重复提交。</p>
+                        </div>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_tl_open_weixin_merchant_tree" model="ir.ui.view">
+            <field name="name">开放平台子商户管理</field>
+            <field name="model">tl.open.weixin.merchant</field>
+            <field name="priority">1</field>
+            <field name="arch" type="xml">
+                <tree string="List Tree">
+                    <field name="app_id"/>
+                    <field name="name"/>
+                    <field name="agent_id"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_tl_open_weixin_merchant" model="ir.actions.act_window">
+            <field name="name">开放平台子商户管理</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">tl.open.weixin.merchant</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_tl_open_weixin_merchant_tree"/>
+
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    母商户（第三方平台）申请获得第三方开发者代制能力后，才可提交名下子商户的资质。
+                </p>
+                <p>子商户资质审核通过后，才可进行后续的授权流程。</p>
+                <p>子商户的资质包括：商户名称、商户logo（图片）、卡券类目、AppID、营业执照或个体户经营执照（扫描件）、授权协议（扫描件）。</p>
+            </field>
+        </record>
+
+        <menuitem name="子商户管理" id="menu_tl_open_weixin_merchant" action="action_tl_open_weixin_merchant"
+                  parent="menu_tl_open_weixin_setting_root" sequence="2"/>
 
     </data>
 </openerp>

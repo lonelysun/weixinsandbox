@@ -144,10 +144,15 @@
 					</header>
 
                     <sheet>
+                        <div class="oe_title">
+                            <label for="app_id" class="oe_edit_only"/>
+                            <h1>
+                                <field name="app_id" options="{'no_create': True,'no_open': True}"/>
+                            </h1>
+                        </div>
 
                         <group>
                             <group>
-                                <field name="app_id" options="{'no_create': True,'no_open': True}"/>
                                 <field name="template_id" options="{'no_create': True,'no_open': True}"/>
                                 <field name="template_content" readonly="1"/>
                                 <field name="url"/>
@@ -612,7 +617,6 @@
                                 <field name="kf_headimgurl" readonly="1"/>
                             </group>
                             <group>
-
                             </group>
                         </group>
                     </sheet>
@@ -640,7 +644,6 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
             <field name="view_id" ref="view_tl_weixin_kfaccount_tree"/>
-
         </record>
 
 
@@ -681,7 +684,6 @@
                         <group>
                             <field name="content" attrs="{'invisible':[('msgtype','!=','text')]}"/>
                         </group>
-
                     </sheet>
                 </form>
             </field>
@@ -780,8 +782,6 @@
                                                attrs="{'invisible':[('type','not in',('location_select','media_id','view_limited'))],
                                                'required':[('type','in',('location_select','media_id','view_limited'))]}"/>
                                         <field name="child_ids" string="二级菜单">
-
-
                                             <form>
                                                 <group>
                                                     <field name="name" required="1"/>
@@ -793,21 +793,16 @@
                                                     <field name="media_id"
                                                         attrs="{'invisible':[('type','not in',('location_select','media_id','view_limited'))],
                                                         'required':[('type','in',('location_select','media_id','view_limited'))]}"/>
-
                                                 </group>
                                             </form>
                                             <tree>
                                                 <field name="name" />
-
                                             </tree>
-
-
                                         </field>
                                     </group>
                                 </form>
                                 <tree>
                                     <field name="name" />
-
                                 </tree>
                             </field>
                         </group>
@@ -825,7 +820,6 @@
                     <field name="app_id" />
                     <field name="company_id" groups="base.group_multi_company"/>
                     <field name="is_conditional" />
-
                 </tree>
             </field>
         </record>
@@ -890,7 +884,6 @@
                         </div>
                         <group>
                             <group>
-
                                 <field name="company_id"  options="{'no_create': True,'no_open': True}" groups="base.group_multi_company"/>
                                 <field name="name" />
                                 <field name="value" />
@@ -898,10 +891,8 @@
                                 <field name="reply_type" />
                                 <field name="text" />
                                 <field name="media_id" />
-
                             </group>
                             <group>
-
                             </group>
                         </group>
 
@@ -915,7 +906,6 @@
             <field name="model">tl.weixin.eventkey</field>
             <field name="arch" type="xml">
                 <tree>
-
                     <field name="app_id" />
                     <field name="company_id" groups="base.group_multi_company"/>
                     <field name="name" />
@@ -924,7 +914,6 @@
                     <field name="reply_type" />
                     <field name="text" />
                     <field name="media_id" />
-
                 </tree>
             </field>
         </record>
@@ -988,11 +977,9 @@
             <field name="model">tl.weixin.matchmenu</field>
             <field name="arch" type="xml">
                 <tree>
-
                     <field name="app_id" />
                     <field name="company_id" groups="base.group_multi_company"/>
                     <field name="user_id" />
-
                 </tree>
             </field>
         </record>
@@ -1010,9 +997,9 @@
 
 
         <!--获取用户数据向导-->
-        <record id="view_tl_weixin_userdata_wizard_form" model="ir.ui.view">
+        <record id="view_tl_weixin_data_wizard_form" model="ir.ui.view">
             <field name="name">获取用户数据向导</field>
-            <field name="model">tl.weixin.userdata.wizard</field>
+            <field name="model">tl.weixin.data.wizard</field>
             <field name="arch" type="xml">
                 <form string="自定义菜单">
                     <sheet>
@@ -1029,15 +1016,52 @@
                                 <field name="company_id" groups="base.group_multi_company"/>
 
                                 <separator style="font-size:13px;" colspan="4"
-                                   string="注意: 结束日期最大值为昨天且结束日期和开始日期差值需要小于7天"/>
-                                <field name="begin_date" />
-                                <field name="end_date" />
+                                   string="注意: 结束日期最大值为昨天且结束日期和开始日期差值需要小于7天"
+                                           attrs="{'invisible':[('wizard_code','not in',('1','6'))]}"/>
+                                <separator style="font-size:13px;" colspan="4"
+                                   string="注意: 结束日期最大值为昨天且结束日期和开始日期差值需要小于3天"
+                                           attrs="{'invisible':[('wizard_code','!=','4')]}"/>
+                                <separator style="font-size:13px;" colspan="4"
+                                   string="注意: 结束日期最大值为昨天且结束日期和开始日期差值需要小于30天"
+                                           attrs="{'invisible':[('wizard_code','not in',('10','11', '12'))]}"/>
+                                <field name="begin_date" attrs="{'invisible':[('wizard_code','in',('2', '3','5','7', '9'))]}"/>
+                                <field name="query_date" string="查询日期" attrs="{'invisible':[('wizard_code','not in',('2', '3', '5', '7', '9'))]}"/>
+                                <field name="end_date" attrs="{'invisible':[('wizard_code','in',('2', '3','5', '7', '9'))]}"/>
+                                <field name="wizard_code" invisible="1"/>
                             </group>
                             <group>
                             </group>
                         </group>
                         <footer>
-                            <button string="确认" name="get_userdata" type="object" class="btn-primary"/>
+                            <button string="确认" name="get_userdata" type="object" class="btn-primary"
+                                attrs="{'invisible':[('wizard_code','!=','1')]}"/>
+                            <button string="确认" name="get_articlesummary_data" type="object" class="btn-primary"
+                                attrs="{'invisible':[('wizard_code','!=','2')]}"/>
+                            <button string="确认" name="get_articletotal_data" type="object" class="btn-primary"
+                                attrs="{'invisible':[('wizard_code','!=','3')]}"/>
+
+                            <button string="确认" name="get_userread_data" type="object" class="btn-primary"
+                                attrs="{'invisible':[('wizard_code','!=','4')]}"/>
+
+                            <button string="确认" name="get_userreadhour_data" type="object" class="btn-primary"
+                                attrs="{'invisible':[('wizard_code','!=','5')]}"/>
+                            <button string="确认" name="get_usershare_data" type="object" class="btn-primary"
+                                attrs="{'invisible':[('wizard_code','!=','6')]}"/>
+
+                            <button string="确认" name="get_usersharehour_data" type="object" class="btn-primary"
+                                attrs="{'invisible':[('wizard_code','!=','7')]}"/>
+
+                            <button string="确认" name="get_upstreammsg_data" type="object" class="btn-primary"
+                                attrs="{'invisible':[('wizard_code','!=','8')]}"/>
+
+                            <button string="确认" name="get_upstreammsghour_data" type="object" class="btn-primary"
+                                attrs="{'invisible':[('wizard_code','!=','9')]}"/>
+                            <button string="确认" name="get_upstreammsgweek_data" type="object" class="btn-primary"
+                                attrs="{'invisible':[('wizard_code','!=','10')]}"/>
+                            <button string="确认" name="get_upstreammsgmonth_data" type="object" class="btn-primary"
+                                attrs="{'invisible':[('wizard_code','!=','11')]}"/>
+                            <button string="确认" name="get_interfacesummary_data" type="object" class="btn-primary"
+                                attrs="{'invisible':[('wizard_code','!=','12')]}"/>
                             <button string="取消" class="btn-default" special="cancel" />
                         </footer>
                     </sheet>
@@ -1086,7 +1110,6 @@
             <field name="model">tl.weixin.userdata</field>
             <field name="arch" type="xml">
                 <tree>
-
                     <field name="app_id" />
                     <field name="company_id" groups="base.group_multi_company"/>
                     <field name="ref_date" />
@@ -1106,12 +1129,929 @@
             <field name="view_mode">tree,form</field>
             <field name="view_id" ref="view_tl_weixin_userdata_tree"/>
         </record>
+        
+        
+        
+        
+        <!--图文群发每日数据-->
+        <record id="view_tl_weixin_articledata_summary_form" model="ir.ui.view">
+            <field name="name">图文群发每日数据</field>
+            <field name="model">tl.weixin.articledata.summary</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                        </div>
+                        <div class="oe_title">
+                            <label for="app_id" class="oe_edit_only"/>
+                            <h1>
+                                <field name="app_id" options="{'no_create': True,'no_open': True}"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                                <field name="ref_date" />
+
+                            </group>
+                            <group>
+                            </group>
+                        </group>
+                        <field name="detail_ids">
+                            <form>
+                                <group>
+                                    <group>
+                                        <field name="article_id" />
+                                        <field name="msgid" />
+                                        <field name="title" />
+                                        <field name="user_source" />
+                                        <field name="int_page_read_user" />
+                                        <field name="int_page_read_count" />
+                                        <field name="ori_page_read_user" />
+                                        <field name="ori_page_read_count" />
+                                        <field name="share_user" />
+                                        <field name="share_count" />
+                                        <field name="add_to_fav_user" />
+                                        <field name="add_to_fav_count" />
+                                    </group>
+                                    <group></group>
+                                </group>
+                            </form>
+                            <tree>
+                                <field name="article_id" />
+                                <field name="msgid" />
+                                <field name="title" />
+                                <field name="user_source" />
+                                <field name="int_page_read_user" />
+                                <field name="int_page_read_count" />
+                                <field name="ori_page_read_user" />
+                                <field name="ori_page_read_count" />
+                                <field name="share_user" />
+                                <field name="share_count" />
+                                <field name="add_to_fav_user" />
+                                <field name="add_to_fav_count" />
+                            </tree>
+                        </field>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+       
+        <record id="view_tl_weixin_articledata_summary_tree" model="ir.ui.view">
+            <field name="name">图文群发每日数据</field>
+            <field name="model">tl.weixin.articledata.summary</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="app_id" />
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="ref_date" />
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_tl_weixin_articledata_summary" model="ir.actions.act_window">
+            <field name="name">图文群发每日数据</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">tl.weixin.articledata.summary</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_tl_weixin_articledata_summary_tree"/>
+        </record>
+
+
+
+
+        <!--图文群发总数据-->
+        <record id="view_tl_weixin_articledata_total_form" model="ir.ui.view">
+            <field name="name">图文群发总数据</field>
+            <field name="model">tl.weixin.articledata.total</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                        </div>
+                        <div class="oe_title">
+                            <label for="app_id" class="oe_edit_only"/>
+                            <h1>
+                                <field name="app_id" options="{'no_create': True,'no_open': True}"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                                <field name="ref_date" />
+                                <field name="title" />
+                                <field name="user_source" />
+                            </group>
+                            <group>
+                            </group>
+                        </group>
+                        <field name="detail_ids">
+                            <form>
+                                <group>
+                                    <group>
+                                        <field name="int_page_read_user" />
+                                        <field name="int_page_read_count" />
+                                        <field name="ori_page_read_user" />
+                                        <field name="ori_page_read_count" />
+                                        <field name="share_user" />
+                                        <field name="share_count" />
+                                    </group>
+                                    <group></group>
+                                </group>
+                            </form>
+                            <tree>
+                                <field name="stat_date" />
+                            </tree>
+                        </field>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="view_tl_weixin_articledata_total_tree" model="ir.ui.view">
+            <field name="name">图文群发总数据</field>
+            <field name="model">tl.weixin.articledata.total</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="app_id" />
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="ref_date" />
+                    <field name="msgid" />
+                    <field name="title" />
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_tl_weixin_articledata_total" model="ir.actions.act_window">
+            <field name="name">图文群发总数据</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">tl.weixin.articledata.total</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_tl_weixin_articledata_total_tree"/>
+        </record>
+
+
+
+
+        <!--获取图文统计数据-->
+        <record id="view_tl_weixin_articledata_userread_form" model="ir.ui.view">
+            <field name="name">图文统计数据</field>
+            <field name="model">tl.weixin.articledata.userread</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                        </div>
+                        <div class="oe_title">
+                            <label for="app_id" class="oe_edit_only"/>
+                            <h1>
+                                <field name="app_id" options="{'no_create': True,'no_open': True}"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                                <field name="ref_date" />
+                            </group>
+                            <group>
+                            </group>
+                        </group>
+                        <field name="detail_ids">
+                            <form>
+                                <group>
+                                    <group>
+                                        <field name="int_page_read_user" />
+                                        <field name="int_page_read_count" />
+                                        <field name="ori_page_read_user" />
+                                        <field name="ori_page_read_count" />
+                                        <field name="share_user" />
+                                        <field name="share_count" />
+                                        <field name="user_source" />
+                                        <field name="add_to_fav_count" />
+                                        <field name="add_to_fav_user" />
+                                    </group>
+                                    <group></group>
+                                </group>
+                            </form>
+                            <tree>
+                                <field name="user_source" />
+                                <field name="int_page_read_user" />
+                                <field name="int_page_read_count" />
+                                <field name="ori_page_read_user" />
+                                <field name="ori_page_read_count" />
+                                <field name="share_user" />
+                                <field name="share_count" />
+                                <field name="add_to_fav_count" />
+                                <field name="add_to_fav_user" />
+                            </tree>
+                        </field>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="view_tl_weixin_articledata_userread_tree" model="ir.ui.view">
+            <field name="name">图文统计数据</field>
+            <field name="model">tl.weixin.articledata.userread</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="app_id" />
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="ref_date" />
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_tl_weixin_articledata_userread" model="ir.actions.act_window">
+            <field name="name">图文统计数据</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">tl.weixin.articledata.userread</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_tl_weixin_articledata_userread_tree"/>
+        </record>
+
+
+        <!--获取图文统计分时数据-->
+        <record id="view_tl_weixin_articledata_userreadhour_form" model="ir.ui.view">
+            <field name="name">图文统计分时数据</field>
+            <field name="model">tl.weixin.articledata.userreadhour</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                        </div>
+                        <div class="oe_title">
+                            <label for="app_id" class="oe_edit_only"/>
+                            <h1>
+                                <field name="app_id" options="{'no_create': True,'no_open': True}"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                                <field name="ref_date" />
+                            </group>
+                            <group>
+                            </group>
+                        </group>
+                        <field name="detail_ids">
+                            <form>
+                                <group>
+                                    <group>
+                                        <field name="int_page_read_user" />
+                                        <field name="int_page_read_count" />
+                                        <field name="ori_page_read_user" />
+                                        <field name="ori_page_read_count" />
+                                        <field name="share_user" />
+                                        <field name="share_count" />
+                                        <field name="user_source" />
+                                        <field name="ref_hour" />
+                                        <field name="add_to_fav_count" />
+                                        <field name="add_to_fav_user" />
+                                    </group>
+                                    <group></group>
+                                </group>
+                            </form>
+                            <tree>
+                                <field name="user_source" />
+                                <field name="ref_hour" />
+                                <field name="int_page_read_user" />
+                                <field name="int_page_read_count" />
+                                <field name="ori_page_read_user" />
+                                <field name="ori_page_read_count" />
+                                <field name="share_user" />
+                                <field name="share_count" />
+                                <field name="add_to_fav_count" />
+                                <field name="add_to_fav_user" />
+                            </tree>
+                        </field>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="view_tl_weixin_articledata_userreadhour_tree" model="ir.ui.view">
+            <field name="name">图文统计分时数据</field>
+            <field name="model">tl.weixin.articledata.userreadhour</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="app_id" />
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="ref_date" />
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_tl_weixin_articledata_userreadhour" model="ir.actions.act_window">
+            <field name="name">图文统计分时数据</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">tl.weixin.articledata.userreadhour</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_tl_weixin_articledata_userreadhour_tree"/>
+        </record>
 
 
 
 
 
+        <!--获取图文分享转发数据-->
+        <record id="view_tl_weixin_articledata_usershare_form" model="ir.ui.view">
+            <field name="name">图文分享转发数据</field>
+            <field name="model">tl.weixin.articledata.usershare</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                        </div>
+                        <div class="oe_title">
+                            <label for="app_id" class="oe_edit_only"/>
+                            <h1>
+                                <field name="app_id" options="{'no_create': True,'no_open': True}"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                                <field name="ref_date" />
+                            </group>
+                            <group>
+                            </group>
+                        </group>
+                        <field name="detail_ids">
+                            <form>
+                                <group>
+                                    <group>
+                                        <field name="user_source" />
+                                        <field name="share_user" />
+                                        <field name="share_count" />
+                                        <field name="share_scene" />
+                                    </group>
+                                    <group></group>
+                                </group>
+                            </form>
+                            <tree>
+                                <field name="user_source" />
+                                <field name="share_user" />
+                                <field name="share_count" />
+                                <field name="share_scene" />
+                            </tree>
+                        </field>
+                    </sheet>
+                </form>
+            </field>
+        </record>
 
+
+        <record id="view_tl_weixin_articledata_usershare_tree" model="ir.ui.view">
+            <field name="name">图文分享转发数据</field>
+            <field name="model">tl.weixin.articledata.usershare</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="app_id" />
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="ref_date" />
+
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_tl_weixin_articledata_usershare" model="ir.actions.act_window">
+            <field name="name">图文分享转发数据</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">tl.weixin.articledata.usershare</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_tl_weixin_articledata_usershare_tree"/>
+        </record>
+
+        
+        
+        
+        <!--获取图文分享转发分时数据-->
+        <record id="view_tl_weixin_articledata_usersharehour_form" model="ir.ui.view">
+            <field name="name">图文分享转发分时数据</field>
+            <field name="model">tl.weixin.articledata.usersharehour</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                        </div>
+                        <div class="oe_title">
+                            <label for="app_id" class="oe_edit_only"/>
+                            <h1>
+                                <field name="app_id" options="{'no_create': True,'no_open': True}"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                                <field name="ref_date" />
+                            </group>
+                            <group>
+                            </group>
+                        </group>
+                        <field name="detail_ids">
+                            <form>
+                                <group>
+                                    <group>
+                                        <field name="user_source" />
+                                        <field name="ref_hour" />
+                                        <field name="share_user" />
+                                        <field name="share_count" />
+                                        <field name="share_scene" />
+                                    </group>
+                                    <group></group>
+                                </group>
+                            </form>
+                            <tree>
+                                <field name="user_source" />
+                                <field name="ref_hour" />
+                                <field name="share_user" />
+                                <field name="share_count" />
+                                <field name="share_scene" />
+                            </tree>
+                        </field>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="view_tl_weixin_articledata_usersharehour_tree" model="ir.ui.view">
+            <field name="name">图文分享转发分时数据</field>
+            <field name="model">tl.weixin.articledata.usersharehour</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="app_id" />
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="ref_date" />
+
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_tl_weixin_articledata_usersharehour" model="ir.actions.act_window">
+            <field name="name">图文分享转发分时数据</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">tl.weixin.articledata.usersharehour</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_tl_weixin_articledata_usersharehour_tree"/>
+        </record>
+
+
+
+        <!--获取消息发送概况数据-->
+        <record id="view_tl_weixin_upstreammsg_form" model="ir.ui.view">
+            <field name="name">消息发送概况数据</field>
+            <field name="model">tl.weixin.upstreammsg</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                        </div>
+                        <div class="oe_title">
+                            <label for="app_id" class="oe_edit_only"/>
+                            <h1>
+                                <field name="app_id" options="{'no_create': True,'no_open': True}"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                                <field name="ref_date" />
+                            </group>
+                            <group>
+                            </group>
+                        </group>
+
+                        <notebook>
+                            <page string="消息发送概况数据">
+                                <field name="detail_ids">
+                                    <form>
+                                        <group>
+                                            <group>
+                                                <field name="msg_type" />
+                                                <field name="user_source" />
+                                                <field name="msg_user" />
+                                                <field name="msg_count" />
+                                            </group>
+                                            <group></group>
+                                        </group>
+                                    </form>
+                                    <tree>
+                                        <field name="msg_type" />
+                                        <field name="user_source" />
+                                        <field name="msg_user" />
+                                        <field name="msg_count" />
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="消息发送分布数据">
+                                <field name="detail2_ids">
+                                    <form>
+                                        <group>
+                                            <group>
+                                                <field name="count_interval" />
+                                                <field name="user_source" />
+                                                <field name="msg_user" />
+                                            </group>
+                                            <group></group>
+                                        </group>
+                                    </form>
+                                    <tree>
+                                        <field name="count_interval" />
+                                        <field name="user_source" />
+                                        <field name="msg_user" />
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="view_tl_weixin_upstreammsg_tree" model="ir.ui.view">
+            <field name="name">消息发送概况数据</field>
+            <field name="model">tl.weixin.upstreammsg</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="app_id" />
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="ref_date" />
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_tl_weixin_upstreammsg" model="ir.actions.act_window">
+            <field name="name">消息发送概况数据</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">tl.weixin.upstreammsg</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_tl_weixin_upstreammsg_tree"/>
+        </record>
+        
+        
+        
+        
+        <!--获取消息发送分时数据-->
+        <record id="view_tl_weixin_upstreammsghour_form" model="ir.ui.view">
+            <field name="name">消息发送分时数据</field>
+            <field name="model">tl.weixin.upstreammsghour</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                        </div>
+                        <div class="oe_title">
+                            <label for="app_id" class="oe_edit_only"/>
+                            <h1>
+                                <field name="app_id" options="{'no_create': True,'no_open': True}"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                                <field name="ref_date" />
+                            </group>
+                            <group>
+                            </group>
+                        </group>
+                        <field name="detail_ids">
+                            <form>
+                                <group>
+                                    <group>
+                                        <field name="user_source" />
+                                        <field name="msg_type" />
+                                        <field name="msg_user" />
+                                        <field name="msg_count" />
+                                        <field name="ref_hour" />
+                                    </group>
+                                    <group></group>
+                                </group>
+                            </form>
+                            <tree>
+                                <field name="ref_hour" />
+                                <field name="user_source" />
+                                <field name="msg_type" />
+                                <field name="msg_user" />
+                                <field name="msg_count" />
+                            </tree>
+                        </field>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="view_tl_weixin_upstreammsghour_tree" model="ir.ui.view">
+            <field name="name">消息发送分时数据</field>
+            <field name="model">tl.weixin.upstreammsghour</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="app_id" />
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="ref_date" />
+
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_tl_weixin_upstreammsghour" model="ir.actions.act_window">
+            <field name="name">消息发送分时数据</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">tl.weixin.upstreammsghour</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_tl_weixin_upstreammsghour_tree"/>
+        </record>
+        
+        
+
+        <!--获取消息发送周数据-->
+        <record id="view_tl_weixin_upstreammsgweek_form" model="ir.ui.view">
+            <field name="name">消息发送周数据</field>
+            <field name="model">tl.weixin.upstreammsgweek</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                        </div>
+                        <div class="oe_title">
+                            <label for="app_id" class="oe_edit_only"/>
+                            <h1>
+                                <field name="app_id" options="{'no_create': True,'no_open': True}"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                                <field name="ref_date" />
+                                <field name="ref_date_end" />
+                            </group>
+                            <group>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="消息发送周概况数据">
+                                <field name="detail_ids">
+                                    <form>
+                                        <group>
+                                            <group>
+
+                                                <field name="msg_type" />
+                                                <field name="user_source" />
+                                                <field name="msg_user" />
+                                                <field name="msg_count" />
+                                            </group>
+                                            <group></group>
+                                        </group>
+                                    </form>
+                                    <tree>
+                                        <field name="msg_type" />
+                                        <field name="user_source" />
+                                        <field name="msg_user" />
+                                        <field name="msg_count" />
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="消息发送周分布数据">
+                                <field name="detail2_ids">
+                                    <form>
+                                        <group>
+                                            <group>
+                                                <field name="count_interval" />
+                                                <field name="user_source" />
+                                                <field name="msg_user" />
+                                            </group>
+                                            <group></group>
+                                        </group>
+                                    </form>
+                                    <tree>
+                                        <field name="count_interval" />
+                                        <field name="user_source" />
+                                        <field name="msg_user" />
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="view_tl_weixin_upstreammsgweek_tree" model="ir.ui.view">
+            <field name="name">消息发送周数据</field>
+            <field name="model">tl.weixin.upstreammsgweek</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="app_id" />
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="ref_date" />
+                    <field name="ref_date_end" />
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_tl_weixin_upstreammsgweek" model="ir.actions.act_window">
+            <field name="name">消息发送周数据</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">tl.weixin.upstreammsgweek</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_tl_weixin_upstreammsgweek_tree"/>
+        </record>
+
+
+        <!--获取消息发送月数据-->
+        <record id="view_tl_weixin_upstreammsgmonth_form" model="ir.ui.view">
+            <field name="name">消息发送月数据</field>
+            <field name="model">tl.weixin.upstreammsgmonth</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                        </div>
+                        <div class="oe_title">
+                            <label for="app_id" class="oe_edit_only"/>
+                            <h1>
+                                <field name="app_id" options="{'no_create': True,'no_open': True}"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                                <field name="ref_date" />
+                                <field name="ref_date_end" />
+                            </group>
+                            <group>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="消息发送月概况数据">
+                                <field name="detail_ids">
+                                    <form>
+                                        <group>
+                                            <group>
+                                                <field name="msg_type" />
+                                                <field name="user_source" />
+                                                <field name="msg_user" />
+                                                <field name="msg_count" />
+                                            </group>
+                                            <group></group>
+                                        </group>
+                                    </form>
+                                    <tree>
+                                        <field name="msg_type" />
+                                        <field name="user_source" />
+                                        <field name="msg_user" />
+                                        <field name="msg_count" />
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="消息发月分布数据">
+                                <field name="detail2_ids">
+                                    <form>
+                                        <group>
+                                            <group>
+                                                <field name="count_interval" />
+                                                <field name="user_source" />
+                                                <field name="msg_user" />
+                                            </group>
+                                            <group></group>
+                                        </group>
+                                    </form>
+                                    <tree>
+                                        <field name="count_interval" />
+                                        <field name="user_source" />
+                                        <field name="msg_user" />
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="view_tl_weixin_upstreammsgmonth_tree" model="ir.ui.view">
+            <field name="name">消息发送月数据</field>
+            <field name="model">tl.weixin.upstreammsgmonth</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="app_id" />
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="ref_date" />
+                    <field name="ref_date_end" />
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_tl_weixin_upstreammsgmonth" model="ir.actions.act_window">
+            <field name="name">消息发送月数据</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">tl.weixin.upstreammsgmonth</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_tl_weixin_upstreammsgmonth_tree"/>
+        </record>
+        
+        
+        
+        
+        
+        
+        <!--获取接口分析数据-->
+        <record id="view_tl_weixin_interfacesummary_form" model="ir.ui.view">
+            <field name="name">接口分析数据</field>
+            <field name="model">tl.weixin.interfacesummary</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                        </div>
+                        <div class="oe_title">
+                            <label for="app_id" class="oe_edit_only"/>
+                            <h1>
+                                <field name="app_id" options="{'no_create': True,'no_open': True}"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                                <field name="ref_date" />
+                                <field name="callback_count" />
+                                <field name="fail_count" />
+                                <field name="total_time_cost" />
+                                <field name="max_time_cost" />
+                            </group>
+                            <group>
+                            </group>
+                        </group>
+                        <field name="hour_ids">
+                            <form>
+                                <group>
+                                    <group>
+                                        <field name="ref_hour" />
+                                        <field name="callback_count" />
+                                        <field name="fail_count" />
+                                        <field name="total_time_cost" />
+                                        <field name="max_time_cost" />
+                                    </group>
+                                    <group></group>
+                                </group>
+                            </form>
+                            <tree>
+                                <field name="ref_hour" />
+                                <field name="callback_count" />
+                                <field name="fail_count" />
+                                <field name="total_time_cost" />
+                                <field name="max_time_cost" />
+                            </tree>
+                        </field>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="view_tl_weixin_interfacesummary_tree" model="ir.ui.view">
+            <field name="name">接口分析数据</field>
+            <field name="model">tl.weixin.interfacesummary</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="app_id" />
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="ref_date" />
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_tl_weixin_interfacesummary" model="ir.actions.act_window">
+            <field name="name">接口分析数据</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">tl.weixin.interfacesummary</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_tl_weixin_interfacesummary_tree"/>
+        </record>
+        
+        
+        
+        
 
 
 
@@ -1150,7 +2090,42 @@
                   parent="menu_tl_weixin_setting_root" sequence="14"/>
 
         <menuitem name="用户分析数据" id="menu_tl_weixin_userdata" action="action_tl_weixin_userdata"
-                  parent="menu_tl_weixin_setting_root" sequence="15"/>
+                  parent="menu_tl_weixin_data_root" sequence="15"/>
+
+
+        <!--统计数据的菜单-->
+        <menuitem name="图文群发每日数据" id="menu_tl_weixin_articledata_summary" action="action_tl_weixin_articledata_summary"
+                  parent="menu_tl_weixin_data_root" sequence="16"/>
+
+        <menuitem name="图文群发总数据" id="menu_tl_weixin_articledata_total" action="action_tl_weixin_articledata_total"
+                  parent="menu_tl_weixin_data_root" sequence="17"/>
+
+        <menuitem name="图文统计数据" id="menu_tl_weixin_articledata_userread" action="action_tl_weixin_articledata_userread"
+                  parent="menu_tl_weixin_data_root" sequence="18"/>
+
+        <menuitem name="图文统计分时数据" id="menu_tl_weixin_articledata_userreadhour" action="action_tl_weixin_articledata_userreadhour"
+                  parent="menu_tl_weixin_data_root" sequence="19"/>
+
+        <menuitem name="获取图文分享转发数据" id="menu_tl_weixin_articledata_usershare" action="action_tl_weixin_articledata_usershare"
+                  parent="menu_tl_weixin_data_root" sequence="20"/>
+
+        <menuitem name="获取图文分享转发分时数据" id="menu_tl_weixin_articledata_usersharehour" action="action_tl_weixin_articledata_usersharehour"
+                  parent="menu_tl_weixin_data_root" sequence="21"/>
+
+        <menuitem name="获取消息发送天数据" id="menu_tl_weixin_upstreammsg" action="action_tl_weixin_upstreammsg"
+                  parent="menu_tl_weixin_data_root" sequence="22"/>
+
+        <menuitem name="获取消息分送分时数据" id="menu_tl_weixin_upstreammsghour" action="action_tl_weixin_upstreammsghour"
+                  parent="menu_tl_weixin_data_root" sequence="23"/>
+        
+        <menuitem name="获取消息发送周数据" id="menu_tl_weixin_upstreammsgweek" action="action_tl_weixin_upstreammsgweek"
+                  parent="menu_tl_weixin_data_root" sequence="24"/>
+        
+        <menuitem name="获取消息发送月数据" id="menu_tl_weixin_upstreammsgmonth" action="action_tl_weixin_upstreammsgmonth"
+                  parent="menu_tl_weixin_data_root" sequence="25"/>
+
+        <menuitem name="获取接口分析数据" id="menu_tl_weixin_interfacesummary" action="action_tl_weixin_interfacesummary"
+                  parent="menu_tl_weixin_data_root" sequence="26"/>
 
     </data>
 </openerp>

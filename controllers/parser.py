@@ -8,7 +8,6 @@
 ##############################################################################
 from xml.etree import ElementTree
 import logging
-import chardet
 
 from messages import MESSAGE_TYPES, UnknownMessage
 from ..tools.utils import to_text

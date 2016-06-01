@@ -23,6 +23,8 @@ import random
 import re
 import hashlib
 import uuid
+import copy
+import calendar
 
 from openerp import _
 from openerp.exceptions import UserError, ValidationError
@@ -1337,22 +1339,18 @@ class tl_weixin_eventkey(models.Model):
 
     app_id = fields.Many2one('tl.weixin.app', required=True, string=u'微信公众号', help=u'发送消息的公众号')
     company_id = fields.Many2one('res.company', u'公司', default=lambda self: self.env.user.company_id, help=u"所属公司")
-
     name = fields.Char(u'Key名称', required=True)
     value = fields.Char(string=u'Key值', default=_get_key, required=True)
-
     menu_type = fields.Selection(
         [('click', u'点击推事件'), ('view', u'跳转URL'), ('scancode_push', u'扫码推事件'),
          ('scancode_waitmsg', u'扫码推事件且弹出“消息接收中”提示框'), ('pic_sysphoto', u'弹出系统拍照发图'),
          ('pic_photo_or_album', u'弹出拍照或者相册发图'), ('pic_weixin', u'弹出微信相册发图器'),
          ('location_select', u'弹出地理位置选择器'), ('media_id', u'下发消息（除文本消息)'), ('view_limited', u'跳转图文消息URL')],
         string=u'点击的自定义菜单类型', help=u"点击的自定义菜单类型")
-
     reply_type = fields.Selection(
         [('mpnews', u'图文'), ('text', u'文本'), ('voice', u'语音'),
          ('image', u'图片'), ('mpvideo', u'视频'), ('wxcard', u'卡券消息')], string=u'消息类型',
         help=u"素材的类型，图文（mpnews）、文本（text） 语音 （voice）、图片（image）、视频（mpvideo）、卡券消息（wxcard）")
-
     text = fields.Text(u'文本信息内容')
     media_id = fields.Many2one('tl.weixin.material')
 
@@ -1425,11 +1423,11 @@ class tl_weixin_matchmenu(models.Model):
 
 
 
-class tl_weixin_userdata_wizard(osv.TransientModel):
+class tl_weixin_data_wizard(osv.TransientModel):
     """
-    获取用户数据的模板
+    获取用户数据的向导
     """
-    _name = 'tl.weixin.userdata.wizard'
+    _name = 'tl.weixin.data.wizard'
     _rec_name = 'app_id'
 
     # 获取选中的默认账号id
@@ -1442,15 +1440,25 @@ class tl_weixin_userdata_wizard(osv.TransientModel):
 
     app_id = fields.Many2one('tl.weixin.app', required=True, default=_get_default_app_id,string=u'微信公众号', help=u'发送消息的公众号')
     company_id = fields.Many2one('res.company', u'公司', default=lambda self: self.env.user.company_id, help=u"所属公司")
+    begin_date = fields.Date(u'开始日期')
+    query_date = fields.Date(u'查询日期')
+    end_date = fields.Date(u'结束日期')
+    wizard_code = fields.Char(u'向导区分代码')
 
-    begin_date = fields.Date(u'开始日期', required=True)
-    end_date = fields.Date(u'结束日期', required=True)
-    # detail_ids = fields.One2many('tl.weixin.userdata.detail', 'userdata_id', string=u'用户分析数据详细')
+    @api.model
+    def default_get(self, fields_list):
+        res = super(tl_weixin_data_wizard, self).default_get(fields_list)
+        context = self._context or {}
+        if context.get('wizard_code', False):
+            res.update({"wizard_code": context.get('wizard_code')})
+
+        return res
 
 
 
     @api.multi
     def get_userdata(self):
+
         # str格式转化成datetime格式来判断end_time最大为昨天,以及两者只差少于7天
         time_list = []
         for x in [self.begin_date, self.end_date]:
@@ -1507,7 +1515,7 @@ class tl_weixin_userdata_wizard(osv.TransientModel):
                     if json1['list']:
                         for each1 in json1['list']:
                             if each1['ref_date'] == each_day:
-                                user_source = each1.get('user_source', 0)
+                                user_source = str(each1.get('user_source', 0))
                                 cancel_user = each1.get('cancel_user', 0)
                                 new_user = each1.get('new_user', 0)
 
@@ -1520,7 +1528,7 @@ class tl_weixin_userdata_wizard(osv.TransientModel):
 
                     vals = {
                         'ref_date': each_day,
-                        'user_source': str(user_source),
+                        'user_source': user_source or '',
                         'new_user': new_user,
                         'cancel_user': cancel_user,
                         'app_id': self.app_id.id,
@@ -1529,10 +1537,685 @@ class tl_weixin_userdata_wizard(osv.TransientModel):
 
                     }
                     self.env['tl.weixin.userdata'].create(vals)
+        return
+
+
+    @api.multi
+    def get_articlesummary_data(self):
+
+        y, m, d = time.strptime(self.query_date, DEFAULT_SERVER_DATE_FORMAT)[0:3]
+        query_date = datetime(y, m , d)
+        yesterday = (datetime.today() + timedelta(-1))
+        if query_date > yesterday and query_date.day != yesterday.day:
+            raise ValidationError(u'查询日期最大为昨天!')
+
+        o = self.app_id
+        client_obj = Client(self.pool, self._cr, o.id, o.appid, o.appsecret, o.access_token, o.token_expires_at)
+
+        json = client_obj.datacube_getarticle_summary(self.query_date, self.query_date)
+        if "errcode" in json and json["errcode"] != 0:
+            raise ValidationError(_(json["errmsg"]))
+        else:
+            if not json.get('list', False):
+                raise UserError(_(u'当天不存在有效数据'))
+            else:
+
+                # 判断是否已经存在查询日期这天的数据, 如果有, 则不在获取
+                articledata = self.env['tl.weixin.articledata.summary'].search([('app_id', '=', self.app_id.id), ('ref_date', '=', self.query_date)])
+                if articledata:
+                    raise UserError(_(u'已存在查询日期的有效数据'))
+
+                vals_lst = []
+                for each_article in json['list']:
+                    # 实际返回数据有user_source字段,API上没有说,也保存起来
+                    # 处理msgid
+                    msg_data_id = each_article.get('msgid','').split('_')[0]
+                    index = each_article.get('msgid','').split('_')[1]
+                    obj = self.env['tl.weixin.group.message'].search([('msg_data_id', '=', msg_data_id)])
+
+                    if obj:
+                        article_id = obj.material_id.article_ids[index].id
+                    else:
+                        article_id = ''
+
+                    vals = {
+                        "user_source": str(each_article.get('user_source', 5)),
+                        "int_page_read_user": each_article.get('int_page_read_user',''),
+                        "int_page_read_count": each_article.get('int_page_read_count',''),
+                        "ori_page_read_user": each_article.get('ori_page_read_user',''),
+                        "ori_page_read_count": each_article.get('ori_page_read_count',''),
+                        "share_user": each_article.get('share_user',''),
+                        "share_count": each_article.get('share_count',''),
+                        "add_to_fav_user": each_article.get('add_to_fav_user',''),
+                        "add_to_fav_count": each_article.get('add_to_fav_count',''),
+                        'msgid': each_article.get('msgid',''),
+                        'article_id': article_id or ''
+                    }
+                    vals_lst.append((0, 0, vals))
+
+                self.env['tl.weixin.articledata.summary'].create({
+                    'app_id': self.app_id.id,
+                    "ref_date": query_date,
+                    'detail_ids': vals_lst
+                })
 
         return
 
 
+    @api.multi
+    def get_articletotal_data(self):
+        # 经试验, 该接口的作用是, 如果某篇文章是1.1号发表的,  现在是2.1号, 那么查询日期选择1.1号,能得到,1.1号以后一共7天该文章的统计数据,
+        # 如果选择查询日期为1.2号,那么查询不到有效内容(如果1.2号没有群发的话)
+
+        y, m, d = time.strptime(self.query_date, DEFAULT_SERVER_DATE_FORMAT)[0:3]
+        query_date = datetime(y, m , d)
+        yesterday = (datetime.today() + timedelta(-1))
+        if query_date > yesterday and query_date.day != yesterday.day:
+            raise ValidationError(u'查询日期最大为昨天!')
+
+        o = self.app_id
+        client_obj = Client(self.pool, self._cr, o.id, o.appid, o.appsecret, o.access_token, o.token_expires_at)
+
+        json = client_obj.datacube_getarticle_total(self.query_date, self.query_date)
+        if "errcode" in json and json["errcode"] != 0:
+            raise ValidationError(_(json["errmsg"]))
+        else:
+            if not json.get('list', False):
+                raise UserError(_(u'当天不存在有效数据'))
+            else:
+
+                # 判断是否已经存在查询日期这天的数据, 如果有, 则不在获取
+                articledata = self.env['tl.weixin.articledata.total'].search([('app_id', '=', self.app_id.id), ('ref_date', '=', self.query_date)])
+                if articledata:
+                    raise UserError(_(u'已存在查询日期的有效数据'))
+
+                vals_lst = []
+                for each_day in json['list'][0]['details']:
+
+                    # 测试'stat_date' 能不能用字符串格式直接存比如u'2016-03-16'
+                    vals = copy.deepcopy(each_day)
+                    # 如果不能,报错的话,把格式处理下
+
+                    vals_lst.append((0, 0, vals))
+
+                # 处理msgid
+                msg_data_id = json['list'][0]['msgid'].split('_')[0]
+                index = json['list'][0]['msgid'].split('_')[1]
+                obj = self.env['tl.weixin.group.message'].search([('msg_data_id', '=', msg_data_id)])
+
+                if obj:
+                    article_id = obj.material_id.article_ids[index].id
+                else:
+                    article_id = ''
+
+                self.env['tl.weixin.articledata.total'].create({
+                    'app_id': self.app_id.id,
+                    "ref_date": query_date,
+                    'title': json['list'][0]['title'],
+                    'msgid': json['list'][0]['msgid'],
+                    'user_source': str(json['list'][0]['user_source']),
+                    'detail_ids': vals_lst,
+                    'article_id': article_id or ''
+                })
+
+        return
+
+
+    @api.multi
+    def get_userread_data(self):
+        # str格式转化成datetime格式来判断end_time最大为昨天,以及两者只差少于3天
+        time_list = []
+        for x in [self.begin_date, self.end_date]:
+            y, m, d = time.strptime(x, DEFAULT_SERVER_DATE_FORMAT)[0:3]
+            time_list.append(datetime(y, m, d))
+        begin_date = time_list[0]
+        end_date = time_list[1]
+        yesterday = (datetime.today() + timedelta(-1))
+
+        if end_date < begin_date:
+            raise ValidationError(u'结束日期不能小于开始日期')
+        if end_date > yesterday and end_date.day != yesterday.day:
+            raise ValidationError(u'结束日期最大为昨天!')
+        if end_date - begin_date > timedelta(2):
+            raise ValidationError(u'结束日期最多比开始日期多2天!')
+
+        o = self.app_id
+        client_obj = Client(self.pool, self._cr, o.id, o.appid, o.appsecret, o.access_token, o.token_expires_at)
+
+        # 先获取用户增减数据
+        json = client_obj.datacube_getuser_read(self.begin_date, self.end_date)
+        # json1 = {u'list': []}
+        if "errcode" in json and json["errcode"] != 0:
+            raise ValidationError(_(json["errmsg"]))
+        else:
+
+            range_list = []
+            while begin_date <= end_date:
+                range_list.append(str(begin_date.year) + '-' + str(str(begin_date.month).rjust(2,'0'))+ '-' +str(str(begin_date.day).rjust(2,'0')))
+                begin_date += timedelta(1)
+
+            for each_day in range_list:
+                # 判断tl.weixin.articledata.userread表上是否已经有这天的数据,如果有,则不再再本地生成
+                if self.env['tl.weixin.articledata.userread'].search([('app_id', '=', self.app_id.id),('ref_date', '=', each_day)]):
+                    continue
+
+                vals_list = []
+                for each in json['list']:
+                    if each['ref_date'] == each_day:
+                        vals = {
+                            'user_source':str(each['user_source']),
+                            'int_page_read_user':each['int_page_read_user'],
+                            'int_page_read_count':each['int_page_read_count'],
+                            'ori_page_read_user':each['ori_page_read_user'],
+                            'ori_page_read_count':each['ori_page_read_count'],
+                            'share_user':each['share_user'],
+                            'share_count':each['share_count'],
+                            'add_to_fav_user':each['add_to_fav_user'],
+
+                        }
+                        vals_list.append((0, 0, vals))
+
+                self.env['tl.weixin.articledata.userread'].create({
+                    'app_id': self.app_id.id,
+                    'ref_date': each_day,
+                    'detail_ids': vals_list
+                })
+        return
+
+    @api.multi
+    def get_userreadhour_data(self):
+        y, m, d = time.strptime(self.query_date, DEFAULT_SERVER_DATE_FORMAT)[0:3]
+        query_date = datetime(y, m , d)
+        yesterday = (datetime.today() + timedelta(-1))
+        if query_date > yesterday and query_date.day != yesterday.day:
+            raise ValidationError(u'查询日期最大为昨天!')
+
+        o = self.app_id
+        client_obj = Client(self.pool, self._cr, o.id, o.appid, o.appsecret, o.access_token, o.token_expires_at)
+
+        json = client_obj.datacube_getuser_readhour(self.query_date, self.query_date)
+        if "errcode" in json and json["errcode"] != 0:
+            raise ValidationError(_(json["errmsg"]))
+        else:
+            print json
+
+            
+            # 判断tl.weixin.articledata.userreadhour表上是否已经有这天的数据,如果有,则不再再本地生成
+            if self.env['tl.weixin.articledata.userreadhour'].search([('app_id', '=', self.app_id.id),('ref_date', '=', self.query_date)]):
+                raise ValidationError(u'已存在查询日期的记录')
+
+            # 这里的做法是,如果某个时间断没有记录,则没有在子表建记录
+            vals_lst = []
+            for each in json['list']:
+
+                vals = {
+                    'ref_hour': str(each.get('ref_hour')),
+                    'user_source': str(each.get('user_source')),
+                    'int_page_read_user': each.get('int_page_read_user'),
+                    'int_page_read_count': each.get('int_page_read_count'),
+                    'ori_page_read_user': each.get('ori_page_read_user'),
+                    'ori_page_read_count': each.get('ori_page_read_count'),
+                    'share_user': each.get('share_user'),
+                    'share_count': each.get('share_count'),
+                    'add_to_fav_user': each.get('add_to_fav_user'),
+                    'add_to_fav_count': each.get('add_to_fav_count'),
+                    'total_online_time': each.get('total_online_time'),
+                }
+                vals_lst.append((0, 0, vals))
+
+            self.env['tl.weixin.articledata.userreadhour'].create({
+                'app_id': self.app_id.id,
+                'ref_date': self.query_date,
+                'detail_ids': vals_lst
+            })
+
+        return
+
+
+
+    @api.multi
+    def get_usershare_data(self):
+
+        # str格式转化成datetime格式来判断end_time最大为昨天,以及两者只差少于7天
+        time_list = []
+        for x in [self.begin_date, self.end_date]:
+            y, m, d = time.strptime(x, DEFAULT_SERVER_DATE_FORMAT)[0:3]
+            time_list.append(datetime(y, m, d))
+        begin_date = time_list[0]
+        end_date = time_list[1]
+        yesterday = (datetime.today() + timedelta(-1))
+
+        if end_date < begin_date:
+            raise ValidationError(u'结束日期不能小于开始日期')
+        if end_date > yesterday and end_date.day != yesterday.day:
+            raise ValidationError(u'结束日期最大为昨天!')
+        if end_date - begin_date > timedelta(6):
+            raise ValidationError(u'结束日期最多比开始日期多6天!')
+
+        o = self.app_id
+        client_obj = Client(self.pool, self._cr, o.id, o.appid, o.appsecret, o.access_token, o.token_expires_at)
+
+        # 先获取用户增减数据
+        json = client_obj.datacube_getuser_share(self.begin_date, self.end_date)
+        if "errcode" in json and json["errcode"] != 0:
+            raise ValidationError(_(json["errmsg"]))
+        else:
+            # 处理两次请求得到的数据,不能直接根据返回的json来循环ref_date,因为,当没有值时,json['list']为空,
+            # 微信文档也没说明,几天中如果有一天没数据该如何处理, 所有这里是考虑了这种情况
+            # 找出self.begin_date 和self.end_date之间的日期的字符串
+            range_list = []
+            while begin_date <= end_date:
+                range_list.append(str(begin_date.year) + '-' + str(str(begin_date.month).rjust(2,'0'))+ '-' +str(str(begin_date.day).rjust(2,'0')))
+                begin_date += timedelta(1)
+
+            for each_day in range_list:
+                # 判断表上是否已经有这天的数据,如果有,则不再再本地生成
+                if self.env['tl.weixin.articledata.usershare'].search([('app_id', '=', self.app_id.id),('ref_date', '=', each_day)]):
+                    continue
+
+                vals_list = []
+                for each in json['list']:
+                    if each['ref_date'] == each_day:
+                        vals = {
+                            'user_source': str(each['user_source']),
+                            'share_count': each['share_count'],
+                            'share_user': each['share_user'],
+                            'share_scene': each['share_scene'],
+                        }
+                        
+                        vals_list.append((0, 0, vals))
+
+                self.env['tl.weixin.articledata.usershare'].create({
+                    'app_id':self.app_id.id,
+                    'ref_date': each_day,
+                    'detail_ids':vals_list
+                })
+
+        return
+
+
+    @api.multi
+    def get_usersharehour_data(self):
+
+        # str格式转化成datetime格式来判断end_time最大为昨天,以及两者只差少于7天
+        y, m, d = time.strptime(self.query_date, DEFAULT_SERVER_DATE_FORMAT)[0:3]
+        query_date = datetime(y, m , d)
+        yesterday = (datetime.today() + timedelta(-1))
+        if query_date > yesterday and query_date.day != yesterday.day:
+            raise ValidationError(u'查询日期最大为昨天!')
+
+        o = self.app_id
+        client_obj = Client(self.pool, self._cr, o.id, o.appid, o.appsecret, o.access_token, o.token_expires_at)
+
+        # 先获取用户增减数据
+        json = client_obj.datacube_getuser_sharehour(self.query_date, self.query_date)
+        if "errcode" in json and json["errcode"] != 0:
+            raise ValidationError(_(json["errmsg"]))
+        else:
+
+            if self.env['tl.weixin.articledata.usersharehour'].search([('app_id', '=', self.app_id.id),('ref_date', '=', self.query_date)]):
+                raise ValidationError(u'已存在查询日期的记录')
+
+            vals_list = []
+            for each in json['list']:
+                vals = {
+                    'user_source': str(each['user_source']),
+                    'ref_hour': str(each['ref_hour']),
+                    'share_scene': each['share_scene'],
+                    'share_count': each['share_count'],
+                    'share_user': each['share_user'],
+                }
+                vals_list.append((0, 0, vals))
+
+            self.env['tl.weixin.articledata.usersharehour'].create({
+                'app_id': self.app_id.id,
+                'ref_date': self.query_date,
+                'detail_ids': vals_list
+            })
+
+        return
+
+
+    @api.multi
+    def get_upstreammsg_data(self):
+
+        # str格式转化成datetime格式来判断end_time最大为昨天,以及两者只差少于7天
+        time_list = []
+        for x in [self.begin_date, self.end_date]:
+            y, m, d = time.strptime(x, DEFAULT_SERVER_DATE_FORMAT)[0:3]
+            time_list.append(datetime(y, m, d))
+        begin_date = time_list[0]
+        end_date = time_list[1]
+        yesterday = (datetime.today() + timedelta(-1))
+
+        if end_date < begin_date:
+            raise ValidationError(u'结束日期不能小于开始日期')
+        if end_date > yesterday and end_date.day != yesterday.day:
+            raise ValidationError(u'结束日期最大为昨天!')
+        if end_date - begin_date > timedelta(6):
+            raise ValidationError(u'结束日期最多比开始日期多6天!')
+
+        o = self.app_id
+        client_obj = Client(self.pool, self._cr, o.id, o.appid, o.appsecret, o.access_token, o.token_expires_at)
+        json = client_obj.datacube_getupstreammsg(self.begin_date, self.end_date)
+        json2 = client_obj.datacube_getupstreammsgdist(self.begin_date, self.end_date)
+
+        if "errcode" in json and json["errcode"] != 0:
+            raise ValidationError(_(json["errmsg"]))
+        elif "errcode" in json2 and json2["errcode"] != 0:
+            raise ValidationError(_(json2["errmsg"]))
+        else:
+            range_list = []
+            while begin_date <= end_date:
+                range_list.append(str(begin_date.year) + '-' + str(str(begin_date.month).rjust(2,'0'))+ '-' +str(str(begin_date.day).rjust(2,'0')))
+                begin_date += timedelta(1)
+
+            for each_day in range_list:
+                # 判断表上是否已经有这天的数据,如果有,则不再再本地生成
+                if self.env['tl.weixin.upstreammsg'].search([('app_id', '=', self.app_id.id),('ref_date', '=', each_day)]):
+                    continue
+
+                vals_list = []
+                for each in json['list']:
+                    if each['ref_date'] == each_day:
+                        vals = {
+                            'user_source': str(each['user_source']),
+                            'msg_count': each['msg_count'],
+                            'msg_type': each['msg_type'],
+                            'msg_user': each['msg_user'],
+                        }
+
+                        vals_list.append((0, 0, vals))
+
+                vals2_list = []
+                for each2 in json2['list']:
+                    if each2['ref_date'] == each_day:
+                        vals2 = {
+                            'user_source': str(each2['user_source']),
+                            'msg_user': each2['msg_user'],
+                            'count_interval': str(each2['count_interval']),
+                        }
+
+                        vals2_list.append((0, 0, vals2))
+
+
+                self.env['tl.weixin.upstreammsg'].create({
+                    'app_id':self.app_id.id,
+                    'ref_date': each_day,
+                    'detail_ids': vals_list,
+                    'detail2_ids': vals2_list
+                })
+        return
+
+
+
+    @api.multi
+    def get_upstreammsghour_data(self):
+        pass
+        # TODO 思考数据结构怎么样合理
+        # TODO 怎么样方式查询合理
+        # str格式转化成datetime格式来判断end_time最大为昨天,以及两者只差少于7天
+        y, m, d = time.strptime(self.query_date, DEFAULT_SERVER_DATE_FORMAT)[0:3]
+        query_date = datetime(y, m , d)
+        yesterday = (datetime.today() + timedelta(-1))
+        if query_date > yesterday and query_date.day != yesterday.day:
+            raise ValidationError(u'查询日期最大为昨天!')
+
+        o = self.app_id
+        client_obj = Client(self.pool, self._cr, o.id, o.appid, o.appsecret, o.access_token, o.token_expires_at)
+
+        # 先获取用户增减数据
+        json = client_obj.datacube_getupstreammsghour(self.query_date, self.query_date)
+        if "errcode" in json and json["errcode"] != 0:
+            raise ValidationError(_(json["errmsg"]))
+        else:
+
+            if self.env['tl.weixin.upstreammsghour'].search([('app_id', '=', self.app_id.id),('ref_date', '=', self.query_date)]):
+                raise ValidationError(u'已存在查询日期的记录')
+
+            vals_list = []
+            for each in json['list']:
+                vals = {
+                    'user_source': str(each['user_source']),
+                    'ref_hour': str(each['ref_hour']),
+                    'msg_type': each['msg_type'],
+                    'msg_user': each['msg_user'],
+                    'msg_count': each['msg_count'],
+                }
+                vals_list.append((0, 0, vals))
+
+            self.env['tl.weixin.upstreammsghour'].create({
+                'app_id': self.app_id.id,
+                'ref_date': self.query_date,
+                'detail_ids': vals_list
+            })
+
+
+
+    @api.multi
+    def get_upstreammsgweek_data(self):
+
+        # str格式转化成datetime格式来判断end_time最大为昨天,以及两者只差少于7天
+        time_list = []
+        for x in [self.begin_date, self.end_date]:
+            y, m, d = time.strptime(x, DEFAULT_SERVER_DATE_FORMAT)[0:3]
+            time_list.append(datetime(y, m, d))
+        begin_date = time_list[0]
+        end_date = time_list[1]
+        last_sunday = datetime.today() + timedelta((0-int(begin_date.strftime('%w'))))
+
+        if end_date < begin_date:
+            raise ValidationError(u'结束日期不能小于开始日期')
+        # 结束日期最大为上周日
+        if end_date > last_sunday and end_date.day != last_sunday.day:
+            raise ValidationError(u'结束日期最大为上周日!')
+
+        if end_date - begin_date > timedelta(29):
+            raise ValidationError(u'结束日期最多比开始日期多29天!')
+
+        o = self.app_id
+        client_obj = Client(self.pool, self._cr, o.id, o.appid, o.appsecret, o.access_token, o.token_expires_at)
+        json = client_obj.datacube_getupstreammsgweek(self.begin_date, self.end_date)
+        json2 = client_obj.datacube_getupstreammsgdistweek(self.begin_date, self.end_date)
+
+        if "errcode" in json and json["errcode"] != 0:
+            raise ValidationError(_(json["errmsg"]))
+        elif "errcode" in json2 and json2["errcode"] != 0:
+            raise ValidationError(_(json2["errmsg"]))
+        else:
+            # range_list 应当返回日期范围里的星期一
+            range_list = []
+            while begin_date <= end_date:
+                # 找出所选日期范围里的星期一
+                # 经测试,如果选择的开始日期在一个星期中,那么这个星期的记录是不被返回的
+                # 如果结束的那天在一个星期中间,那么这个星期的记录是被返回的
+                if str(begin_date.strftime('%w')) == '1':
+                    range_list.append(str(begin_date.year) + '-' + str(str(begin_date.month).rjust(2,'0'))+ '-' +str(str(begin_date.day).rjust(2,'0')))
+                begin_date += timedelta(1)
+
+            print range_list
+            for each_day in range_list:
+                # 判断表上是否已经有这天的数据,如果有,则不再再本地生成
+                if self.env['tl.weixin.upstreammsgweek'].search([('app_id', '=', self.app_id.id),('ref_date', '=', each_day)]):
+                    continue
+
+                vals_list = []
+                for each in json['list']:
+                    if each['ref_date'] == each_day:
+                        vals = {
+                            'user_source': str(each['user_source']),
+                            'msg_count': each['msg_count'],
+                            'msg_type': each['msg_type'],
+                            'msg_user': each['msg_user'],
+                        }
+                        vals_list.append((0, 0, vals))
+
+                vals2_list = []
+                for each2 in json2['list']:
+                    if each2['ref_date'] == each_day:
+                        vals2 = {
+                            'user_source': str(each2['user_source']),
+                            'msg_user': each2['msg_user'],
+                            'count_interval': str(each2['count_interval']),
+                        }
+                        vals2_list.append((0, 0, vals2))
+
+                self.env['tl.weixin.upstreammsgweek'].create({
+                    'app_id':self.app_id.id,
+                    'ref_date': each_day,
+                    'detail_ids':vals_list,
+                    'detail2_ids':vals2_list
+                })
+        return
+
+
+    @api.multi
+    def get_upstreammsgmonth_data(self):
+
+        # str格式转化成datetime格式来判断end_time最大为昨天,以及两者只差少于7天
+        time_list = []
+        for x in [self.begin_date, self.end_date]:
+            y, m, d = time.strptime(x, DEFAULT_SERVER_DATE_FORMAT)[0:3]
+            time_list.append(datetime(y, m, d))
+        begin_date = time_list[0]
+        end_date = time_list[1]
+        last_month_endday = datetime.today() + timedelta((0-int(datetime.today().day)))
+        
+        if end_date < begin_date:
+            raise ValidationError(u'结束日期不能小于开始日期')
+        # 结束日期最大为上月末
+        if end_date > last_month_endday and end_date.day != last_month_endday.day:
+            raise ValidationError(u'结束日期最大为上月末!')
+        
+        if end_date - begin_date > timedelta(29):
+            raise ValidationError(u'结束日期最多比开始日期多29天!')
+        
+        o = self.app_id
+        client_obj = Client(self.pool, self._cr, o.id, o.appid, o.appsecret, o.access_token, o.token_expires_at)
+        json = client_obj.datacube_getupstreammsgmonth(self.begin_date, self.end_date)
+        json2 = client_obj.datacube_getupstreammsgdistmonth(self.begin_date, self.end_date)
+        
+        if "errcode" in json and json["errcode"] != 0:
+            raise ValidationError(_(json["errmsg"]))
+        if "errcode" in json2 and json2["errcode"] != 0:
+            raise ValidationError(_(json2["errmsg"]))
+        else:
+            # range_list 应当返回日期范围里的星期一
+            range_list = []
+            while begin_date <= end_date:
+                # 找出所选日期范围里的1号
+                if int(begin_date.day) == 1:
+                    range_list.append(str(begin_date.year) + '-' + str(str(begin_date.month).rjust(2,'0'))+ '-' +str(str(begin_date.day).rjust(2,'0')))
+                begin_date += timedelta(1)
+        
+            for each_day in range_list:
+                # 判断表上是否已经有这天的数据,如果有,则不再再本地生成
+                if self.env['tl.weixin.upstreammsgmonth'].search([('app_id', '=', self.app_id.id),('ref_date', '=', each_day)]):
+                    continue
+        
+                vals_list = []
+                for each in json['list']:
+                    if each['ref_date'] == each_day:
+                        vals = {
+                            'user_source': str(each['user_source']),
+                            'msg_count': each['msg_count'],
+                            'msg_type': each['msg_type'],
+                            'msg_user': each['msg_user'],
+                        }
+        
+                        vals_list.append((0, 0, vals))
+                
+                vals2_list = []
+                for each2 in json2['list']:
+                    if each2['ref_date'] == each_day:
+                        vals2 = {
+                            'user_source': str(each2['user_source']),
+                            'msg_user': each2['msg_user'],
+                            'count_interval': str(each2['count_interval']),
+                        }
+        
+                        vals2_list.append((0, 0, vals2))
+                
+        
+                self.env['tl.weixin.upstreammsgmonth'].create({
+                    'app_id':self.app_id.id,
+                    'ref_date': each_day,
+                    'detail_ids':vals_list,
+                    'detail2_ids':vals2_list,
+                })
+        return
+
+
+    @api.multi
+    def get_interfacesummary_data(self):
+        # str格式转化成datetime格式来判断end_time最大为昨天,以及两者只差少于7天
+        time_list = []
+        for x in [self.begin_date, self.end_date]:
+            y, m, d = time.strptime(x, DEFAULT_SERVER_DATE_FORMAT)[0:3]
+            time_list.append(datetime(y, m, d))
+        begin_date = time_list[0]
+        end_date = time_list[1]
+        yesterday = (datetime.today() + timedelta(-1))
+
+        if end_date < begin_date:
+            raise ValidationError(u'结束日期不能小于开始日期')
+        # 结束日期昨天
+        if end_date > yesterday and end_date.day != yesterday.day:
+            raise ValidationError(u'结束日期最大为昨天!')
+
+        if end_date - begin_date > timedelta(29):
+            raise ValidationError(u'结束日期最多比开始日期多29天!')
+
+        o = self.app_id
+        client_obj = Client(self.pool, self._cr, o.id, o.appid, o.appsecret, o.access_token, o.token_expires_at)
+        json = client_obj.datacube_getinterfacesummary(self.begin_date, self.end_date)
+
+        if "errcode" in json and json["errcode"] != 0:
+            raise ValidationError(_(json["errmsg"]))
+
+        range_list = []
+        while begin_date <= end_date:
+            # 找出所选日期范围里的每一天
+            range_list.append(str(begin_date.year) + '-' + str(str(begin_date.month).rjust(2,'0'))+ '-' +str(str(begin_date.day).rjust(2,'0')))
+            begin_date += timedelta(1)
+
+        for each_day in range_list:
+            json2 = client_obj.datacube_getinterfacesummaryhour(each_day, each_day)
+            if "errcode" in json2 and json2["errcode"] != 0:
+                raise ValidationError(_(json2["errmsg"]))
+
+            if self.env['tl.weixin.interfacesummary'].search([('app_id', '=', self.app_id.id),('ref_date', '=', each_day)]):
+                continue
+
+            vals_list = []
+            for each in json2['list']:
+                if each['ref_date'] == each_day:
+                    vals = {
+                        'total_time_cost': each['total_time_cost'],
+                        'max_time_cost': each['max_time_cost'],
+                        'fail_count': each['fail_count'],
+                        'ref_hour': str(each['ref_hour']),
+                        'callback_count': each['callback_count'],
+                    }
+                    vals_list.append((0, 0, vals))
+
+            self.env['tl.weixin.interfacesummary'].create({
+                'app_id':self.app_id.id,
+                'ref_date': each_day,
+                'hour_ids': vals_list,
+                'total_time_cost': each['total_time_cost'],
+                'max_time_cost': each['max_time_cost'],
+                'fail_count': each['fail_count'],
+                'callback_count': each['callback_count'],
+            })
+
+        return
+
+
+
+
+
+### FFFFF
 
 class tl_weixin_userdata(models.Model):
     """
@@ -1544,16 +2227,545 @@ class tl_weixin_userdata(models.Model):
 
     app_id = fields.Many2one('tl.weixin.app', required=True, string=u'微信公众号', help=u'发送消息的公众号')
     company_id = fields.Many2one('res.company', u'公司', default=lambda self: self.env.user.company_id, help=u"所属公司")
-
-    # userdata_id = fields.Many2one('tl.weixin.userdata', string=u'用户分析数据')
-    ref_date = fields.Date(u'数据的日期')
+    ref_date = fields.Date(u'数据日期')
     # TODO user source 不是指单一用户的吗, 对一个用户群是什么含义
     user_source = fields.Selection(
         [('0', u'其他合计'), ('1', u'公众号搜索'), ('17', u'名片分享'),
          ('30', u'扫描二维码'), ('43', u'图文页右上角菜单'), ('51', u'支付后关注（在支付完成页）'),
-         ('57', u'图文页内公众号名称'), ('75', u'公众号文章广告'), ('78', u'表朋友圈广告'),], string=u'用户的渠道',
+         ('57', u'图文页内公众号名称'), ('75', u'公众号文章广告'), ('78', u'表朋友圈广告'),], string=u'用户渠道',
         help=u"0代表其他合计 1代表公众号搜索 17代表名片分享 30代表扫描二维码 43代表图文页右上角菜单 51代表支付后关注（在支付完成页） 57代表图文页内公众号名称 75代表公众号文章广告 78代表朋友圈广告")
-    new_user = fields.Integer(u'新增的用户数量', help=u'新增的用户数量')
-    cancel_user = fields.Integer(u'取消关注的用户数量', help=u'取消关注的用户数量，new_user减去cancel_user即为净增用户数量')
-    cumulate_user = fields.Integer(u'总用户量', help=u'总用户量')
+    new_user = fields.Integer(u'新增用户数', help=u'新增的用户数量')
+    cancel_user = fields.Integer(u'减少用户数', help=u'取消关注的用户数量，新增数减去取消数即为净增用户数量')
+    cumulate_user = fields.Integer(u'总用户数', help=u'总用户数量')
 
+
+
+
+
+
+
+class tl_weixin_articledata_summary(models.Model):
+    """
+    图文群发每日数据
+    """
+    _name = 'tl.weixin.articledata.summary'
+    _rec_name = 'ref_date'
+    _order = 'ref_date'
+
+    app_id = fields.Many2one('tl.weixin.app', required=True, string=u'微信公众号', help=u'发送消息的公众号')
+    company_id = fields.Many2one('res.company', u'公司', default=lambda self: self.env.user.company_id, help=u"所属公司")
+    ref_date = fields.Date(u'数据的日期')
+    detail_ids = fields.One2many('tl.weixin.articledata.summary.detail','summary_id')
+
+
+class tl_weixin_articledata_summary_detail(models.Model):
+    """
+    图文群发每日数据详细
+    """
+    _name = 'tl.weixin.articledata.summary.detail'
+
+    _order = 'title'
+
+    summary_id = fields.Many2one('tl.weixin.articledata.summary', cascade='ondelete')
+    article_id = fields.Many2one('tl.weixin.articles')
+    msgid = fields.Char(u'图文消息Id', help=u'图文消息Id_Article的Index')
+    title = fields.Char(u'图文标题')
+    user_source = fields.Selection(
+        [('0', u'会话'), ('1', u'好友'), ('2', u'朋友圈'),
+         ('3', u'腾讯微博'), ('4', u'历史消息'), ('5', u'其它'),], string=u'用户渠道',help=u'代表用户从哪里进入来阅读该图文')
+    int_page_read_user = fields.Integer(u'图文页阅读人数', help=u'图文页（点击群发图文卡片进入的页面）的阅读人数')
+    int_page_read_count = fields.Integer(u'图文页的阅读次数', help=u'图文页的阅读次数')
+    ori_page_read_user = fields.Integer(u'原文页阅读人数', help=u'原文页（点击图文页“阅读原文”进入的页面）的阅读人数，无原文页时此处数据为0')
+    ori_page_read_count = fields.Integer(u'原文页的阅读次数', help=u'原文页的阅读次数')
+    share_user = fields.Integer(u'分享的人数', help=u'分享的人数')
+    share_count = fields.Integer(u'分享的次数', help=u'分享的次数')
+    add_to_fav_user = fields.Integer(u'收藏的人数', help=u'收藏的人数')
+    add_to_fav_count = fields.Integer(u'收藏的次数', help=u'收藏的次数')
+
+
+
+
+
+
+
+
+
+# 获取图文群发总数据
+class tl_weixin_articledata_total(models.Model):
+    """
+    图文群发总数据
+    """
+    _name = 'tl.weixin.articledata.total'
+    _rec_name = 'ref_date'
+    _order = 'ref_date'
+
+    app_id = fields.Many2one('tl.weixin.app', required=True, string=u'微信公众号', help=u'发送消息的公众号')
+    company_id = fields.Many2one('res.company', u'公司', default=lambda self: self.env.user.company_id, help=u"所属公司")
+    ref_date = fields.Date(u'数据的日期')
+    title = fields.Char(u'图文标题')
+    user_source = fields.Selection(
+        [('0', u'会话'), ('1', u'好友'), ('2', u'朋友圈'),
+         ('3', u'腾讯微博'), ('4', u'历史消息'), ('5', u'其它'),], string=u'用户渠道',help=u'代表用户从哪里进入来阅读该图文')
+    msgid = fields.Char(u'图文消息Id', help=u'图文消息Id_Article的Index')
+    article_id = fields.Many2one('tl.weixin.articles')
+    detail_ids = fields.One2many('tl.weixin.articledata.total.detail','total_id')
+
+
+class tl_weixin_articledata_total_detail(models.Model):
+    """
+    图文群发总数据详细
+    """
+    _name = 'tl.weixin.articledata.total.detail'
+
+    _order = 'stat_date'
+
+    total_id = fields.Many2one('tl.weixin.articledata.total', cascade='ondelete')
+
+    # 未加中文string=...的值是接口返回的,但文档上没有说明的值
+    stat_date = fields.Date(u'截止日期')
+    int_page_read_user = fields.Integer(u'图文页阅读人数', help=u'图文页（点击群发图文卡片进入的页面）的阅读人数')
+    int_page_read_count = fields.Integer(u'图文页的阅读次数', help=u'图文页的阅读次数')
+    ori_page_read_user = fields.Integer(u'原文页阅读人数', help=u'原文页（点击图文页“阅读原文”进入的页面）的阅读人数，无原文页时此处数据为0')
+    ori_page_read_count = fields.Integer(u'原文页的阅读次数', help=u'原文页的阅读次数')
+    share_user = fields.Integer(u'分享的人数', help=u'分享的人数')
+    share_count = fields.Integer(u'分享的次数', help=u'分享的次数')
+    add_to_fav_user = fields.Integer(u'收藏的人数', help=u'收藏的人数')
+    add_to_fav_count = fields.Integer(u'收藏的次数')
+    feed_share_from_feed_user = fields.Integer(u'feed_share_from_feed_user')
+    feed_share_from_session_user = fields.Integer(u'feed_share_from_session_user')
+    int_page_from_friends_read_count = fields.Integer(u'int_page_from_friends_read_count')
+    int_page_from_session_read_user = fields.Integer(u'int_page_from_session_read_user')
+    int_page_from_feed_read_count = fields.Integer(u'int_page_from_feed_read_count')
+    int_page_from_hist_msg_read_user = fields.Integer(u'int_page_from_hist_msg_read_user')
+    int_page_from_friends_read_user = fields.Integer(u'int_page_from_friends_read_user')
+    int_page_from_feed_read_user = fields.Integer(u'int_page_from_feed_read_user')
+    feed_share_from_other_cnt = fields.Integer(u'feed_share_from_other_cnt')
+    int_page_from_hist_msg_read_count = fields.Integer(u'int_page_from_hist_msg_read_count')
+    int_page_from_other_read_count = fields.Integer(u'int_page_from_other_read_count')
+    feed_share_from_other_user = fields.Integer(u'feed_share_from_other_user')
+    int_page_from_other_read_user = fields.Integer(u'int_page_from_other_read_user')
+    feed_share_from_session_cnt = fields.Integer(u'feed_share_from_session_cnt')
+    target_user = fields.Integer(u'target_user')
+    int_page_from_session_read_count = fields.Integer(u'int_page_from_session_read_count')
+
+
+
+
+
+
+class tl_weixin_articledata_userread(models.Model):
+    """
+    获取图文统计数据
+    """
+    _name = 'tl.weixin.articledata.userread'
+    _rec_name = 'ref_date'
+    _order = 'ref_date'
+
+    app_id = fields.Many2one('tl.weixin.app', required=True, string=u'微信公众号', help=u'发送消息的公众号')
+    company_id = fields.Many2one('res.company', u'公司', default=lambda self: self.env.user.company_id, help=u"所属公司")
+    ref_date = fields.Date(u'数据的日期')
+    detail_ids = fields.One2many('tl.weixin.articledata.userread.detail', 'userread_id')
+
+
+class tl_weixin_articledata_userread_detail(models.Model):
+    """
+    获取图文统计数据详细
+    """
+    _name = 'tl.weixin.articledata.userread.detail'
+
+
+
+    userread_id = fields.Many2one('tl.weixin.articledata.userread', cascade='ondelete')
+    user_source = fields.Selection(
+        [('0', u'会话'), ('1', u'好友'), ('2', u'朋友圈'),
+         ('3', u'腾讯微博'), ('4', u'历史消息'), ('5', u'其它'),], string=u'用户渠道',help=u'代表用户从哪里进入来阅读该图文')
+    int_page_read_user = fields.Integer(u'图文页阅读人数', help=u'图文页（点击群发图文卡片进入的页面）的阅读人数')
+    int_page_read_count = fields.Integer(u'图文页的阅读次数', help=u'图文页的阅读次数')
+    ori_page_read_user = fields.Integer(u'原文页阅读人数', help=u'原文页（点击图文页“阅读原文”进入的页面）的阅读人数，无原文页时此处数据为0')
+    ori_page_read_count = fields.Integer(u'原文页的阅读次数', help=u'原文页的阅读次数')
+    share_user = fields.Integer(u'分享的人数', help=u'分享的人数')
+    share_count = fields.Integer(u'分享的次数', help=u'分享的次数')
+    add_to_fav_user = fields.Integer(u'收藏的人数', help=u'收藏的人数')
+    add_to_fav_count = fields.Integer(u'收藏的次数', help=u'收藏的次数')
+
+
+
+class tl_weixin_articledata_userreadhour(models.Model):
+    """
+    获取图文统计分时数据
+    """
+    _name = 'tl.weixin.articledata.userreadhour'
+    _rec_name = 'ref_date'
+    _order = 'ref_date'
+
+    app_id = fields.Many2one('tl.weixin.app', required=True, string=u'微信公众号', help=u'发送消息的公众号')
+    company_id = fields.Many2one('res.company', u'公司', default=lambda self: self.env.user.company_id, help=u"所属公司")
+    ref_date = fields.Date(u'数据的日期')
+    detail_ids = fields.One2many('tl.weixin.articledata.userreadhour.detail', 'userreadhour_id')
+
+
+class tl_weixin_articledata_userreadhour_detail(models.Model):
+    """
+    获取图文统计分时数据详细
+    """
+    _name = 'tl.weixin.articledata.userreadhour.detail'
+
+    userreadhour_id = fields.Many2one('tl.weixin.articledata.userreadhour', cascade='ondelete')
+    ref_hour = fields.Selection(
+        [('000', u'[000,100)'), ('100', u'[100,200)'), ('200', u'[200,300)'),
+         ('300', u'[300,400)'), ('400', u'[400,500)'), ('500', u'[500,600)'),
+        ('600', u'[600,700)'), ('700', u'[700,800)'), ('800', u'[800,900)'),
+        ('900', u'[900,1000)'), ('1000', u'[1000,1100)'), ('1100', u'[1100,1200)'),
+        ('1200', u'[1200,1300)'), ('1300', u'[1300,1400)'), ('1400', u'[1400,1500)'),
+        ('1500', u'[1500,1600)'), ('1600', u'[1600,1700)'), ('1700', u'[1700,1800)'),
+        ('1800', u'[1800,1900)'), ('1900', u'[1900,2000)'), ('2000', u'[2000,2100)'),
+        ('2100', u'[2100,2200)'), ('2200', u'[2200,2300)'), ('2300', u'[2300,2400)'),],
+        string=u'小时数据',help=u'`数据的小时')
+    user_source = fields.Selection(
+        [('0', u'会话'), ('1', u'好友'), ('2', u'朋友圈'),
+         ('3', u'腾讯微博'), ('4', u'历史消息'), ('5', u'其它'),], string=u'用户渠道',help=u'代表用户从哪里进入来阅读该图文')
+    int_page_read_user = fields.Integer(u'图文页阅读人数', help=u'图文页（点击群发图文卡片进入的页面）的阅读人数')
+    int_page_read_count = fields.Integer(u'图文页的阅读次数', help=u'图文页的阅读次数')
+    ori_page_read_user = fields.Integer(u'原文页阅读人数', help=u'原文页（点击图文页“阅读原文”进入的页面）的阅读人数，无原文页时此处数据为0')
+    ori_page_read_count = fields.Integer(u'原文页的阅读次数', help=u'原文页的阅读次数')
+    share_user = fields.Integer(u'分享的人数', help=u'分享的人数')
+    share_count = fields.Integer(u'分享的次数', help=u'分享的次数')
+    add_to_fav_user = fields.Integer(u'收藏的人数', help=u'收藏的人数')
+    add_to_fav_count = fields.Integer(u'收藏的次数', help=u'收藏的次数')
+    total_online_time = fields.Integer(u'total_online_time')
+
+
+
+class tl_weixin_articledata_usershare(models.Model):
+    """
+    获取图文分享转发数据
+    """
+    _name = 'tl.weixin.articledata.usershare'
+    _rec_name = 'ref_date'
+    _order = 'ref_date'
+
+    app_id = fields.Many2one('tl.weixin.app', required=True, string=u'微信公众号', help=u'发送消息的公众号')
+    company_id = fields.Many2one('res.company', u'公司', default=lambda self: self.env.user.company_id, help=u"所属公司")
+    ref_date = fields.Date(u'数据的日期')
+    detail_ids = fields.One2many('tl.weixin.articledata.usershare.detail', 'usershare_id')
+
+
+class tl_weixin_articledata_usershare_detail(models.Model):
+    """
+    获取图文分享转发数据详细
+    """
+    _name = 'tl.weixin.articledata.usershare.detail'
+
+    usershare_id = fields.Many2one('tl.weixin.articledata.usershare', cascade='ondelete')
+    user_source = fields.Selection([('0', u'会话'), ('1', u'好友'), ('2', u'朋友圈'),('3', u'腾讯微博'),('4', u'历史消息'), ('5', u'其它')],
+                                   string=u'用户渠道',help=u'代表用户从哪里进入来阅读该图文')
+    share_user = fields.Integer(u'分享的人数', help=u'分享的人数')
+    share_count = fields.Integer(u'分享的次数', help=u'分享的次数')
+    share_scene = fields.Selection(
+        [(1, u'好友转发'), (2, u'朋友圈'), (3, u'腾讯微博'),(255, u'其他'),], string=u'分享的场景',help=u'分享的场景')
+
+
+
+class tl_weixin_articledata_usersharehour(models.Model):
+    """
+    获取图文分享转发分时数据
+    """
+    _name = 'tl.weixin.articledata.usersharehour'
+    _rec_name = 'ref_date'
+    _order = 'ref_date'
+
+    app_id = fields.Many2one('tl.weixin.app', required=True, string=u'微信公众号', help=u'发送消息的公众号')
+    company_id = fields.Many2one('res.company', u'公司', default=lambda self: self.env.user.company_id, help=u"所属公司")
+    ref_date = fields.Date(u'数据的日期')
+    detail_ids = fields.One2many('tl.weixin.articledata.usersharehour.detail', 'usersharehour_id')
+
+
+class tl_weixin_articledata_usersharehour_detail(models.Model):
+    """
+    获取图文分享转发分时数据详细
+    """
+    _name = 'tl.weixin.articledata.usersharehour.detail'
+
+    usersharehour_id = fields.Many2one('tl.weixin.articledata.usersharehour', cascade='ondelete')
+    user_source = fields.Selection([('0', u'会话'), ('1', u'好友'), ('2', u'朋友圈'),('3', u'腾讯微博'),('4', u'历史消息'), ('5', u'其它')],
+                                   string=u'用户渠道',help=u'代表用户从哪里进入来阅读该图文')
+    share_user = fields.Integer(u'分享的人数', help=u'分享的人数')
+    share_count = fields.Integer(u'分享的次数', help=u'分享的次数')
+    share_scene = fields.Selection(
+        [(1, u'好友转发'), (2, u'朋友圈'), (3, u'腾讯微博'),(255, u'其他'),], string=u'分享的场景',help=u'分享的场景')
+    ref_hour = fields.Selection(
+        [('000', u'[000,100)'), ('100', u'[100,200)'), ('200', u'[200,300)'),
+         ('300', u'[300,400)'), ('400', u'[400,500)'), ('500', u'[500,600)'),
+        ('600', u'[600,700)'), ('700', u'[700,800)'), ('800', u'[800,900)'),
+        ('900', u'[900,1000)'), ('1000', u'[1000,1100)'), ('1100', u'[1100,1200)'),
+        ('1200', u'[1200,1300)'), ('1300', u'[1300,1400)'), ('1400', u'[1400,1500)'),
+        ('1500', u'[1500,1600)'), ('1600', u'[1600,1700)'), ('1700', u'[1700,1800)'),
+        ('1800', u'[1800,1900)'), ('1900', u'[1900,2000)'), ('2000', u'[2000,2100)'),
+        ('2100', u'[2100,2200)'), ('2200', u'[2200,2300)'), ('2300', u'[2300,2400)'),],
+        string=u'小时数据',help=u'数据的小时')
+    
+
+
+# ggg
+class tl_weixin_upstreammsg(models.Model):
+    """
+    获取消息发送概况数据
+    """
+    _name = 'tl.weixin.upstreammsg'
+    _rec_name = 'ref_date'
+    _order = 'ref_date'
+
+    app_id = fields.Many2one('tl.weixin.app', required=True, string=u'微信公众号', help=u'发送消息的公众号')
+    company_id = fields.Many2one('res.company', u'公司', default=lambda self: self.env.user.company_id, help=u"所属公司")
+    ref_date = fields.Date(u'数据的日期')
+    detail_ids = fields.One2many('tl.weixin.upstreammsg.detail', 'upstreammsg_id', string=u'消息发送概况数据')
+    detail2_ids = fields.One2many('tl.weixin.upstreammsg.detail2', 'upstreammsg_id', string=u'消息发送分布数据')
+
+
+class tl_weixin_upstreammsg_detail(models.Model):
+    """
+    获取消息发送概况数据详细
+    """
+    _name = 'tl.weixin.upstreammsg.detail'
+
+    upstreammsg_id = fields.Many2one('tl.weixin.upstreammsg', cascade='ondelete')
+    user_source = fields.Selection([('0', u'会话'), ('1', u'好友'), ('2', u'朋友圈'),('3', u'腾讯微博'),('4', u'历史消息'), ('5', u'其它')],
+                                   string=u'用户渠道',help=u'代表用户从哪里进入来阅读该图文')
+    msg_type = fields.Selection([(1, u'文字'), (2, u'图片'), (3, u'语音'),(4, u'视频'),(6, u'第三方应用消息（链接消息）'),],
+                                string=u'消息类型',help=u'消息类型')
+    msg_user = fields.Integer(string=u'用户数', help=u'上行发送了（向公众号发送了）消息的用户数')
+    msg_count = fields.Integer(string=u'消息总数', help=u'上行发送了消息的消息总数')
+
+
+class tl_weixin_upstreammsg_detail2(models.Model):
+    """
+    获取消息发送分布数据详细
+    """
+    _name = 'tl.weixin.upstreammsg.detail2'
+
+    upstreammsg_id = fields.Many2one('tl.weixin.upstreammsg', cascade='ondelete')
+    user_source = fields.Selection([('0', u'会话'), ('1', u'好友'), ('2', u'朋友圈'),('3', u'腾讯微博'),('4', u'历史消息'), ('5', u'其它')],
+                                   string=u'用户渠道',help=u'代表用户从哪里进入来阅读该图文')
+    msg_user = fields.Integer(string=u'用户数', help=u'上行发送了（向公众号发送了）消息的用户数')
+    count_interval = fields.Selection([('0', u'0'), ('1', u'1-5'), ('2', u'6-10'),('3', u'10次以上'),],
+                                string=u'消息量分布区间',help=u'当日发送消息量分布的区间')
+
+
+
+
+
+
+
+
+
+
+class tl_weixin_upstreammsghour(models.Model):
+    """
+    获取消息发送分时数据
+    """
+    _name = 'tl.weixin.upstreammsghour'
+    _rec_name = 'ref_date'
+    _order = 'ref_date'
+
+    app_id = fields.Many2one('tl.weixin.app', required=True, string=u'微信公众号', help=u'发送消息的公众号')
+    company_id = fields.Many2one('res.company', u'公司', default=lambda self: self.env.user.company_id, help=u"所属公司")
+    ref_date = fields.Date(u'数据的日期')
+    detail_ids = fields.One2many('tl.weixin.upstreammsghour.detail', 'upstreammsghour_id')
+
+
+class tl_weixin_upstreammsghour_detail(models.Model):
+    """
+    获取消息发送分时数据详细
+    """
+    _name = 'tl.weixin.upstreammsghour.detail'
+
+    upstreammsghour_id = fields.Many2one('tl.weixin.upstreammsghour', cascade='ondelete')
+    user_source = fields.Selection([('0', u'会话'), ('1', u'好友'), ('2', u'朋友圈'),('3', u'腾讯微博'),('4', u'历史消息'), ('5', u'其它')],
+                                   string=u'用户渠道',help=u'代表用户从哪里进入来阅读该图文')
+    msg_type = fields.Selection([(1, u'文字'), (2, u'图片'), (3, u'语音'),(4, u'视频'),(6, u'第三方应用消息（链接消息）'),],
+                                string=u'消息类型',help=u'消息类型')
+    msg_user = fields.Integer(string=u'用户数', help=u'上行发送了（向公众号发送了）消息的用户数')
+    msg_count = fields.Integer(string=u'消息总数', help=u'上行发送了消息的消息总数')
+    ref_hour = fields.Selection(
+        [('000', u'[000,100)'), ('100', u'[100,200)'), ('200', u'[200,300)'),
+         ('300', u'[300,400)'), ('400', u'[400,500)'), ('500', u'[500,600)'),
+        ('600', u'[600,700)'), ('700', u'[700,800)'), ('800', u'[800,900)'),
+        ('900', u'[900,1000)'), ('1000', u'[1000,1100)'), ('1100', u'[1100,1200)'),
+        ('1200', u'[1200,1300)'), ('1300', u'[1300,1400)'), ('1400', u'[1400,1500)'),
+        ('1500', u'[1500,1600)'), ('1600', u'[1600,1700)'), ('1700', u'[1700,1800)'),
+        ('1800', u'[1800,1900)'), ('1900', u'[1900,2000)'), ('2000', u'[2000,2100)'),
+        ('2100', u'[2100,2200)'), ('2200', u'[2200,2300)'), ('2300', u'[2300,2400)'),],
+        string=u'小时数据',help=u'数据的小时')
+
+
+
+class tl_weixin_upstreammsgweek(models.Model):
+    """
+    获取消息发送周数据
+    """
+    _name = 'tl.weixin.upstreammsgweek'
+    _rec_name = 'ref_date'
+    _order = 'ref_date'
+
+    @api.multi
+    def _get_ref_date_end(self):
+        for each in self:
+            if each.ref_date:
+
+                y, m, d = time.strptime(each.ref_date, DEFAULT_SERVER_DATE_FORMAT)[0:3]
+                ref_date = datetime(y, m, d)
+                each.ref_date_end = ref_date + timedelta(6)
+
+
+    app_id = fields.Many2one('tl.weixin.app', required=True, string=u'微信公众号', help=u'发送消息的公众号')
+    company_id = fields.Many2one('res.company', u'公司', default=lambda self: self.env.user.company_id, help=u"所属公司")
+    ref_date = fields.Date(u'数据开始日期')
+    ref_date_end = fields.Date(u'数据截止日期', compute=_get_ref_date_end)
+    detail_ids = fields.One2many('tl.weixin.upstreammsgweek.detail', 'upstreammsgweek_id')
+    detail2_ids = fields.One2many('tl.weixin.upstreammsgweek.detail2', 'upstreammsgweek_id')
+
+
+
+
+class tl_weixin_upstreammsgweek_detail(models.Model):
+    """
+    获取消息发送周数据详细
+    """
+    _name = 'tl.weixin.upstreammsgweek.detail'
+
+    upstreammsgweek_id = fields.Many2one('tl.weixin.upstreammsgweek', cascade='ondelete')
+    user_source = fields.Selection([('0', u'会话'), ('1', u'好友'), ('2', u'朋友圈'),('3', u'腾讯微博'),('4', u'历史消息'), ('5', u'其它')],
+                                   string=u'用户渠道',help=u'代表用户从哪里进入来阅读该图文')
+    msg_type = fields.Selection([(1, u'文字'), (2, u'图片'), (3, u'语音'),(4, u'视频'),(6, u'第三方应用消息（链接消息）'),],
+                                string=u'消息类型',help=u'消息类型')
+    msg_user = fields.Integer(string=u'用户数', help=u'上行发送了（向公众号发送了）消息的用户数')
+    msg_count = fields.Integer(string=u'消息总数', help=u'上行发送了消息的消息总数')
+
+
+class tl_weixin_upstreammsgweek_detail2(models.Model):
+    """
+    获取消息发送周分布数据详细
+    """
+    _name = 'tl.weixin.upstreammsgweek.detail2'
+
+    upstreammsgweek_id = fields.Many2one('tl.weixin.upstreammsgweek', cascade='ondelete')
+    user_source = fields.Selection([('0', u'会话'), ('1', u'好友'), ('2', u'朋友圈'),('3', u'腾讯微博'),('4', u'历史消息'), ('5', u'其它')],
+                                   string=u'用户渠道',help=u'代表用户从哪里进入来阅读该图文')
+    msg_user = fields.Integer(string=u'用户数', help=u'上行发送了（向公众号发送了）消息的用户数')
+    count_interval = fields.Selection([('0', u'0'), ('1', u'1-5'), ('2', u'6-10'),('3', u'10次以上'),],
+                                string=u'消息量分布区间',help=u'当日发送消息量分布的区间')
+
+
+
+
+
+
+class tl_weixin_upstreammsgmonth(models.Model):
+    """
+    获取消息发送月数据
+    """
+    _name = 'tl.weixin.upstreammsgmonth'
+    _rec_name = 'ref_date'
+    _order = 'ref_date'
+
+    @api.multi
+    def _get_ref_date_end(self):
+        # 计算出月末那一天
+        for each in self:
+            if each.ref_date:
+                y, m, d = time.strptime(self.ref_date, DEFAULT_SERVER_DATE_FORMAT)[0:3]
+                ref_date = datetime(y, m, d)
+                days_of_month = int(calendar.monthrange(ref_date.year, ref_date.month)[1])
+                each.ref_date_end = ref_date + timedelta(days_of_month - 1)
+
+
+    app_id = fields.Many2one('tl.weixin.app', required=True, string=u'微信公众号', help=u'发送消息的公众号')
+    company_id = fields.Many2one('res.company', u'公司', default=lambda self: self.env.user.company_id, help=u"所属公司")
+    ref_date = fields.Date(u'数据开始日期')
+    ref_date_end = fields.Date(u'数据截止日期', compute=_get_ref_date_end)
+    detail_ids = fields.One2many('tl.weixin.upstreammsgmonth.detail', 'upstreammsgmonth_id')
+    detail2_ids = fields.One2many('tl.weixin.upstreammsgmonth.detail2', 'upstreammsgmonth_id')
+
+
+
+
+class tl_weixin_upstreammsgmonth_detail(models.Model):
+    """
+    获取消息发送月数据详细
+    """
+    _name = 'tl.weixin.upstreammsgmonth.detail'
+
+    upstreammsgmonth_id = fields.Many2one('tl.weixin.upstreammsgmonth', cascade='ondelete')
+
+    user_source = fields.Selection([('0', u'会话'), ('1', u'好友'), ('2', u'朋友圈'),('3', u'腾讯微博'),('4', u'历史消息'), ('5', u'其它')],
+                                   string=u'用户渠道',help=u'代表用户从哪里进入来阅读该图文')
+    msg_type = fields.Selection([(1, u'文字'), (2, u'图片'), (3, u'语音'),(4, u'视频'),(6, u'第三方应用消息（链接消息）')],string=u'消息类型',help=u'消息类型')
+    msg_user = fields.Integer(string=u'用户数', help=u'上行发送了（向公众号发送了）消息的用户数')
+    msg_count = fields.Integer(string=u'消息总数', help=u'上行发送了消息的消息总数')
+
+
+class tl_weixin_upstreammsgmonth_detail2(models.Model):
+    """
+    获取消息发送周月布数据详细
+    """
+    _name = 'tl.weixin.upstreammsgmonth.detail2'
+
+    upstreammsgmonth_id = fields.Many2one('tl.weixin.upstreammsgmonth', cascade='ondelete')
+    user_source = fields.Selection([('0', u'会话'), ('1', u'好友'), ('2', u'朋友圈'),('3', u'腾讯微博'),('4', u'历史消息'), ('5', u'其它')],
+                                   string=u'用户渠道',help=u'代表用户从哪里进入来阅读该图文')
+    msg_user = fields.Integer(string=u'用户数', help=u'上行发送了（向公众号发送了）消息的用户数')
+    count_interval = fields.Selection([('0', u'0'), ('1', u'1-5'), ('2', u'6-10'),('3', u'10次以上'),],
+                                string=u'消息量分布区间',help=u'当日发送消息量分布的区间')
+
+
+
+## 接口分析数据
+
+class tl_weixin_interfacesummary(models.Model):
+    """
+    接口分析数据
+    """
+    _name = 'tl.weixin.interfacesummary'
+    _rec_name = 'ref_date'
+    _order = 'ref_date'
+
+    app_id = fields.Many2one('tl.weixin.app', required=True, string=u'微信公众号', help=u'发送消息的公众号')
+    company_id = fields.Many2one('res.company', u'公司', default=lambda self: self.env.user.company_id, help=u"所属公司")
+    ref_date = fields.Date(u'数据开始日期')
+    hour_ids = fields.One2many('tl.weixin.interfacesummaryhour', 'day_id')
+    callback_count = fields.Integer(string=u'回复用户次数', help=u'通过服务器配置地址获得消息后，被动回复用户消息的次数')
+    fail_count = fields.Integer(string=u'失败次数', help=u'通过服务器配置地址获得消息后，被动回复用户消息失败的次数')
+    total_time_cost = fields.Integer(string=u'总耗时', help=u'总耗时，除以callback_count即为平均耗时')
+    max_time_cost = fields.Integer(string=u'最大耗时', help=u'最大耗时')
+
+
+
+class tl_weixin_interfacesummaryhour(models.Model):
+    """
+    接口分析分时数据
+    """
+    _name = 'tl.weixin.interfacesummaryhour'
+
+    day_id = fields.Many2one('tl.weixin.interfacesummary', cascade='ondelete')
+    callback_count = fields.Integer(string=u'回复用户次数', help=u'通过服务器配置地址获得消息后，被动回复用户消息的次数')
+    fail_count = fields.Integer(string=u'失败次数', help=u'通过服务器配置地址获得消息后，被动回复用户消息失败的次数')
+    total_time_cost = fields.Integer(string=u'总耗时', help=u'总耗时，除以callback_count即为平均耗时')
+    max_time_cost = fields.Integer(string=u'最大耗时', help=u'最大耗时')
+    ref_hour = fields.Selection(
+        [('000', u'[000,100)'), ('100', u'[100,200)'), ('200', u'[200,300)'),
+         ('300', u'[300,400)'), ('400', u'[400,500)'), ('500', u'[500,600)'),
+        ('600', u'[600,700)'), ('700', u'[700,800)'), ('800', u'[800,900)'),
+        ('900', u'[900,1000)'), ('1000', u'[1000,1100)'), ('1100', u'[1100,1200)'),
+        ('1200', u'[1200,1300)'), ('1300', u'[1300,1400)'), ('1400', u'[1400,1500)'),
+        ('1500', u'[1500,1600)'), ('1600', u'[1600,1700)'), ('1700', u'[1700,1800)'),
+        ('1800', u'[1800,1900)'), ('1900', u'[1900,2000)'), ('2000', u'[2000,2100)'),
+        ('2100', u'[2100,2200)'), ('2200', u'[2200,2300)'), ('2300', u'[2300,2400)'),],
+        string=u'小时数据',help=u'数据的小时')
+
+
+
+
+
+
+
+### EEEEE

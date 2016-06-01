@@ -144,12 +144,15 @@ class Home(http.Controller):
         event_id = redirect.source+str(redirect.time)
         if event_id in MsgId:
             return ''
+        ids = self.obj_users.search(cr, SUPERUSER_ID, [('openid', '=', redirect.source),
+                                                       ('app_id', '=', context['account_id'])])
         MsgId[event_id] = event_id
         context['property'] = u'链接'
         context['property_note'] = redirect.raw
         # 创建或者更新关注着信息
-        self.obj_users.create(cr, SUPERUSER_ID, context['account_id'], redirect.source,
-                                                       context)
+        # self.obj_users.create(cr, SUPERUSER_ID, context['account_id'], redirect.source,
+        #                                                context)
+        self.obj_users.create_or_update_user_by_openid(cr, SUPERUSER_ID, context['account_id'], redirect.source, context)
         val = {
             'to_user_name': redirect.target,
             'from_user_name': redirect.source,
@@ -160,8 +163,15 @@ class Home(http.Controller):
             'msg_event_id':event_id,
             'app_id': context['account_id']
         }
+        print(val)
+        # 取出用户在系统的ID
+        o = self.obj_users.browse(cr, SUPERUSER_ID, ids, context)
+        client_o = Client(pool, cr, o.app_id.id, o.app_id.appid,
+                          o.app_id.appsecret, o.app_id.access_token,
+                          o.app_id.token_expires_at)
+
         self.obj_message_history.create(cr, SUPERUSER_ID, val,context)
-        del MsgId[str(redirect.id)]
+        del MsgId[event_id]
         return ''
 
     def user_post_message_view(self, cr, pool, uid, redirect, kw, context):
@@ -188,7 +198,7 @@ class Home(http.Controller):
             'app_id': context['account_id']
         }
         self.obj_message_history.create(cr, SUPERUSER_ID, val,context)
-        del MsgId[str(redirect.id)]
+        del MsgId[event_id]
         return ''
 
     def user_post_message_link(self, cr, pool, uid, redirect, kw, context):
@@ -220,7 +230,7 @@ class Home(http.Controller):
             'app_id': context['account_id']
         }
         self.obj_message_history.create(cr, SUPERUSER_ID, val,context)
-        del MsgId[str(redirect.id)]
+        del MsgId[event_id]
         return ''
 
     def user_post_message_image(self, cr, pool, uid, redirect, kw, context):
@@ -676,4 +686,3 @@ class TlweixinClient(http.Controller):
             return True
         except:
             return False
-        
